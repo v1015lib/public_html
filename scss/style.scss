@@ -1,0 +1,39 @@
+// scss/style.scss
+
+// Importar variables y mixins primero
+@import 'vars';
+@import 'mixins'; // Este archivo estará vacío por ahora, pero lo preparamos
+
+// Estilos base
+@import 'base';
+
+// Componentes
+@import 'header';
+@import 'sidemenu';
+@import 'product_card';
+@import 'pagination';
+
+// Responsividad
+@import 'responsive';
+
+// Estilos para el layout general
+.main-container {
+    display: flex;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: $spacing-unit; // Agrega un poco de padding alrededor
+}
+
+.products-container {
+    flex-grow: 1; // Ocupa el espacio restante
+    padding: $spacing-unit;
+    overflow-y: auto; // Permitir scroll solo en el contenedor de productos
+    height: calc(100vh - 80px); /* Ajusta esto según la altura de tu header */
+    /* La altura se ajustará con JS para que el scroll sea solo en esta área */
+}
+
+.product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: $spacing-unit;
+}

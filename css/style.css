@@ -1,0 +1,222 @@
+@charset "UTF-8";
+*, *::before, *::after {
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  line-height: 1.6;
+  color: #343a40;
+  background-color: #f8f9fa;
+}
+
+a {
+  color: #007bff;
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+
+ul {
+  list-style: none;
+}
+
+.main-header {
+  background-color: #007bff;
+  color: white;
+  padding: 1rem;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+.main-header .header-content {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.main-header .logo a {
+  color: white;
+  font-size: 1.5rem;
+  font-weight: bold;
+  text-decoration: none;
+}
+.main-header .search-bar {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+.main-header .search-bar input[type=text] {
+  padding: 0.5rem;
+  border: none;
+  border-radius: 4px 0 0 4px;
+  width: 200px;
+}
+.main-header .search-bar button {
+  background-color: #0062cc;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 0 4px 4px 0;
+  cursor: pointer;
+}
+.main-header .search-bar button:hover {
+  background-color: #0056b3;
+}
+.main-header .main-nav ul {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+.main-header .main-nav ul li {
+  margin-left: 1rem;
+}
+.main-header .main-nav ul li a {
+  color: white;
+}
+.main-header .main-nav ul li a:hover {
+  text-decoration: underline;
+}
+.main-header .mobile-menu-toggle {
+  display: none;
+  font-size: 2rem;
+  cursor: pointer;
+}
+
+.sidemenu {
+  width: 250px;
+  -ms-flex-negative: 0;
+      flex-shrink: 0;
+  background-color: #fff;
+  border-right: 1px solid #dee2e6;
+  padding: 1rem;
+  position: sticky;
+  top: 80px;
+  height: calc(100vh - 80px);
+  overflow-y: auto;
+}
+.sidemenu .sidemenu-header {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  margin-bottom: 1rem;
+}
+.sidemenu .sidemenu-header h3 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+.sidemenu .sidemenu-header .close-sidemenu {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 2rem;
+  cursor: pointer;
+  color: #343a40;
+}
+.sidemenu ul li {
+  margin-bottom: 0.5rem;
+}
+.sidemenu ul li a {
+  display: block;
+  padding: 0.5rem 0;
+  color: #343a40;
+}
+.sidemenu ul li a:hover {
+  color: #007bff;
+  text-decoration: none;
+}
+
+@media (max-width: 768px) {
+  .main-header .search-bar {
+    width: 100%;
+    margin-top: 10px;
+  }
+  .main-header .search-bar input[type=text] {
+    width: calc(100% - 70px);
+  }
+  .main-header .main-nav {
+    display: none;
+  }
+  .main-header .mobile-menu-toggle {
+    display: block;
+  }
+  .main-header .header-content {
+    -ms-flex-wrap: wrap;
+        flex-wrap: wrap;
+    -webkit-box-pack: center;
+        -ms-flex-pack: center;
+            justify-content: center;
+  }
+  .main-container {
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+        -ms-flex-direction: column;
+            flex-direction: column;
+    padding: 0;
+  }
+  .sidemenu {
+    position: fixed;
+    top: 0;
+    left: -100%;
+    width: 75%;
+    height: 100vh;
+    z-index: 2000;
+    -webkit-transition: left 0.3s ease-in-out;
+    transition: left 0.3s ease-in-out;
+    -webkit-box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+  }
+  .sidemenu.active {
+    left: 0;
+  }
+  .sidemenu .sidemenu-header .close-sidemenu {
+    display: block;
+  }
+  .products-container {
+    width: 100%;
+    height: auto;
+    padding: 1rem;
+  }
+}
+.main-container {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.products-container {
+  -webkit-box-flex: 1;
+      -ms-flex-positive: 1;
+          flex-grow: 1;
+  padding: 1rem;
+  overflow-y: auto;
+  height: calc(100vh - 80px); /* Ajusta esto según la altura de tu header */
+  /* La altura se ajustará con JS para que el scroll sea solo en esta área */
+}
+
+.product-grid {
+  display: -ms-grid;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1rem;
+}

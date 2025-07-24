@@ -1,0 +1,61 @@
+// scss/_responsive.scss
+@import 'vars';
+
+// Media Queries
+@media (max-width: $breakpoint-tablet) {
+    .main-header {
+        .search-bar {
+            width: 100%;
+            margin-top: 10px;
+            input[type="text"] {
+                width: calc(100% - 70px); // Ajustar el ancho del input
+            }
+        }
+        .main-nav {
+            display: none; // Ocultar navegación principal en móviles
+        }
+        .mobile-menu-toggle {
+            display: block; // Mostrar icono de hamburguesa
+        }
+        .header-content {
+            flex-wrap: wrap; // Permite que los elementos se envuelvan
+            justify-content: center;
+        }
+    }
+
+    .main-container {
+        flex-direction: column; // Columnas en móviles
+        padding: 0; // Quitar padding para que el sidemenu pueda ocupar el ancho completo
+    }
+
+    .sidemenu {
+        position: fixed; // Overlay en móviles
+        top: 0;
+        left: -100%; // Oculto por defecto
+        width: 75%; // Ocupa 75% del ancho del dispositivo
+        height: 100vh;
+        z-index: 2000;
+        transition: left 0.3s ease-in-out;
+        box-shadow: 2px 0 5px rgba(0,0,0,0.2);
+
+        &.active {
+            left: 0; // Visible cuando tiene la clase 'active'
+        }
+
+        .sidemenu-header {
+            .close-sidemenu {
+                display: block; // Mostrar botón de cerrar en móviles
+            }
+        }
+    }
+
+    .products-container {
+        width: 100%; // Ocupa todo el ancho en móviles
+        height: auto; // Altura automática
+        padding: $spacing-unit; // Restaurar padding para el contenido
+    }
+}
+
+@media (min-width: $breakpoint-tablet) and (max-width: $breakpoint-desktop) {
+    // Estilos específicos para tablets si es necesario
+}

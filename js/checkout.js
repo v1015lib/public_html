@@ -5,9 +5,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (sendButton) {
         sendButton.addEventListener('click', async (event) => {
-            // No prevenimos el comportamiento por defecto (abrir el enlace),
-            // pero sí realizamos una acción justo antes.
+            // Prevenimos que el enlace se abra inmediatamente
+            event.preventDefault(); 
             
+            // Guardamos la URL de WhatsApp para usarla después
+            const whatsappUrl = sendButton.href;
+
             try {
                 const response = await fetch('api/index.php?resource=cart-checkout', {
                     method: 'POST'
@@ -21,17 +24,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 if (data.success) {
                     console.log('El carrito se ha marcado como completado.');
-                    // Opcional: limpiar el carrito en el frontend inmediatamente
-                    // y redirigir a una página de "gracias".
-                    // Por ahora, simplemente dejamos que el enlace de WhatsApp se abra.
+                    
+                    // Abrimos el enlace de WhatsApp en una nueva pestaña
+                    window.open(whatsappUrl, '_blank');
+                    
+                    // ======================================================
+                    // REDIRECCIÓN A LA PÁGINA DE INICIO (AÑADIDA AQUÍ)
+                    // ======================================================
+                    alert('¡Pedido enviado! Serás redirigido al inicio.');
+                    window.location.href = 'index.php';
+
                 } else {
-                    // Si falla, prevenimos la redirección y mostramos un error
-                    event.preventDefault();
                     alert('Hubo un problema al finalizar tu compra. Por favor, intenta de nuevo.');
                 }
 
             } catch (error) {
-                event.preventDefault();
                 console.error("Error en el checkout:", error);
                 alert('Error de conexión al finalizar la compra. Por favor, intenta de nuevo.');
             }

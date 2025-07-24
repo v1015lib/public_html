@@ -19,11 +19,22 @@ async function getCartState() {
     }
 }
 
+// --- NUEVO: Función para obtener los favoritos del usuario ---
+async function getUserFavorites() {
+    try {
+        const response = await fetch('api/index.php?resource=favorites');
+        if (!response.ok) return new Set();
+        const favoriteIds = await response.json();
+        // Convertimos el array de IDs en un Set para búsquedas rápidas
+        return new Set(favoriteIds.map(id => parseInt(id, 10)));
+    } catch (error) {
+        console.error("No se pudieron cargar los favoritos:", error);
+        return new Set();
+    }
+}
+
 export async function loadProducts(productListId, paginationControlsId, params = {}) {
-    // Esta línea combina los parámetros viejos y nuevos. `department_id: null`
-    // sobrescribirá cualquier valor anterior.
     currentProductParams = { ...currentProductParams, ...params };
-    
     currentProductParams.page = params.page || 1;
     const productListElement = document.getElementById(productListId);
     const paginationControlsElement = document.getElementById(paginationControlsId);
@@ -41,11 +52,11 @@ export async function loadProducts(productListId, paginationControlsId, params =
     productListElement.innerHTML = '<div class="loading-spinner">Cargando...</div>';
     paginationControlsElement.innerHTML = '';
     
-    const cartState = await getCartState();
+    // Obtenemos el estado del carrito Y los favoritos del usuario
+    const [cartState, userFavorites] = await Promise.all([getCartState(), getUserFavorites()]);
 
     const urlParams = new URLSearchParams({ resource: 'products' });
     for (const key in currentProductParams) {
-        // --- CORRECCIÓN CLAVE: Ignoramos los parámetros que sean null ---
         if (currentProductParams[key] !== null && currentProductParams[key] !== undefined) {
             urlParams.append(key, currentProductParams[key]);
         }
@@ -64,8 +75,12 @@ export async function loadProducts(productListId, paginationControlsId, params =
         if (data.products && data.products.length > 0) {
             data.products.forEach(product => {
                 const currentQuantity = cartState[product.id_producto] || 0;
+                // Verificamos si el producto está en la lista de favoritos
+                const isFavorite = userFavorites.has(parseInt(product.id_producto, 10));
+
                 const productCardHtml = `
                     <div class="product-card" data-product-id="${product.id_producto}">
+                        <button class="favorite-btn ${isFavorite ? 'is-favorite' : ''}" data-product-id="${product.id_producto}" aria-label="Añadir a favoritos">❤️</button>
                         <div class="product-image-container">
                             <img src="${product.url_imagen || 'https://via.placeholder.com/200'}" alt="${product.nombre_producto}">
                         </div>

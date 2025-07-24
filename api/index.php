@@ -1,7 +1,8 @@
 <?php
-// api/index.php (Versión corregida y completa)
+// api/index.php (Versión final y completa con favoritos)
 
 ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 header('Content-Type: application/json');
@@ -21,22 +22,35 @@ try {
             handleDepartmentsRequest($pdo);
             break;
         case 'cart':
-            if ($method === 'POST' || $method === 'PUT') handleSetCartItemRequest($pdo);
-            elseif ($method === 'DELETE') handleDeleteCartItemRequest($pdo);
+            if ($method === 'POST' || $method === 'PUT') {
+                handleSetCartItemRequest($pdo);
+            } elseif ($method === 'DELETE') {
+                handleDeleteCartItemRequest($pdo);
+            }
             break;
         case 'cart-status':
-             if ($method === 'GET') handleCartStatusRequest($pdo);
+             if ($method === 'GET') {
+                handleCartStatusRequest($pdo);
+            }
             break;
         case 'cart-details':
-            if ($method === 'GET') handleCartDetailsRequest($pdo);
+            if ($method === 'GET') {
+                handleCartDetailsRequest($pdo);
+            }
             break;
-        // --- RUTA CORREGIDA PARA FINALIZAR LA COMPRA ---
         case 'cart-checkout':
             if ($method === 'POST') {
                 handleCheckoutRequest($pdo);
-            } else {
-                http_response_code(405); // Method Not Allowed
-                echo json_encode(['error' => 'Método no permitido. Se esperaba POST.']);
+            }
+            break;
+        // --- NUEVA RUTA PARA MANEJAR FAVORITOS ---
+        case 'favorites':
+            if ($method === 'GET') {
+                handleGetFavoritesRequest($pdo);
+            } elseif ($method === 'POST') {
+                handleAddFavoriteRequest($pdo);
+            } elseif ($method === 'DELETE') {
+                handleRemoveFavoriteRequest($pdo);
             }
             break;
         default:
@@ -44,60 +58,73 @@ try {
             echo json_encode(['error' => 'Recurso no especificado o no válido.']);
             break;
     }
+} catch (PDOException $e) {
+    http_response_code(500);
+    error_log("Error en la API (PDOException): " . $e->getMessage());
+    echo json_encode(['error' => 'Error interno del servidor (BD): ' . $e->getMessage()]);
 } catch (Exception $e) {
     http_response_code(500);
-    echo json_encode(['error' => 'Error: ' . $e->getMessage()]);
+    error_log("Error en la API (General Exception): " . $e->getMessage());
+    echo json_encode(['error' => 'Error inesperado del servidor: ' . $e->getMessage()]);
 }
 
 
-// --- FUNCIÓN DE CHECKOUT CORREGIDA Y MÁS ROBUSTA ---
-function handleCheckoutRequest(PDO $pdo) {
-    $client_id = 1;
+// =======================================================================
+// NUEVAS FUNCIONES PARA MANEJAR FAVORITOS
+// =======================================================================
 
-    $cart_id = getOrCreateCart($pdo, $client_id);
-    if (!$cart_id) {
-        // No se puede finalizar una compra si no hay carrito
-        http_response_code(404); // Not Found
-        echo json_encode(['error' => 'No se encontró un carrito activo para finalizar.']);
-        return;
-    }
+function handleGetFavoritesRequest(PDO $pdo) {
+    $client_id = 1; // Simulación de usuario
+    $stmt = $pdo->prepare("SELECT id_producto FROM favoritos WHERE id_cliente = :client_id");
+    $stmt->execute([':client_id' => $client_id]);
+    $favorites = $stmt->fetchAll(PDO::FETCH_COLUMN, 0); // Devuelve un array simple de IDs de producto
+    echo json_encode($favorites);
+}
+
+function handleAddFavoriteRequest(PDO $pdo) {
+    $data = json_decode(file_get_contents('php://input'), true);
+    if (!isset($data['product_id'])) throw new Exception('Falta el ID del producto.');
     
-    // Cambiamos el estado del carrito de 1 (activo) a 2 (completado)
-    $stmt = $pdo->prepare("UPDATE carritos_compra SET estado_id = 20 WHERE id_carrito = :cart_id AND id_cliente = :client_id AND estado_id = 1");
-    $stmt->execute([':cart_id' => $cart_id, ':client_id' => $client_id]);
+    $product_id = (int)$data['product_id'];
+    $client_id = 1; // Simulación de usuario
 
-    // rowCount() > 0 significa que la actualización fue exitosa.
-    if ($stmt->rowCount() > 0) {
-        echo json_encode(['success' => true, 'message' => 'Compra finalizada con éxito.']);
-    } else {
-        // Esto puede pasar si el carrito ya estaba vacío o ya se había finalizado.
-        // Lo tratamos como un éxito para el usuario, ya que el estado final es el deseado.
-        echo json_encode(['success' => true, 'message' => 'El carrito ya estaba procesado o vacío.']);
-    }
+    // Usamos INSERT IGNORE para evitar errores si el favorito ya existe
+    $stmt = $pdo->prepare("INSERT IGNORE INTO favoritos (id_cliente, id_producto) VALUES (:client_id, :product_id)");
+    $stmt->execute([':client_id' => $client_id, ':product_id' => $product_id]);
+
+    echo json_encode(['success' => true, 'message' => 'Producto añadido a favoritos.']);
 }
 
-// --- LÓGICA DEL CARRITO CORREGIDA Y MEJORADA ---
+function handleRemoveFavoriteRequest(PDO $pdo) {
+    $data = json_decode(file_get_contents('php://input'), true);
+    if (!isset($data['product_id'])) throw new Exception('Falta el ID del producto.');
+
+    $product_id = (int)$data['product_id'];
+    $client_id = 1; // Simulación de usuario
+
+    $stmt = $pdo->prepare("DELETE FROM favoritos WHERE id_cliente = :client_id AND id_producto = :product_id");
+    $stmt->execute([':client_id' => $client_id, ':product_id' => $product_id]);
+
+    echo json_encode(['success' => true, 'message' => 'Producto eliminado de favoritos.']);
+}
+
+
+// --- FUNCIONES EXISTENTES (SIN CAMBIOS) ---
 
 function handleSetCartItemRequest(PDO $pdo) {
     $data = json_decode(file_get_contents('php://input'), true);
-    if (!isset($data['product_id']) || !isset($data['quantity'])) {
-        throw new Exception('Faltan datos del producto o cantidad.');
-    }
-
+    if (!isset($data['product_id']) || !isset($data['quantity'])) throw new Exception('Faltan datos.');
     $product_id = (int)$data['product_id'];
     $quantity = (int)$data['quantity'];
     $client_id = 1;
-
     $pdo->beginTransaction();
     $cart_id = getOrCreateCart($pdo, $client_id);
-
     if ($quantity <= 0) {
         deleteCartItem($pdo, $cart_id, $product_id);
     } else {
         $stmt_check = $pdo->prepare("SELECT id_detalle_carrito FROM detalle_carrito WHERE id_carrito = :cart_id AND id_producto = :product_id");
         $stmt_check->execute([':cart_id' => $cart_id, ':product_id' => $product_id]);
         $detail_id = $stmt_check->fetchColumn();
-
         if ($detail_id) {
             $stmt_update = $pdo->prepare("UPDATE detalle_carrito SET cantidad = :quantity WHERE id_detalle_carrito = :detail_id");
             $stmt_update->execute([':quantity' => $quantity, ':detail_id' => $detail_id]);
@@ -106,7 +133,6 @@ function handleSetCartItemRequest(PDO $pdo) {
             $stmt_price->execute([':product_id' => $product_id]);
             $unit_price = $stmt_price->fetchColumn();
             if ($unit_price === false) throw new Exception("Producto no encontrado.");
-
             $stmt_insert = $pdo->prepare("INSERT INTO detalle_carrito (id_carrito, id_producto, cantidad, precio_unitario) VALUES (:cart_id, :product_id, :quantity, :unit_price)");
             $stmt_insert->execute([':cart_id' => $cart_id, ':product_id' => $product_id, ':quantity' => $quantity, ':unit_price' => $unit_price]);
         }
@@ -141,26 +167,14 @@ function deleteCartItem(PDO $pdo, int $cart_id, int $product_id) {
     $stmt->execute([':cart_id' => $cart_id, ':product_id' => $product_id]);
 }
 
-
-// --- FUNCIÓN DE ESTADO DEL CARRITO MODIFICADA ---
 function handleCartStatusRequest(PDO $pdo) {
     $client_id = 1; 
-    
-    // Ahora calculamos la suma total en lugar de contar los items.
-    $stmt = $pdo->prepare(
-        "SELECT SUM(dc.cantidad * dc.precio_unitario) as total_price
-         FROM detalle_carrito dc
-         JOIN carritos_compra cc ON dc.id_carrito = cc.id_carrito
-         WHERE cc.id_cliente = :client_id AND cc.estado_id = 1"
-    );
+    $stmt = $pdo->prepare("SELECT SUM(dc.cantidad * dc.precio_unitario) as total_price FROM detalle_carrito dc JOIN carritos_compra cc ON dc.id_carrito = cc.id_carrito WHERE cc.id_cliente = :client_id AND cc.estado_id = 1");
     $stmt->execute([':client_id' => $client_id]);
     $result = $stmt->fetch(PDO::FETCH_ASSOC);
-    
     $total_price = $result['total_price'] ? number_format($result['total_price'], 2, '.', '') : '0.00';
-    
     echo json_encode(['total_price' => $total_price]);
 }
-
 
 function handleCartDetailsRequest(PDO $pdo) {
     $client_id = 1;
@@ -175,10 +189,25 @@ function handleCartDetailsRequest(PDO $pdo) {
     $stmt_items->execute([':cart_id' => $cart_id]);
     $cart_items = $stmt_items->fetchAll(PDO::FETCH_ASSOC);
     $total = 0;
-    foreach ($cart_items as $item) {
-        $total += $item['subtotal'];
-    }
+    foreach ($cart_items as $item) $total += $item['subtotal'];
     echo json_encode(['cart_items' => $cart_items, 'total' => number_format($total, 2, '.', '')]);
+}
+
+function handleCheckoutRequest(PDO $pdo) {
+    $client_id = 1;
+    $cart_id = getOrCreateCart($pdo, $client_id);
+    if (!$cart_id) {
+        http_response_code(404);
+        echo json_encode(['error' => 'No se encontró un carrito activo para finalizar.']);
+        return;
+    }
+    $stmt = $pdo->prepare("UPDATE carritos_compra SET estado_id = 20 WHERE id_carrito = :cart_id AND id_cliente = :client_id AND estado_id = 1");
+    $stmt->execute([':cart_id' => $cart_id, ':client_id' => $client_id]);
+    if ($stmt->rowCount() > 0) {
+        echo json_encode(['success' => true, 'message' => 'Compra finalizada con éxito.']);
+    } else {
+        echo json_encode(['success' => true, 'message' => 'El carrito ya estaba procesado o vacío.']);
+    }
 }
 
 function handleProductsRequest(PDO $pdo) {

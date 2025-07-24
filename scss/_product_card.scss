@@ -1,52 +1,27 @@
 // scss/_product_card.scss
 @import 'vars';
 
-// --- 1. TU ESTRUCTURA DE GRID (SIN CAMBIOS) ---
 .product-grid {
     display: grid;
     gap: 1.5rem;
     grid-template-columns: repeat(2, 1fr);
 }
+@media (max-width: 320px) { .product-grid { width: 60vw; margin: auto; grid-template-columns: repeat(1, 1fr); } }
+@media (min-width: 600px) { .product-grid { grid-template-columns: repeat(4, 1fr); } }
+@media (min-width: 992px) { .product-grid { grid-template-columns: repeat(5, 1fr); } }
+@media (min-width: 1024px) { .product-grid { grid-template-columns: repeat(4, 1fr); } }
+@media (min-width: 1400px) { .product-grid { grid-template-columns: repeat(6, 1fr); } }
 
-@media (max-width: 320px) {
-    .product-grid {
-        width: 60vw;
-        margin: auto;
-        grid-template-columns: repeat(1, 1fr);
-    }
-}
-@media (min-width: 600px) {
-    .product-grid {
-        grid-template-columns: repeat(4, 1fr);
-    }
-}
-@media (min-width: 992px) {
-    .product-grid {
-        grid-template-columns: repeat(5, 1fr);
-    }
-}
-@media (min-width: 1024px) {
-    .product-grid {
-        grid-template-columns: repeat(4, 1fr);
-    }
-}
-@media (min-width: 1400px) {
-    .product-grid {
-        grid-template-columns: repeat(6, 1fr);
-    }
-}
-
-// --- 2. DISEÑO DE LA TARJETA (CON ESTILOS INTEGRADOS) ---
 .product-card {
+    position: relative; // Necesario para posicionar el botón de favoritos
     display: flex;
-    flex-direction: column; 
+    flex-direction: column;
     background: #ffffff;
     border-radius: 10px;
     justify-content: center;
     align-items: center;
     box-shadow: 0 4px 15px rgba(0,0,0,0.05);
     transition: all 0.3s ease;
-
     &:hover {
         transform: translateY(-5px);
         box-shadow: 0 8px 25px rgba(0,0,0,0.08);
@@ -60,7 +35,6 @@
     align-items: center;
     justify-content: center;
     background-color: #fdfdfd;
-    
     img {
         width: 100%;
         height: auto;
@@ -72,28 +46,27 @@
 
 .product-info {
     display: flex;
-    flex-direction: column; 
+    flex-direction: column;
     justify-content: center;
     padding: .5em;
     width: 100%;
     height: 200px;
 }
 
-// Estilos del texto dentro de .product-info
 h3 {
     font-size: 1rem;
     font-weight: 600;
     color: #2c3e50;
     line-height: 1.4;
     margin-bottom: 0.25rem;
-    height: 2.8em; 
+    height: 2.8em;
     overflow: hidden;
 }
 
 p.department {
     font-size: 0.85rem;
     color: $primary-color;
-    margin-bottom: auto; 
+    margin-bottom: auto;
     padding-bottom: 0.5rem;
 }
 
@@ -119,14 +92,10 @@ p.code {
     font-weight: normal;
 }
 
-// ===========================================
-// ESTILOS PARA EL NUEVO CONTADOR DE CANTIDAD
-// ===========================================
 .quantity-selector {
     display: flex;
     align-items: center;
-    margin-top: 1rem; // Espacio superior
-    
+    margin-top: 1rem;
     .quantity-input {
         width: 50px;
         text-align: center;
@@ -136,24 +105,21 @@ p.code {
         font-size: 1rem;
         font-weight: bold;
         padding: 0.5rem 0;
-        -moz-appearance: textfield; // Oculta flechas en Firefox
-
+        -moz-appearance: textfield;
         &:focus {
             outline: 2px solid $primary-color;
             position: relative;
             z-index: 2;
         }
-
         &::-webkit-outer-spin-button,
         &::-webkit-inner-spin-button {
-            -webkit-appearance: none; // Oculta flechas en Chrome/Safari
+            -webkit-appearance: none;
             margin: 0;
         }
     }
-
     .quantity-btn {
         width: 35px;
-        height: 38px; // Para alinear altura con el input
+        height: 38px;
         border: 1px solid #ddd;
         background-color: #f5f5f5;
         color: #333;
@@ -161,16 +127,40 @@ p.code {
         font-weight: bold;
         cursor: pointer;
         transition: background-color 0.2s ease;
+        &:hover { background-color: #e0e0e0; }
+        &.minus { border-radius: 5px 0 0 5px; }
+        &.plus { border-radius: 0 5px 5px 0; }
+    }
+}
 
-        &:hover {
-            background-color: #e0e0e0;
-        }
+// --- ESTILOS PARA EL BOTÓN DE FAVORITOS ---
+.favorite-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 1.2rem;
+    color: #ccc; // Corazón gris por defecto
+    transition: all 0.2s ease;
+    z-index: 5;
 
-        &.minus {
-            border-radius: 5px 0 0 5px;
-        }
-        &.plus {
-            border-radius: 0 5px 5px 0;
-        }
+    &:hover {
+        color: #ff8a80;
+        transform: scale(1.1);
+    }
+
+    // Estilo para cuando es favorito (MODIFICADO)
+    &.is-favorite {
+        color: #fff; /* Corazón blanco */
+        border-color: #ff5252; /* Borde rojo */
+        background-color: #ff5252; /* Fondo rojo */
     }
 }

@@ -1,25 +1,40 @@
 // scss/style.scss
+
+// Importar variables y mixins primero
 @import 'vars';
+@import 'mixins';
+
+// Estilos base
 @import 'base';
+
+// Componentes
 @import 'header';
 @import 'sidemenu';
 @import 'product_card';
+@import 'cart_panel'; // <-- AQUÍ SE IMPORTA EL NUEVO PANEL
 @import 'pagination';
+
+// Responsividad
 @import 'responsive';
 
-.main-header {
-    flex-shrink: 0; // Evita que el header se encoja
-}
-
+// Estilos para el layout general
 .main-container {
     display: flex;
-    flex-grow: 1; // Ocupa todo el espacio vertical sobrante
-    overflow: hidden; // Previene scrolls inesperados aquí
-    background-color: #f4f7f9;
+    flex-grow: 1;
+    overflow: hidden;
 }
 
 .products-container {
-    flex-grow: 1; // Ocupa el espacio horizontal restante
-    overflow-y: auto; // <-- ESTE es el único contenedor que tendrá scroll vertical
-    padding: $spacing-unit * 1.5;
+    flex-grow: 1;
+    padding: 1.5rem;
+    overflow-y: auto;
+}
+
+// Estilos para el contador de resultados
+.results-summary-style {
+    margin-bottom: 1.5rem;
+    font-size: 1.1rem;
+    color: #555;
+    padding-left: 0.5rem;
+    border-left: 3px solid #007bff;
 }

@@ -1,34 +1,35 @@
 // js/main.js
 
-import { loadProducts, setupPagination } from './ajax/product_loader.js';
+import { loadProducts } from './ajax/product_loader.js';
 import { initializeSearch } from './ajax/search_handler.js';
 import { setupMobileMenu } from './mobile_menu.js';
 
-// Define la URL base de tu API aquí.
-// ¡AJUSTA ESTO PARA QUE COINCIDA CON TU CONFIGURACIÓN EXACTA DE XAMPP!
+// Define la URL base de tu API.
 const API_BASE_URL = 'api/index.php'; 
 
 document.addEventListener('DOMContentLoaded', () => {
     console.log('DOM completamente cargado y parseado.');
 
+    // 1. Inicializa el menú móvil
     setupMobileMenu();
-    loadDepartments(); // <--- Esta es la llamada inicial a la función
+    
+    // 2. Carga los departamentos en el menú lateral
+    loadDepartments(); 
 
-    // Cargar productos iniciales (aleatorios por defecto)
+    // 3. Carga los productos iniciales
     loadProducts('product-list', 'pagination-controls', { sortBy: 'random', apiBaseUrl: API_BASE_URL });
 
-    // Inicializar la búsqueda en tiempo real
+    // 4. Inicializa la búsqueda
     initializeSearch('search-input', 'search-button', 'product-list', 'pagination-controls', API_BASE_URL);
 
-    // Manejar clics en los enlaces de departamento
+    // 5. Maneja los clics en los enlaces de departamento
     document.getElementById('sidemenu').addEventListener('click', (event) => {
         const target = event.target;
         if (target.matches('.department-link')) {
             event.preventDefault(); 
             const departmentId = target.dataset.departmentId;
-            console.log(`Cargando productos para departamento: ${departmentId}`);
 
-            let params = { apiBaseUrl: API_BASE_URL }; 
+            let params = { apiBaseUrl: API_BASE_URL, page: 1 }; // Resetea a la página 1
             if (departmentId !== 'all') {
                 params.departmentId = departmentId;
             } else {
@@ -36,84 +37,48 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             loadProducts('product-list', 'pagination-controls', params);
 
-            // Cerrar sidemenu en móviles después de la selección
-            const sidemenu = document.getElementById('sidemenu');
-            if (sidemenu.classList.contains('active')) {
-                sidemenu.classList.remove('active');
-            }
+            // Cierra el menú lateral en móviles después de la selección
+            document.getElementById('sidemenu').classList.remove('active');
         }
     });
-
-    // Ajustar la altura del contenedor de productos para el scroll
-    function adjustProductContainerHeight() {
-        const headerElement = document.querySelector('.main-header');
-        const productsContainer = document.querySelector('.products-container');
-        if (!headerElement || !productsContainer) return; 
-
-        const headerHeight = headerElement.offsetHeight;
-        
-        // Asegúrate de que el breakpoint de tablet (768) coincida con tu SCSS
-        if (window.innerWidth >= 768) { 
-            productsContainer.style.height = `calc(100vh - ${headerHeight}px)`;
-            productsContainer.style.overflowY = 'auto';
-        } else {
-            productsContainer.style.height = 'auto'; 
-            productsContainer.style.overflowY = 'visible'; 
-        }
-    }
-
-    adjustProductContainerHeight();
-    window.addEventListener('resize', adjustProductContainerHeight);
-
 });
 
 
-// Función para cargar departamentos
+// Función para cargar departamentos desde la API
 async function loadDepartments() {
     try {
-        // Asegúrate de que API_BASE_URL esté correcta aquí.
         const response = await fetch(`${API_BASE_URL}?resource=departments`); 
         
         if (!response.ok) {
-            const errorText = await response.text(); 
-            throw new Error(`Error HTTP! status: ${response.status}. Response: ${errorText}`);
+            throw new Error(`Error HTTP! status: ${response.status}`);
         }
 
-        const departments = await response.json(); // Parsea la respuesta como JSON
-        const sidemenuUl = document.querySelector('#sidemenu ul'); // Obtiene el <ul> en el sidemenu
+        const departments = await response.json();
+        const sidemenuUl = document.querySelector('#sidemenu nav ul');
 
         if (!sidemenuUl) {
             console.error('Elemento <ul> del sidemenu no encontrado.');
             return;
         }
 
-        // Limpiar departamentos existentes (excepto el primer <li> "Ver todos")
+        // Limpiar departamentos existentes (excepto el "Ver todos")
         sidemenuUl.querySelectorAll('li:not(:first-child)').forEach(li => li.remove());
 
-        // Verifica si 'departments' es realmente un array antes de iterar
         if (Array.isArray(departments)) {
             departments.forEach(dept => {
                 const li = document.createElement('li');
-                const a = document.createElement('a');
-                a.href = '#';
-                a.classList.add('department-link');
-                a.dataset.departmentId = dept.id_departamento; // Usa el ID del departamento para el filtro
-                a.textContent = dept.departamento; // Muestra el nombre del departamento
-                li.appendChild(a);
-                sidemenuUl.appendChild(li); // Añade el nuevo <li> al <ul>
+                li.innerHTML = `<a href="#" class="department-link" data-department-id="${dept.id_departamento}">${dept.departamento}</a>`;
+                sidemenuUl.appendChild(li);
             });
         } else {
             console.error('La respuesta de departamentos no es un array:', departments);
-            // Esto ocurriría si la API devolvió JSON, pero no era un array de departamentos
         }
     } catch (error) {
         console.error('Error al cargar departamentos:', error);
-        // Si hay un error, muestra un mensaje en el sidemenu
-        const sidemenuUl = document.querySelector('#sidemenu ul');
+        const sidemenuUl = document.querySelector('#sidemenu nav ul');
         if (sidemenuUl) {
-             sidemenuUl.querySelectorAll('li:not(:first-child)').forEach(li => li.remove());
              const errorLi = document.createElement('li');
-             errorLi.textContent = 'Error al cargar departamentos.';
+             errorLi.textContent = 'Error al cargar.';
              errorLi.style.color = 'red';
              sidemenuUl.appendChild(errorLi);
         }

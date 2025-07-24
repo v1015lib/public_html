@@ -1,5 +1,5 @@
 // scss/_base.scss
-@import 'vars'; // Importar variables
+@import 'vars';
 
 *, *::before, *::after {
     box-sizing: border-box;
@@ -7,21 +7,35 @@
     padding: 0;
 }
 
-body {
-    font-family: Arial, sans-serif;
-    line-height: 1.6;
-    color: $text-color;
-    background-color: $background-color;
-}
+html {
+    // --- LA MAGIA DE LA TIPOGRAFÍA RESPONSIVA EMPIEZA AQUÍ ---
+    
+    // Base para móviles (un poco más pequeño para empezar)
+    font-size: 14px; 
 
-a {
-    color: $primary-color;
-    text-decoration: none;
-    &:hover {
-        text-decoration: underline;
+    // Aumenta la base en tablets
+    @media (min-width: 768px) {
+        font-size: 15px;
+    }
+
+    // El tamaño estándar en escritorio
+    @media (min-width: 1200px) {
+        font-size: 16px; // Esto se convierte en nuestro 1rem = 16px
     }
 }
 
-ul {
+body {
+    height: 100vh;
+    overflow: hidden;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.5;
+    color: $text-color;
+    background-color: $background-color;
+    display: flex;
+    flex-direction: column;
+}
+ul,li,a{
+    text-decoration: none;
     list-style: none;
 }
+// ... resto del archivo ...

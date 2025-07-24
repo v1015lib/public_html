@@ -1,61 +1,55 @@
 // scss/_responsive.scss
 @import 'vars';
 
-// Media Queries
+// --- Estilos para Tablet y Móvil ---
 @media (max-width: $breakpoint-tablet) {
     .main-header {
+        .header-content {
+            flex-wrap: wrap;
+        }
         .search-bar {
+            order: 3; // Mueve la barra de búsqueda al final
             width: 100%;
-            margin-top: 10px;
-            input[type="text"] {
-                width: calc(100% - 70px); // Ajustar el ancho del input
-            }
+            margin-top: $spacing-unit;
         }
         .main-nav {
-            display: none; // Ocultar navegación principal en móviles
+            display: none; // Oculta la navegación de escritorio
         }
         .mobile-menu-toggle {
-            display: block; // Mostrar icono de hamburguesa
-        }
-        .header-content {
-            flex-wrap: wrap; // Permite que los elementos se envuelvan
-            justify-content: center;
+            display: block; // Muestra el ícono de hamburguesa
         }
     }
 
     .main-container {
-        flex-direction: column; // Columnas en móviles
-        padding: 0; // Quitar padding para que el sidemenu pueda ocupar el ancho completo
+        flex-direction: column;
+        position: relative; // Necesario para el menú overlay
     }
 
     .sidemenu {
-        position: fixed; // Overlay en móviles
+        position: fixed;
         top: 0;
         left: -100%; // Oculto por defecto
-        width: 75%; // Ocupa 75% del ancho del dispositivo
-        height: 100vh;
+        width: 280px; // Ancho del menú desplegable
+        height: 100%;
         z-index: 2000;
         transition: left 0.3s ease-in-out;
-        box-shadow: 2px 0 5px rgba(0,0,0,0.2);
-
+        box-shadow: 4px 0 15px rgba(0,0,0,0.1);
+        // El scroll del body está desactivado, así que el menú no necesita `calc`
+        height: 100vh;
+        
         &.active {
-            left: 0; // Visible cuando tiene la clase 'active'
+            left: 0; // Muestra el menú cuando tiene la clase 'active'
         }
 
         .sidemenu-header {
             .close-sidemenu {
-                display: block; // Mostrar botón de cerrar en móviles
+                display: block; // Muestra el botón de cerrar
             }
         }
     }
 
     .products-container {
-        width: 100%; // Ocupa todo el ancho en móviles
-        height: auto; // Altura automática
-        padding: $spacing-unit; // Restaurar padding para el contenido
+        // En móvil, el padding puede ser menor
+        padding: $spacing-unit;
     }
-}
-
-@media (min-width: $breakpoint-tablet) and (max-width: $breakpoint-desktop) {
-    // Estilos específicos para tablets si es necesario
 }

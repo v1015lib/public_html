@@ -49,6 +49,8 @@
     }
 
     .products-container {
+        width: 100vw;
+        margin: auto;
         // En móvil, el padding puede ser menor
         padding: $spacing-unit;
     }

@@ -17,7 +17,17 @@ document.addEventListener('DOMContentLoaded', () => {
     loadDepartments(); 
 
     // 3. Carga los productos iniciales
-    loadProducts('product-list', 'pagination-controls', { sortBy: 'random', apiBaseUrl: API_BASE_URL });
+    loadProducts('product-list', 'pagination-controls', { 
+        sortBy: 'random', 
+        apiBaseUrl: API_BASE_URL
+        
+        // ====================================================================
+        // PARA ACTIVAR EL FILTRO Y OCULTAR PRODUCTOS SIN IMAGEN:
+        // Simplemente descomenta la siguiente línea (quitando las dos barras "//").
+        // Si la dejas comentada, se mostrarán TODOS los productos.
+        // ====================================================================
+         , hide_no_image: true 
+    });
 
     // 4. Inicializa la búsqueda
     initializeSearch('search-input', 'search-button', 'product-list', 'pagination-controls', API_BASE_URL);
@@ -29,7 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
             event.preventDefault(); 
             const departmentId = target.dataset.departmentId;
 
-            let params = { apiBaseUrl: API_BASE_URL, page: 1 }; // Resetea a la página 1
+            let params = { apiBaseUrl: API_BASE_URL, page: 1 };
             if (departmentId !== 'all') {
                 params.departmentId = departmentId;
             } else {
@@ -37,7 +47,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             loadProducts('product-list', 'pagination-controls', params);
 
-            // Cierra el menú lateral en móviles después de la selección
             document.getElementById('sidemenu').classList.remove('active');
         }
     });
@@ -61,7 +70,6 @@ async function loadDepartments() {
             return;
         }
 
-        // Limpiar departamentos existentes (excepto el "Ver todos")
         sidemenuUl.querySelectorAll('li:not(:first-child)').forEach(li => li.remove());
 
         if (Array.isArray(departments)) {

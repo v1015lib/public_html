@@ -6,13 +6,13 @@ import { setupMobileMenu } from './mobile_menu.js';
 
 // Define la URL base de tu API aquí.
 // ¡AJUSTA ESTO PARA QUE COINCIDA CON TU CONFIGURACIÓN EXACTA DE XAMPP!
-const API_BASE_URL = 'http://localhost:8848/public_html/api/index.php'; 
+const API_BASE_URL = 'api/index.php'; 
 
 document.addEventListener('DOMContentLoaded', () => {
     console.log('DOM completamente cargado y parseado.');
 
     setupMobileMenu();
-    loadDepartments();
+    loadDepartments(); // <--- Esta es la llamada inicial a la función
 
     // Cargar productos iniciales (aleatorios por defecto)
     loadProducts('product-list', 'pagination-controls', { sortBy: 'random', apiBaseUrl: API_BASE_URL });
@@ -71,39 +71,44 @@ document.addEventListener('DOMContentLoaded', () => {
 // Función para cargar departamentos
 async function loadDepartments() {
     try {
-        const response = await fetch(`${API_BASE_URL}?resource=departments`);
+        // Asegúrate de que API_BASE_URL esté correcta aquí.
+        const response = await fetch(`${API_BASE_URL}?resource=departments`); 
         
         if (!response.ok) {
             const errorText = await response.text(); 
             throw new Error(`Error HTTP! status: ${response.status}. Response: ${errorText}`);
         }
 
-        const departments = await response.json();
-        const sidemenuUl = document.querySelector('#sidemenu ul');
+        const departments = await response.json(); // Parsea la respuesta como JSON
+        const sidemenuUl = document.querySelector('#sidemenu ul'); // Obtiene el <ul> en el sidemenu
 
         if (!sidemenuUl) {
             console.error('Elemento <ul> del sidemenu no encontrado.');
             return;
         }
 
+        // Limpiar departamentos existentes (excepto el primer <li> "Ver todos")
         sidemenuUl.querySelectorAll('li:not(:first-child)').forEach(li => li.remove());
 
+        // Verifica si 'departments' es realmente un array antes de iterar
         if (Array.isArray(departments)) {
             departments.forEach(dept => {
                 const li = document.createElement('li');
                 const a = document.createElement('a');
                 a.href = '#';
                 a.classList.add('department-link');
-                a.dataset.departmentId = dept.id_departamento;
-                a.textContent = dept.departamento;
+                a.dataset.departmentId = dept.id_departamento; // Usa el ID del departamento para el filtro
+                a.textContent = dept.departamento; // Muestra el nombre del departamento
                 li.appendChild(a);
-                sidemenuUl.appendChild(li);
+                sidemenuUl.appendChild(li); // Añade el nuevo <li> al <ul>
             });
         } else {
             console.error('La respuesta de departamentos no es un array:', departments);
+            // Esto ocurriría si la API devolvió JSON, pero no era un array de departamentos
         }
     } catch (error) {
         console.error('Error al cargar departamentos:', error);
+        // Si hay un error, muestra un mensaje en el sidemenu
         const sidemenuUl = document.querySelector('#sidemenu ul');
         if (sidemenuUl) {
              sidemenuUl.querySelectorAll('li:not(:first-child)').forEach(li => li.remove());

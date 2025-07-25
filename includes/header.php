@@ -1,3 +1,10 @@
+<?php
+// includes/header.php
+// Inicia la sesión en cada página que incluya este header para poder leer las variables de sesión.
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+?>
 <header class="main-header">
     <div class="header-content">
         <div class="logo">
@@ -9,11 +16,16 @@
         </div>
         <nav class="main-nav">
             <ul>
-                <li><a href="#">Inicio</a></li>
-                <li><a href="#">Ofertas</a></li>
-                <li><a href="#">Contacto</a></li>
-                <li><a href="#">Acerca de</a></li>
-                <li class="login-link"><a href="customers/index.php">Iniciar Sesión</a></li>
+                <?php if (isset($_SESSION['id_cliente'])): ?>
+                    <li class="welcome-message">Hola, <?php echo htmlspecialchars($_SESSION['nombre_usuario']); ?></li>
+                    <li><a href="dashboard.php">Mi Cuenta</a></li>
+                    <li><a href="logout.php">Cerrar Sesión</a></li>
+                <?php else: ?>
+                    <li><a href="index.php">Inicio</a></li>
+                    <li><a href="#">Ofertas</a></li>
+                    <li><a href="registro.php">Crear Cuenta</a></li>
+                    <li class="login-link"><a href="login.php">Iniciar Sesión</a></li>
+                <?php endif; ?>
             </ul>
         </nav>
 

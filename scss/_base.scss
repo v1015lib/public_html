@@ -4,7 +4,9 @@
 *, *::before, *::after {
     box-sizing: border-box;
     margin: 0;
+    transition: .4s;
     padding: 0;
+    font-family: $font-family-base;
 }
 
 html {
@@ -13,7 +15,7 @@ html {
     // Base para móviles (un poco más pequeño para empezar)
     font-size: 14px; 
 
-    // Aumenta la base en tablets
+    // Aumenta la base en tablets244
     @media (min-width: 768px) {
         font-size: 15px;
     }
@@ -27,7 +29,7 @@ html {
 body {
     height: 100vh;
     overflow: hidden;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+
     line-height: 1.5;
     color: $text-color;
     background-color: $background-color;

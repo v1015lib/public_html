@@ -1,10 +1,22 @@
 <?php
 // finalizar_compra.php
 
-require_once __DIR__ . '/config/config.php'; // Conexión a la BD
+// Inicia la sesión
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
 
-// Simulación de usuario logueado
-$client_id = 1;
+// --- NUEVO: Proteger la página ---
+// Si no hay sesión, redirigir a la página de login
+if (!isset($_SESSION['id_cliente'])) {
+    header('Location: login.php');
+    exit;
+}
+
+require_once __DIR__ . '/config/config.php';
+
+// Usamos el ID de la sesión en lugar de uno fijo
+$client_id = $_SESSION['id_cliente'];
 
 $cart_items = [];
 $total = 0;
@@ -30,39 +42,23 @@ try {
         }
     }
     
-    // --- NUEVO FORMATO DE WHATSAPP OPTIMIZADO ---
+    // --- Lógica para el mensaje de WhatsApp (sin cambios) ---
     $whatsapp_message = "¡Hola! Quisiera realizar el siguiente pedido:\n\n";
-    
-    // Encabezado de la "tabla" más ancha
-    $whatsapp_message .= "```\n"; // Inicia el bloque monoespaciado
+    $whatsapp_message .= "```\n";
     $whatsapp_message .= "Cant | Código          | Producto      | Subtotal\n";
     $whatsapp_message .= "--------------------------------------------------\n";
-
     foreach ($cart_items as $item) {
-        // Ajustamos las columnas para el nuevo formato
         $cantidad = str_pad($item['cantidad'], 4, " ", STR_PAD_LEFT);
-        
-        // Columna Código (más ancha)
         $codigo = str_pad($item['codigo_producto'], 15, " ", STR_PAD_RIGHT);
-
-        // Columna Producto (más corta)
         $producto_nombre = $item['nombre_producto'];
-        if (strlen($producto_nombre) > 13) {
-            $producto_nombre = substr($producto_nombre, 0, 10) . "...";
-        }
+        if (strlen($producto_nombre) > 13) $producto_nombre = substr($producto_nombre, 0, 10) . "...";
         $producto_nombre = str_pad($producto_nombre, 13, " ", STR_PAD_RIGHT);
-
-        // Columna Subtotal
         $subtotal = str_pad("$" . number_format($item['subtotal'], 2), 9, " ", STR_PAD_LEFT);
-
         $whatsapp_message .= $cantidad . " | " . $codigo . " | " . $producto_nombre . " | " . $subtotal . "\n";
     }
     $whatsapp_message .= "--------------------------------------------------\n";
-    $whatsapp_message .= "```\n"; // Cierra el bloque monoespaciado
-
+    $whatsapp_message .= "```\n";
     $whatsapp_message .= "\n*Total a Pagar: $" . number_format($total, 2) . "*";
-    
-    // Tu número de teléfono
     $whatsapp_number = "50368345121"; 
     $whatsapp_url = "https://wa.me/" . $whatsapp_number . "?text=" . urlencode($whatsapp_message);
 
@@ -78,7 +74,6 @@ try {
     <title>Finalizar Compra</title>
     <link rel="stylesheet" href="css/style.css">
     <style>
-        /* Estilos rápidos para la página de resumen */
         .summary-container { max-width: 800px; margin: 2rem auto; padding: 2rem; background: #fff; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
         .summary-table { width: 100%; border-collapse: collapse; margin-bottom: 2rem; }
         .summary-table th, .summary-table td { padding: 1rem; text-align: left; border-bottom: 1px solid #eee; }

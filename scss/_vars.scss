@@ -1,7 +1,7 @@
 // scss/_vars.scss
 
 // Colores
-$primary-color: #007bff;
+$primary-color: #141042;
 $secondary-color: #6c757d;
 $background-color: #f8f9fa;
 $text-color: #343a40;
@@ -17,14 +17,9 @@ $breakpoint-desktop: 1024px;
 
 // scss/_vars.scss
 
-// Colores primarios y secundarios
-$primary-color: #007bff;
-$secondary-color: #6c757d;
 
 // Colores de texto y fondo
-$text-color: #333;
 $background-color: #f8f9fa;
-$border-color: #dee2e6;
 
 // Medidas y espaciados
 $spacing-unit: 1rem; // Unidad base de espaciado (ej. 16px)
@@ -35,4 +30,4 @@ $breakpoint-tablet: 768px;
 $breakpoint-mobile: 480px;
 
 // Fuentes
-$font-family-base: 'Helvetica Neue', Arial, sans-serif;
+$font-family-base: 'Inter', sans-serif;

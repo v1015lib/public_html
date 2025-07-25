@@ -35,14 +35,16 @@
             width: 200px;
         }
         button {
-            background-color: darken($primary-color, 10%);
+            background-color: lighten($primary-color, 15%);
             color: white;
             border: none;
-            padding: 0.5rem 1rem;
+            padding: .5rem;
             border-radius: 0 4px 4px 0;
             cursor: pointer;
+
             &:hover {
-                background-color: darken($primary-color, 15%);
+                background-color: lighten($primary-color, 35%);
+
             }
         }
     }

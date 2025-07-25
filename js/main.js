@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loadProducts('product-list', 'pagination-controls', { 
         sortBy: 'random', 
         apiBaseUrl: API_BASE_URL,
-        hide_no_image: true // <-- Opción integrada aquí
+        //hide_no_image: true // <-- Opción integrada aquí
     });
 
     initializeSearch('search-input', 'search-button', 'product-list', 'pagination-controls', API_BASE_URL);

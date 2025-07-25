@@ -4,7 +4,7 @@
 *, *::before, *::after {
     box-sizing: border-box;
     margin: 0;
-    transition: .4s;
+    transition: .2s;
     padding: 0;
     font-family: $font-family-base;
 }
@@ -13,16 +13,16 @@ html {
     // --- LA MAGIA DE LA TIPOGRAFÍA RESPONSIVA EMPIEZA AQUÍ ---
     
     // Base para móviles (un poco más pequeño para empezar)
-    font-size: 14px; 
+    font-size: 1rem; 
 
     // Aumenta la base en tablets244
     @media (min-width: 768px) {
-        font-size: 15px;
+        font-size: 1rem;
     }
 
     // El tamaño estándar en escritorio
     @media (min-width: 1200px) {
-        font-size: 16px; // Esto se convierte en nuestro 1rem = 16px
+        font-size: 1.15rem; // Esto se convierte en nuestro 1rem = 16px
     }
 }
 

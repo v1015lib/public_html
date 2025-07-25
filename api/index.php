@@ -6,6 +6,33 @@ if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
 
+// =======================================================================
+// LÓGICA DE CIERRE DE SESIÓN AUTOMÁTICO POR INACTIVIDAD
+// =======================================================================
+
+// 1. Definir el tiempo de inactividad en segundos (1800 segundos = 30 minutos)
+$timeout_duration = 3000;
+
+// 2. Comprobar si hay una sesión activa y si ha expirado
+if (isset($_SESSION['id_cliente']) && isset($_SESSION['last_activity'])) {
+    $elapsed_time = time() - $_SESSION['last_activity'];
+    
+    if ($elapsed_time > $timeout_duration) {
+        session_unset();
+        session_destroy();
+        http_response_code(401); // Unauthorized
+        echo json_encode(['error' => 'Tu sesión ha expirado por inactividad.']);
+        exit; // Detenemos la ejecución
+    }
+}
+
+// 3. Actualizar la hora de la última actividad en cada petición
+// Esto reinicia el "contador" de inactividad
+$_SESSION['last_activity'] = time();
+
+
+
+
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 header('Content-Type: application/json');
@@ -61,10 +88,10 @@ try {
 }
 
 
-// --- LÓGICA DE FAVORITOS AHORA USA SESIONES ---
+// --- LÓGICA DE FAVORITOS AHORA USA SESIONES Y DEVUELVE ERRORES CLAROS ---
 function handleGetFavoritesRequest(PDO $pdo) {
     if (!isset($_SESSION['id_cliente'])) {
-        echo json_encode([]); // Si no hay sesión, no hay favoritos
+        echo json_encode([]);
         return;
     }
     $client_id = $_SESSION['id_cliente'];
@@ -74,7 +101,11 @@ function handleGetFavoritesRequest(PDO $pdo) {
     echo json_encode($favorites);
 }
 function handleAddFavoriteRequest(PDO $pdo) {
-    if (!isset($_SESSION['id_cliente'])) throw new Exception('Debes iniciar sesión para añadir favoritos.');
+    if (!isset($_SESSION['id_cliente'])) {
+        http_response_code(401); // Unauthorized
+        echo json_encode(['error' => 'Debes iniciar sesión para añadir favoritos.']);
+        return;
+    }
     $data = json_decode(file_get_contents('php://input'), true);
     if (!isset($data['product_id'])) throw new Exception('Falta el ID del producto.');
     $product_id = (int)$data['product_id'];
@@ -84,7 +115,11 @@ function handleAddFavoriteRequest(PDO $pdo) {
     echo json_encode(['success' => true, 'message' => 'Producto añadido a favoritos.']);
 }
 function handleRemoveFavoriteRequest(PDO $pdo) {
-    if (!isset($_SESSION['id_cliente'])) throw new Exception('Debes iniciar sesión para quitar favoritos.');
+    if (!isset($_SESSION['id_cliente'])) {
+        http_response_code(401); // Unauthorized
+        echo json_encode(['error' => 'Debes iniciar sesión para quitar favoritos.']);
+        return;
+    }
     $data = json_decode(file_get_contents('php://input'), true);
     if (!isset($data['product_id'])) throw new Exception('Falta el ID del producto.');
     $product_id = (int)$data['product_id'];
@@ -94,9 +129,13 @@ function handleRemoveFavoriteRequest(PDO $pdo) {
     echo json_encode(['success' => true, 'message' => 'Producto eliminado de favoritos.']);
 }
 
-// --- LÓGICA DEL CARRITO AHORA USA SESIONES ---
+// --- LÓGICA DEL CARRITO AHORA USA SESIONES Y DEVUELVE ERRORES CLAROS ---
 function handleSetCartItemRequest(PDO $pdo) {
-    if (!isset($_SESSION['id_cliente'])) throw new Exception('Debes iniciar sesión para modificar el carrito.');
+    if (!isset($_SESSION['id_cliente'])) {
+        http_response_code(401); // Unauthorized
+        echo json_encode(['error' => 'Debes iniciar sesión para modificar el carrito.']);
+        return;
+    }
     $data = json_decode(file_get_contents('php://input'), true);
     $product_id = (int)$data['product_id'];
     $quantity = (int)$data['quantity'];
@@ -124,6 +163,7 @@ function handleSetCartItemRequest(PDO $pdo) {
     $pdo->commit();
     echo json_encode(['success' => true, 'message' => 'Carrito actualizado.']);
 }
+
 
 function handleCartStatusRequest(PDO $pdo) {
     if (!isset($_SESSION['id_cliente'])) {

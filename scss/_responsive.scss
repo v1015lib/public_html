@@ -1,62 +1,47 @@
 // scss/_responsive.scss
 @import 'vars';
 
-// --- Estilos para Tablet y Móvil ---
+// --- Media Query para Tablet y Móvil ---
 @media (max-width: $breakpoint-tablet) {
+
+    // --- MUESTRA LA SECCIÓN DE USUARIO SOLO EN MÓVIL ---
+    .sidemenu-user-section {
+        display: block; 
+    }
+    
+    // --- Oculta los enlaces de "Mi Cuenta" etc. del header principal ---
+    .main-header .main-nav .hide-on-mobile {
+        display: none;
+    }
+
+    // El resto de tus estilos responsivos (sin cambios)
     .main-header {
         .header-content {
-            flex-wrap: wrap;
+            justify-content: space-between;
         }
-        .search-bar {
-            order: 3; // Mueve la barra de búsqueda al final
+        .search-bar { 
+            order: 3;
             width: 100%;
-            margin-top: $spacing-unit;
-        }
-        .main-nav {
-            display: none; // Oculta la navegación de escritorio
-        }
-        .mobile-menu-toggle {
-            display: block; // Muestra el ícono de hamburguesa
-        }
-    }
+            margin: 1rem 0 0 0;
+            max-width: 100%;
 
-    .main-container {
-        flex-direction: column;
-        position: relative; // Necesario para el menú overlay
-    }
-
-    .sidemenu {
-        position: fixed;
-        top: 0;
-        left: -100%; // Oculto por defecto
-        width: 280px; // Ancho del menú desplegable
-        height: 100%;
-        z-index: 2000;
-        transition: left 0.3s ease-in-out;
-        box-shadow: 4px 0 15px rgba(0,0,0,0.1);
-        // El scroll del body está desactivado, así que el menú no necesita `calc`
-        height: 100vh;
-        
-        &.active {
-            left: 0; // Muestra el menú cuando tiene la clase 'active'
-        }
-
-        .sidemenu-header {
-            .close-sidemenu {
-                display: block; // Muestra el botón de cerrar
+            button{
+                display: none;
             }
         }
+        .main-nav .welcome-message {
+             display: none;
+        }
+        .mobile-menu-toggle {
+            display: block;
+        }
     }
+    .main-container { flex-direction: column; }
+    .sidemenu {
+        position: fixed; top: 0; left: -100%; width: 280px; height: 100vh;
+        z-index: 2000; transition: left 0.3s ease-in-out; box-shadow: 4px 0 15px rgba(0,0,0,0.1);
+        &.active { left: 0; }
+        .sidemenu-header .close-sidemenu { display: block; }
+    }
+}
 
-    .products-container {
-        width: 100vw;
-        margin: auto;
-        // En móvil, el padding puede ser menor
-        padding: $spacing-unit;
-    }
-}
-@media(max-width: $breakpoint-mobile){
-    .products-container{
-        
-    }
-}

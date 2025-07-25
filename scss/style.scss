@@ -13,9 +13,10 @@
 @import 'product_card';
 @import 'cart_panel'; // <-- AQUÍ SE IMPORTA EL NUEVO PANEL
 @import 'notifications'; 
-
+@import 'modal';
 @import 'pagination';
 @import 'forms';
+@import 'footer';
 // Responsividad
 @import 'responsive';
 
@@ -40,3 +41,4 @@
     padding-left: 0.5rem;
     border-left: 3px solid #007bff;
 }
+

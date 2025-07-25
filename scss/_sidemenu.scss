@@ -2,14 +2,14 @@
 @import 'vars';
 
 .sidemenu {
-    width: 250px; // Ancho en PC
+    width:20vw; // Ancho en PC
     flex-shrink: 0; // Evita que se encoja
     background-color: #fff;
     border-right: 1px solid $border-color;
-    padding: $spacing-unit;
+
     position: sticky; // Menú pegajoso en PC
     top: 80px; // Ajustar esto según la altura final del header
-    height: calc(100vh - 80px); // Se ajusta a la altura de la ventana menos el header
+    height: 100%; // Se ajusta a la altura de la ventana menos el header
     overflow-y: auto; // Permite scroll si hay muchos departamentos
 
     .sidemenu-header {
@@ -17,6 +17,8 @@
         justify-content: space-between;
         align-items: center;
         margin-bottom: $spacing-unit;
+        background: white;
+        padding: .5rem;
         h3 {
             margin: 0;
             font-size: 1.2rem;
@@ -28,19 +30,28 @@
             font-size: 2rem;
             cursor: pointer;
             color: $text-color;
+            position: absolute;
+            top: 0;
+            right: 0;
+            padding: .5rem;
         }
     }
 
     ul {
         li {
-            margin-bottom: 0.5rem;
+
             a {
+                font-size: .8rem;
                 display: block;
-                padding: 0.5rem 0;
+                padding: .5rem;
                 color: $text-color;
+                font-weight: 900;
+                width: 100%;
                 &:hover {
                     color: $primary-color;
                     text-decoration: none;
+                    background: $primary-color;
+                    color: white;
                 }
             }
         }

@@ -3,23 +3,23 @@
   -webkit-box-sizing: border-box;
           box-sizing: border-box;
   margin: 0;
-  -webkit-transition: 0.4s;
-  transition: 0.4s;
+  -webkit-transition: 0.2s;
+  transition: 0.2s;
   padding: 0;
   font-family: "Inter", sans-serif;
 }
 
 html {
-  font-size: 14px;
+  font-size: 1rem;
 }
 @media (min-width: 768px) {
   html {
-    font-size: 15px;
+    font-size: 1rem;
   }
 }
 @media (min-width: 1200px) {
   html {
-    font-size: 16px;
+    font-size: 1.15rem;
   }
 }
 
@@ -63,34 +63,63 @@ ul, li, a {
           align-items: center;
   max-width: 1200px;
   margin: 0 auto;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
 }
 .main-header .logo a {
-  color: white;
-  font-size: 1.5rem;
-  font-weight: bold;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
   text-decoration: none;
+  color: white;
+  height: 50px;
+  padding: 0;
+}
+.main-header .logo a img {
+  max-height: 100%;
+  width: auto;
+  display: block;
+  -webkit-filter: invert(1);
+          filter: invert(1);
+  padding: 0;
 }
 .main-header .search-bar {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
+  -webkit-box-flex: 1;
+      -ms-flex-positive: 1;
+          flex-grow: 1;
+  max-width: 500px;
+  margin: 0 1.5rem;
 }
-.main-header .search-bar input[type=text] {
+.main-header input[type=text] {
+  width: 100%;
   padding: 0.5rem;
   border: none;
   border-radius: 4px 0 0 4px;
-  width: 200px;
 }
-.main-header .search-bar button {
-  background-color: #271f80;
+.main-header button#search-button {
+  background-color: #080619;
   color: white;
   border: none;
-  padding: 0.5rem;
+  padding: 0.5rem 1rem;
   border-radius: 0 4px 4px 0;
   cursor: pointer;
 }
-.main-header .search-bar button:hover {
-  background-color: #4236ce;
+.main-header button#search-button:hover {
+  background-color: #010104;
+}
+.main-header .header-right-controls {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
 }
 .main-header .main-nav ul {
   display: -webkit-box;
@@ -99,12 +128,16 @@ ul, li, a {
   -webkit-box-align: center;
       -ms-flex-align: center;
           align-items: center;
+  list-style: none;
+  padding: 0;
+  margin: 0;
 }
 .main-header .main-nav ul li {
   margin-left: 1rem;
 }
 .main-header .main-nav ul li a {
   color: white;
+  text-decoration: none;
 }
 .main-header .main-nav ul li a:hover {
   text-decoration: underline;
@@ -113,9 +146,7 @@ ul, li, a {
   display: none;
   font-size: 2rem;
   cursor: pointer;
-}
-.main-header .cart-widget-container {
-  margin-left: 1.5rem;
+  margin-left: 1rem;
 }
 .main-header .cart-widget-container a {
   display: -webkit-box;
@@ -137,7 +168,6 @@ ul, li, a {
 .main-header .cart-icon {
   font-size: 1.8rem;
   margin-right: 0.5rem;
-  vertical-align: middle;
 }
 .main-header .cart-total-header {
   font-size: 1rem;
@@ -145,15 +175,14 @@ ul, li, a {
 }
 
 .sidemenu {
-  width: 250px;
+  width: 20vw;
   -ms-flex-negative: 0;
       flex-shrink: 0;
   background-color: #fff;
   border-right: 1px solid #dee2e6;
-  padding: 1rem;
   position: sticky;
   top: 80px;
-  height: calc(100vh - 80px);
+  height: 100%;
   overflow-y: auto;
 }
 .sidemenu .sidemenu-header {
@@ -167,6 +196,8 @@ ul, li, a {
       -ms-flex-align: center;
           align-items: center;
   margin-bottom: 1rem;
+  background: white;
+  padding: 0.5rem;
 }
 .sidemenu .sidemenu-header h3 {
   margin: 0;
@@ -179,18 +210,24 @@ ul, li, a {
   font-size: 2rem;
   cursor: pointer;
   color: #343a40;
-}
-.sidemenu ul li {
-  margin-bottom: 0.5rem;
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 0.5rem;
 }
 .sidemenu ul li a {
+  font-size: 0.8rem;
   display: block;
-  padding: 0.5rem 0;
+  padding: 0.5rem;
   color: #343a40;
+  font-weight: 900;
+  width: 100%;
 }
 .sidemenu ul li a:hover {
   color: #141042;
   text-decoration: none;
+  background: #141042;
+  color: white;
 }
 
 .product-grid {
@@ -306,7 +343,7 @@ h3 {
   font-size: 1rem;
   font-weight: 600;
   color: #2c3e50;
-  line-height: 1.4;
+  line-height: 1.8;
   margin-bottom: 0.25rem;
   height: 2.8em;
   overflow: hidden;
@@ -668,6 +705,103 @@ p.code {
           transform: translateX(0);
 }
 
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  z-index: 2999;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  -webkit-transition: opacity 0.3s ease, visibility 0.3s ease;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+.modal-overlay.hidden {
+  display: none;
+}
+.modal-overlay.visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+.modal-content {
+  background-color: white;
+  padding: 2rem;
+  border-radius: 12px;
+  -webkit-box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  max-width: 450px;
+  width: 90%;
+  text-align: center;
+  -webkit-transform: scale(0.9);
+          transform: scale(0.9);
+  -webkit-transition: -webkit-transform 0.3s ease;
+  transition: -webkit-transform 0.3s ease;
+  transition: transform 0.3s ease;
+  transition: transform 0.3s ease, -webkit-transform 0.3s ease;
+}
+.visible .modal-content {
+  -webkit-transform: scale(1);
+          transform: scale(1);
+}
+.modal-content h3 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+}
+.modal-content p {
+  margin-bottom: 2rem;
+  color: #6c757d;
+  line-height: 1.6;
+}
+
+.modal-actions {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  gap: 1rem;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+}
+.modal-actions .btn-secondary, .modal-actions .btn-primary {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  text-decoration: none;
+  -webkit-transition: all 0.2s ease;
+  transition: all 0.2s ease;
+}
+.modal-actions .btn-secondary {
+  background-color: #f0f0f0;
+  color: #333;
+  border: 1px solid #ccc;
+}
+.modal-actions .btn-secondary:hover {
+  background-color: #e0e0e0;
+}
+.modal-actions .btn-primary {
+  background-color: #141042;
+  color: white;
+}
+.modal-actions .btn-primary:hover {
+  background-color: #080619;
+}
+
 .pagination {
   display: -webkit-box;
   display: -ms-flexbox;
@@ -856,19 +990,43 @@ p.code {
   margin-top: 1rem;
 }
 
+.main-footer {
+  background-color: #f8f9fa;
+  color: #6c757d;
+  border-top: 1px solid #dee2e6;
+  text-align: center;
+  font-size: 1rem;
+}
+.main-footer .footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  font-weight: 900;
+}
+
 @media (max-width: 768px) {
+  .sidemenu-user-section {
+    display: block;
+  }
+  .main-header .main-nav .hide-on-mobile {
+    display: none;
+  }
   .main-header .header-content {
-    -ms-flex-wrap: wrap;
-        flex-wrap: wrap;
+    -webkit-box-pack: justify;
+        -ms-flex-pack: justify;
+            justify-content: space-between;
   }
   .main-header .search-bar {
     -webkit-box-ordinal-group: 4;
         -ms-flex-order: 3;
             order: 3;
     width: 100%;
-    margin-top: 1rem;
+    margin: 1rem 0 0 0;
+    max-width: 100%;
   }
-  .main-header .main-nav {
+  .main-header .search-bar button {
+    display: none;
+  }
+  .main-header .main-nav .welcome-message {
     display: none;
   }
   .main-header .mobile-menu-toggle {
@@ -879,31 +1037,24 @@ p.code {
     -webkit-box-direction: normal;
         -ms-flex-direction: column;
             flex-direction: column;
-    position: relative;
   }
   .sidemenu {
     position: fixed;
     top: 0;
     left: -100%;
     width: 280px;
-    height: 100%;
+    height: 100vh;
     z-index: 2000;
     -webkit-transition: left 0.3s ease-in-out;
     transition: left 0.3s ease-in-out;
     -webkit-box-shadow: 4px 0 15px rgba(0, 0, 0, 0.1);
             box-shadow: 4px 0 15px rgba(0, 0, 0, 0.1);
-    height: 100vh;
   }
   .sidemenu.active {
     left: 0;
   }
   .sidemenu .sidemenu-header .close-sidemenu {
     display: block;
-  }
-  .products-container {
-    width: 100vw;
-    margin: auto;
-    padding: 1rem;
   }
 }
 .main-container {

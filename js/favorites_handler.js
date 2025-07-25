@@ -18,7 +18,7 @@ async function toggleFavorite(productId, button) {
         if (!response.ok) {
             throw new Error(result.error || 'Error en la respuesta del servidor.');
         }
-        
+
         if (result.success) {
             button.classList.toggle('is-favorite');
             showNotification(successMessage);
@@ -50,7 +50,8 @@ export function initializeFavoritesHandler() {
     document.body.addEventListener('click', (event) => {
         const favoriteButton = event.target.closest('.favorite-btn');
         if (favoriteButton) {
-            const isLoggedIn = document.querySelector('.welcome-message');
+            // MODIFICADO: Check if the main-header has the data-logged-in attribute
+            const isLoggedIn = document.querySelector('.main-header[data-logged-in="true"]');
 
             if (isLoggedIn) {
                 // Si el usuario ha iniciado sesión, funciona normal

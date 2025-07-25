@@ -4,7 +4,7 @@ if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
 ?>
-<header class="main-header">
+<header class="main-header" <?php echo isset($_SESSION['id_cliente']) ? 'data-logged-in="true"' : ''; ?>>
     <div class="header-content">
         <div class="logo">
             <a href="index.php">
@@ -16,7 +16,7 @@ if (session_status() == PHP_SESSION_NONE) {
             <input type="text" id="search-input" placeholder="Que producto buscaba?">
             <button id="search-button">Buscar</button>
         </div>
-        
+
         <div class="header-right-controls">
             <nav class="main-nav">
                 <ul>

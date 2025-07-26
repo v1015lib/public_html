@@ -1,5 +1,5 @@
 <?php
-// api/index.php (Versión final y completa con sesiones de usuario integradas)
+// api/index.php
 
 // Iniciar la sesión al principio de cualquier script que la necesite
 if (session_status() == PHP_SESSION_NONE) {
@@ -11,7 +11,7 @@ if (session_status() == PHP_SESSION_NONE) {
 // =======================================================================
 
 // 1. Definir el tiempo de inactividad en segundos (1800 segundos = 30 minutos)
-$timeout_duration = 3000;
+$timeout_duration = 1800;
 
 // 2. Comprobar si hay una sesión activa y si ha expirado
 if (isset($_SESSION['id_cliente']) && isset($_SESSION['last_activity'])) {
@@ -27,11 +27,13 @@ if (isset($_SESSION['id_cliente']) && isset($_SESSION['last_activity'])) {
 }
 
 // 3. Actualizar la hora de la última actividad en cada petición
-// Esto reinicia el "contador" de inactividad
-$_SESSION['last_activity'] = time();
+// Esto reinicia el "contador" de inactividad si el usuario está logueado
+if (isset($_SESSION['id_cliente'])) {
+    $_SESSION['last_activity'] = time();
+}
 
 
-
+// --- El resto de tu archivo se mantiene exactamente igual ---
 
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
@@ -85,6 +87,53 @@ try {
 } catch (Exception $e) {
     http_response_code(500);
     echo json_encode(['error' => 'Error: ' . $e->getMessage()]);
+}
+
+// --- LÓGICA DE LOGIN (CORREGIDA) ---
+function handleLoginRequest(PDO $pdo) {
+    $data = json_decode(file_get_contents('php://input'), true);
+    if (empty($data['nombre_usuario']) || empty($data['password'])) throw new Exception("Nombre de usuario y contraseña son requeridos.");
+    
+    $stmt = $pdo->prepare("SELECT id_cliente, nombre_usuario, password_hash FROM clientes WHERE nombre_usuario = :nombre_usuario");
+    $stmt->execute([':nombre_usuario' => $data['nombre_usuario']]);
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($user && password_verify($data['password'], $user['password_hash'])) {
+        $_SESSION['id_cliente'] = $user['id_cliente'];
+        $_SESSION['nombre_usuario'] = $user['nombre_usuario'];
+        // --- CORRECCIÓN: Iniciamos el temporizador de actividad aquí ---
+        $_SESSION['last_activity'] = time();
+        echo json_encode(['success' => true, 'message' => 'Inicio de sesión exitoso. Redirigiendo...']);
+    } else {
+        throw new Exception("Nombre de usuario o contraseña incorrectos.");
+    }
+}
+
+// --- LÓGICA DE REGISTRO (CORREGIDA) ---
+function handleRegisterRequest(PDO $pdo) {
+    $data = json_decode(file_get_contents('php://input'), true);
+    $required_fields = ['nombre_usuario', 'password', 'nombre', 'telefono', 'id_tipo_cliente'];
+    foreach ($required_fields as $field) {
+        if (empty($data[$field])) throw new Exception("El campo '$field' es obligatorio.");
+    }
+    $stmt_check = $pdo->prepare("SELECT id_cliente FROM clientes WHERE nombre_usuario = :nombre_usuario");
+    $stmt_check->execute([':nombre_usuario' => $data['nombre_usuario']]);
+    if ($stmt_check->fetch()) throw new Exception("El nombre de usuario ya está en uso.");
+    if (!empty($data['email'])) {
+        $stmt_email_check = $pdo->prepare("SELECT id_cliente FROM clientes WHERE email = :email");
+        $stmt_email_check->execute([':email' => $data['email']]);
+        if ($stmt_email_check->fetch()) throw new Exception("El correo electrónico ya está en uso.");
+    }
+    $password_hash = password_hash($data['password'], PASSWORD_DEFAULT);
+    $sql = "INSERT INTO clientes (nombre_usuario, nombre, apellido, email, telefono, password_hash, id_tipo_cliente, institucion, grado_actual) VALUES (:nombre_usuario, :nombre, :apellido, :email, :telefono, :password_hash, :id_tipo_cliente, :institucion, :grado_actual)";
+    $stmt_insert = $pdo->prepare($sql);
+    $stmt_insert->execute([':nombre_usuario' => $data['nombre_usuario'], ':nombre' => $data['nombre'], ':apellido' => empty($data['apellido']) ? null : $data['apellido'], ':email' => empty($data['email']) ? null : $data['email'], ':telefono' => $data['telefono'], ':password_hash' => $password_hash, ':id_tipo_cliente' => (int)$data['id_tipo_cliente'], ':institucion' => $data['institucion'] ?? null, ':grado_actual' => $data['grado_actual'] ?? null]);
+    $new_user_id = $pdo->lastInsertId();
+    $_SESSION['id_cliente'] = $new_user_id;
+    $_SESSION['nombre_usuario'] = $data['nombre_usuario'];
+    // --- CORRECCIÓN: Iniciamos el temporizador de actividad aquí también ---
+    $_SESSION['last_activity'] = time(); 
+    echo json_encode(['success' => true, 'message' => '¡Registro exitoso! Redirigiendo...']);
 }
 
 
@@ -233,43 +282,8 @@ function deleteCartItem(PDO $pdo, int $cart_id, int $product_id) {
     $stmt = $pdo->prepare("DELETE FROM detalle_carrito WHERE id_carrito = :cart_id AND id_producto = :product_id");
     $stmt->execute([':cart_id' => $cart_id, ':product_id' => $product_id]);
 }
-function handleLoginRequest(PDO $pdo) {
-    $data = json_decode(file_get_contents('php://input'), true);
-    if (empty($data['nombre_usuario']) || empty($data['password'])) throw new Exception("Nombre de usuario y contraseña son requeridos.");
-    $stmt = $pdo->prepare("SELECT id_cliente, nombre_usuario, password_hash FROM clientes WHERE nombre_usuario = :nombre_usuario");
-    $stmt->execute([':nombre_usuario' => $data['nombre_usuario']]);
-    $user = $stmt->fetch(PDO::FETCH_ASSOC);
-    if ($user && password_verify($data['password'], $user['password_hash'])) {
-        $_SESSION['id_cliente'] = $user['id_cliente'];
-        $_SESSION['nombre_usuario'] = $user['nombre_usuario'];
-        echo json_encode(['success' => true, 'message' => 'Inicio de sesión exitoso. Redirigiendo...']);
-    } else {
-        throw new Exception("Nombre de usuario o contraseña incorrectos.");
-    }
-}
-function handleRegisterRequest(PDO $pdo) {
-    $data = json_decode(file_get_contents('php://input'), true);
-    $required_fields = ['nombre_usuario', 'password', 'nombre', 'telefono', 'id_tipo_cliente'];
-    foreach ($required_fields as $field) {
-        if (empty($data[$field])) throw new Exception("El campo '$field' es obligatorio.");
-    }
-    $stmt_check = $pdo->prepare("SELECT id_cliente FROM clientes WHERE nombre_usuario = :nombre_usuario");
-    $stmt_check->execute([':nombre_usuario' => $data['nombre_usuario']]);
-    if ($stmt_check->fetch()) throw new Exception("El nombre de usuario ya está en uso.");
-    if (!empty($data['email'])) {
-        $stmt_email_check = $pdo->prepare("SELECT id_cliente FROM clientes WHERE email = :email");
-        $stmt_email_check->execute([':email' => $data['email']]);
-        if ($stmt_email_check->fetch()) throw new Exception("El correo electrónico ya está en uso.");
-    }
-    $password_hash = password_hash($data['password'], PASSWORD_DEFAULT);
-    $sql = "INSERT INTO clientes (nombre_usuario, nombre, apellido, email, telefono, password_hash, id_tipo_cliente, institucion, grado_actual) VALUES (:nombre_usuario, :nombre, :apellido, :email, :telefono, :password_hash, :id_tipo_cliente, :institucion, :grado_actual)";
-    $stmt_insert = $pdo->prepare($sql);
-    $stmt_insert->execute([':nombre_usuario' => $data['nombre_usuario'], ':nombre' => $data['nombre'], ':apellido' => empty($data['apellido']) ? null : $data['apellido'], ':email' => empty($data['email']) ? null : $data['email'], ':telefono' => $data['telefono'], ':password_hash' => $password_hash, ':id_tipo_cliente' => (int)$data['id_tipo_cliente'], ':institucion' => $data['institucion'] ?? null, ':grado_actual' => $data['grado_actual'] ?? null]);
-    $new_user_id = $pdo->lastInsertId();
-    $_SESSION['id_cliente'] = $new_user_id;
-    $_SESSION['nombre_usuario'] = $data['nombre_usuario'];
-    echo json_encode(['success' => true, 'message' => '¡Registro exitoso! Redirigiendo...']);
-}
+
+
 function handleCheckUsernameRequest(PDO $pdo) {
     $username = $_GET['username'] ?? '';
     if (empty($username)) {

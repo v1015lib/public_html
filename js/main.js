@@ -6,9 +6,8 @@ import { setupMobileMenu } from './mobile_menu.js';
 import { initializeCartView } from './cart_view_handler.js';
 import { updateCartHeader } from './cart_updater.js';
 import { initializeQuantityHandlers } from './cart_quantity_handler.js';
-// --- NUEVO: Importamos el manejador de favoritos ---
 import { initializeFavoritesHandler } from './favorites_handler.js';
-
+import { initializeModals } from './modal_handler.js';
 const API_BASE_URL = 'api/index.php'; 
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -17,24 +16,37 @@ document.addEventListener('DOMContentLoaded', () => {
     initializeCartView();
     updateCartHeader();
     initializeQuantityHandlers();
-    // --- NUEVO: Inicializamos el manejador de favoritos ---
     initializeFavoritesHandler();
+    initializeModals();
+    // --- LÓGICA CORREGIDA PARA MANEJAR BÚSQUEDA DESDE OTRAS PÁGINAS ---
+    const urlParams = new URLSearchParams(window.location.search);
+    const searchTermFromUrl = urlParams.get('search'); // Usamos 'search' para coincidir con el form
 
-    // --- LÍNEA MODIFICADA: El filtro de imagen está integrado aquí ---
-    loadProducts('product-list', 'pagination-controls', { 
-        sortBy: 'random', 
-        apiBaseUrl: API_BASE_URL,
-        //hide_no_image: true // <-- Opción integrada aquí
-    });
+    if (searchTermFromUrl) {
+        // Si hay un término de búsqueda en la URL, lo ponemos en el input
+        // y cargamos los productos filtrados.
+        document.getElementById('search-input').value = searchTermFromUrl;
+        loadProducts('product-list', 'pagination-controls', { 
+            apiBaseUrl: API_BASE_URL,
+            search: searchTermFromUrl 
+        });
+    } else {
+        // Si no, cargamos los productos iniciales como siempre.
+        loadProducts('product-list', 'pagination-controls', { 
+            sortBy: 'random', 
+            apiBaseUrl: API_BASE_URL,
+           // hide_no_image: true
+        });
+    }
 
     initializeSearch('search-input', 'search-button', 'product-list', 'pagination-controls', API_BASE_URL);
-
+    
     document.getElementById('sidemenu').addEventListener('click', (event) => {
         const target = event.target;
         if (target.matches('.department-link')) {
             event.preventDefault(); 
             const departmentId = target.dataset.departmentId;
-            let params = { page: 1 };
+            let params = { page: 1, apiBaseUrl: API_BASE_URL };
             if (departmentId !== 'all') {
                 params.department_id = departmentId;
             } else {

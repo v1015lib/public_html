@@ -7,6 +7,8 @@ if (isset($_SESSION['id_cliente'])) {
     header('Location: index.php');
     exit;
 }
+$page_type = 'simplified';
+
 ?>
 <!DOCTYPE html>
 <html lang="es">

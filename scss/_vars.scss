@@ -1,7 +1,7 @@
 // scss/_vars.scss
 
 // Colores
-$primary-color: #141042;
+$primary-color: #0E0C66;
 $secondary-color: #6c757d;
 $background-color: #f8f9fa;
 $text-color: #343a40;
@@ -31,3 +31,15 @@ $breakpoint-mobile: 480px;
 
 // Fuentes
 $font-family-base: 'Inter', sans-serif;
+
+@mixin resp-mobile-header{
+        @media screen and (max-width: 425px) and (min-width: 320px){
+        padding: .5rem;
+
+        & > *,ul,li,a{
+            font-size: .7rem !important;
+        }
+
+    }
+}
+$font-mobile: .7rem;

@@ -1,6 +1,7 @@
 // js/cart_quantity_handler.js
 import { updateCartHeader } from './cart_updater.js';
 import { loadCartDetails } from './cart_view_handler.js';
+import { showLoginPrompt } from './modal_handler.js'; // <-- Importamos la nueva función
 
 async function updateCartAPI(productId, quantity) {
     try {
@@ -13,16 +14,13 @@ async function updateCartAPI(productId, quantity) {
         const data = await response.json();
         if (!data.success) throw new Error(data.message || 'Error del API.');
 
-        // 1. Actualizar el total en el header
         await updateCartHeader();
 
-        // 2. Si el panel del carrito está visible, recargarlo
         const cartPanel = document.getElementById('cart-panel');
         if (cartPanel && cartPanel.classList.contains('visible')) {
             await loadCartDetails();
         }
 
-        // 3. --- ¡NUEVO! SINCRONIZAR LA TARJETA DEL PRODUCTO PRINCIPAL ---
         const productCardInput = document.querySelector(`.product-card[data-product-id="${productId}"] .quantity-input`);
         if (productCardInput) {
             productCardInput.value = quantity;
@@ -33,49 +31,54 @@ async function updateCartAPI(productId, quantity) {
     }
 }
 
-function handleQuantityButtonClick(event) {
-    const button = event.target;
-    const action = button.dataset.action;
-    const selector = button.closest('.quantity-selector');
+function handleQuantityInteraction(event) {
+    const isLoggedIn = document.querySelector('.my-account-link');
+    if (!isLoggedIn) {
+        // --- Llama a la nueva ventana modal en lugar de la alerta ---
+        showLoginPrompt();
+        // Reseteamos el input a 0 para evitar confusión.
+        const input = event.target.closest('.quantity-selector')?.querySelector('.quantity-input');
+        if (input) input.value = 0;
+        return;
+    }
+
+    const target = event.target;
+    const selector = target.closest('.quantity-selector');
+    if (!selector) return;
+
     const input = selector.querySelector('.quantity-input');
     const productId = input.dataset.productId;
     let currentValue = parseInt(input.value, 10);
 
     if (isNaN(currentValue)) currentValue = 0;
 
-    if (action === 'increase') {
-        currentValue++;
-    } else if (action === 'decrease') {
-        currentValue = Math.max(0, currentValue - 1);
+    if (target.matches('.quantity-btn')) {
+        const action = target.dataset.action;
+        if (action === 'increase') {
+            currentValue++;
+        } else if (action === 'decrease') {
+            currentValue = Math.max(0, currentValue - 1);
+        }
+        input.value = currentValue;
+        updateCartAPI(productId, currentValue);
+    } else if (target.matches('.quantity-input')) {
+        let debounceTimer = null;
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => {
+            updateCartAPI(productId, currentValue);
+        }, 500);
     }
-    input.value = currentValue;
-    updateCartAPI(productId, currentValue);
-}
-
-let debounceTimer = null;
-function handleQuantityInputChange(event) {
-    const input = event.target;
-    const productId = input.dataset.productId;
-    let finalQuantity = parseInt(input.value, 10);
-    if (isNaN(finalQuantity) || finalQuantity < 0) {
-        finalQuantity = 0;
-        input.value = finalQuantity;
-    }
-    clearTimeout(debounceTimer);
-    debounceTimer = setTimeout(() => {
-        updateCartAPI(productId, finalQuantity);
-    }, 500);
 }
 
 export function initializeQuantityHandlers() {
     document.body.addEventListener('click', event => {
         if (event.target.matches('.quantity-btn')) {
-            handleQuantityButtonClick(event);
+            handleQuantityInteraction(event);
         }
     });
     document.body.addEventListener('input', event => {
         if (event.target.matches('.quantity-input')) {
-            handleQuantityInputChange(event);
+            handleQuantityInteraction(event);
         }
     });
 }

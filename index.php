@@ -46,14 +46,15 @@
 <div id="login-prompt-modal" class="modal-overlay hidden">
     <div class="modal-content">
         <h3>Inicia Sesión para Continuar</h3>
-        <p>Debes iniciar sesión para guardar productos en tus favoritos.</p>
+        <p>Debe inciar sesion o registrarte para efectuar la accion :)
+        </br>Adelante, No te llevara mucho tiempo</p>
         <div class="modal-actions">
             <button id="login-prompt-cancel" class="btn-secondary">Cancelar</button>
             <a href="login.php" class="btn-primary">Iniciar Sesión</a>
         </div>
     </div>
 </div>
-    
+
 
     <script type="module" src="js/main.js"></script>
 </body>

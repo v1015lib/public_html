@@ -1,5 +1,3 @@
-// js/mobile_menu.js
-
 export function setupMobileMenu() {
     const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
     const sidemenu = document.getElementById('sidemenu');

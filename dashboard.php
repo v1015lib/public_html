@@ -7,6 +7,8 @@ if (!isset($_SESSION['id_cliente'])) {
     header('Location: login.php');
     exit;
 }
+$page_type = 'simplified';
+
 $view = $_GET['view'] ?? 'perfil';
 ?>
 <!DOCTYPE html>

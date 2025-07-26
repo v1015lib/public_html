@@ -44,7 +44,7 @@ ul, li, a {
 }
 
 .main-header {
-  background-color: #141042;
+  background-color: #0E0C66;
   color: white;
   padding: 1rem;
   position: sticky;
@@ -55,9 +55,6 @@ ul, li, a {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
-  -webkit-box-pack: justify;
-      -ms-flex-pack: justify;
-          justify-content: space-between;
   -webkit-box-align: center;
       -ms-flex-align: center;
           align-items: center;
@@ -73,8 +70,6 @@ ul, li, a {
   -webkit-box-align: center;
       -ms-flex-align: center;
           align-items: center;
-  text-decoration: none;
-  color: white;
   height: 50px;
   padding: 0;
 }
@@ -84,7 +79,6 @@ ul, li, a {
   display: block;
   -webkit-filter: invert(1);
           filter: invert(1);
-  padding: 0;
 }
 .main-header .search-bar {
   display: -webkit-box;
@@ -103,7 +97,7 @@ ul, li, a {
   border-radius: 4px 0 0 4px;
 }
 .main-header button#search-button {
-  background-color: #080619;
+  background-color: #080738;
   color: white;
   border: none;
   padding: 0.5rem 1rem;
@@ -111,7 +105,7 @@ ul, li, a {
   cursor: pointer;
 }
 .main-header button#search-button:hover {
-  background-color: #010104;
+  background-color: #050422;
 }
 .main-header .header-right-controls {
   display: -webkit-box;
@@ -120,6 +114,7 @@ ul, li, a {
   -webkit-box-align: center;
       -ms-flex-align: center;
           align-items: center;
+  margin-left: auto;
 }
 .main-header .main-nav ul {
   display: -webkit-box;
@@ -133,20 +128,33 @@ ul, li, a {
   margin: 0;
 }
 .main-header .main-nav ul li {
-  margin-left: 1rem;
+  margin-left: 0.75rem;
 }
-.main-header .main-nav ul li a {
+.main-header .main-nav ul li a { /*Link a mi cuenta*/
   color: white;
   text-decoration: none;
+  padding: 0.5rem;
+  display: block;
 }
 .main-header .main-nav ul li a:hover {
   text-decoration: underline;
 }
-.main-header .mobile-menu-toggle {
+@media screen and (max-width: 425px) and (min-width: 320px) {
+  .main-header .main-nav ul li a {
+    font-size: 0.7rem;
+  }
+}
+.main-header .mobile-menu-toggle { /*Boton Menu*/
   display: none;
   font-size: 2rem;
   cursor: pointer;
   margin-left: 1rem;
+}
+@media screen and (max-width: 425px) and (min-width: 320px) {
+  .main-header .mobile-menu-toggle {
+    font-size: 0.7rem;
+    font-weight: bold;
+  }
 }
 .main-header .cart-widget-container a {
   display: -webkit-box;
@@ -166,12 +174,27 @@ ul, li, a {
   background-color: rgba(255, 255, 255, 0.1);
 }
 .main-header .cart-icon {
-  font-size: 1.8rem;
-  margin-right: 0.5rem;
+  font-size: 0.7rem;
 }
-.main-header .cart-total-header {
+.main-header .cart-total-header { /*Total de  compra*/
   font-size: 1rem;
   font-weight: bold;
+}
+@media screen and (max-width: 425px) and (min-width: 320px) {
+  .main-header .cart-total-header {
+    font-size: 0.7rem;
+  }
+}
+
+.header-content.simplified-header {
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  gap: 1rem;
+}
+.header-content.simplified-header .search-bar {
+  margin: 0;
 }
 
 .sidemenu {
@@ -224,9 +247,9 @@ ul, li, a {
   width: 100%;
 }
 .sidemenu ul li a:hover {
-  color: #141042;
+  color: #0E0C66;
   text-decoration: none;
-  background: #141042;
+  background: #0E0C66;
   color: white;
 }
 
@@ -351,7 +374,7 @@ h3 {
 
 p.department {
   font-size: 0.85rem;
-  color: #141042;
+  color: #0E0C66;
   font-weight: bold;
   margin-bottom: auto;
   padding-bottom: 0.5rem;
@@ -407,7 +430,7 @@ p.code {
   -moz-appearance: textfield;
 }
 .quantity-selector .quantity-input:focus {
-  outline: 2px solid #141042;
+  outline: 2px solid #0E0C66;
   position: relative;
   z-index: 2;
 }
@@ -586,7 +609,7 @@ p.code {
   font-size: 1.1rem;
   font-weight: bold;
   color: white;
-  background-color: #141042;
+  background-color: #0E0C66;
   border: none;
   border-radius: 5px;
   cursor: pointer;
@@ -594,7 +617,7 @@ p.code {
   transition: background-color 0.2s ease;
 }
 .cart-footer .checkout-btn:hover {
-  background-color: #080619;
+  background-color: #080738;
 }
 
 .cart-item {
@@ -687,7 +710,7 @@ p.code {
 
 .toast-notification {
   background-color: #333;
-  color: white;
+  color: red;
   padding: 15px 25px;
   border-radius: 8px;
   -webkit-box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
@@ -734,6 +757,12 @@ p.code {
   opacity: 1;
   visibility: visible;
 }
+@media screen and (max-width: 425px) and (min-width: 320px) {
+  .modal-overlay > * {
+    font-size: 0.7rem;
+    font-weight: bold;
+  }
+}
 
 .modal-content {
   background-color: white;
@@ -759,6 +788,12 @@ p.code {
   margin-top: 0;
   margin-bottom: 1rem;
   font-size: 1.5rem;
+}
+@media screen and (max-width: 425px) and (min-width: 320px) {
+  .modal-content h3 {
+    font-size: 0.9rem;
+    font-weight: bold;
+  }
 }
 .modal-content p {
   margin-bottom: 2rem;
@@ -795,11 +830,11 @@ p.code {
   background-color: #e0e0e0;
 }
 .modal-actions .btn-primary {
-  background-color: #141042;
+  background-color: #0E0C66;
   color: white;
 }
 .modal-actions .btn-primary:hover {
-  background-color: #080619;
+  background-color: #080738;
 }
 
 .pagination {
@@ -818,7 +853,7 @@ p.code {
 .pagination button {
   background-color: #fff;
   border: 1px solid #dee2e6;
-  color: #141042;
+  color: #0E0C66;
   padding: 0.75rem 1rem;
   margin: 0 5px;
   cursor: pointer;
@@ -828,14 +863,14 @@ p.code {
   transition: all 0.2s ease;
 }
 .pagination button:hover {
-  background-color: #141042;
+  background-color: #0E0C66;
   color: white;
-  border-color: #141042;
+  border-color: #0E0C66;
 }
 .pagination button.active {
-  background-color: #141042;
+  background-color: #0E0C66;
   color: white;
-  border-color: #141042;
+  border-color: #0E0C66;
   cursor: default;
 }
 .pagination button:disabled {
@@ -885,9 +920,9 @@ p.code {
 }
 .register-form input[type=text]:focus, .register-form input[type=email]:focus, .register-form input[type=password]:focus, .register-form input[type=tel]:focus, .login-form input[type=text]:focus, .login-form input[type=email]:focus, .login-form input[type=password]:focus, .login-form input[type=tel]:focus {
   outline: none;
-  border-color: #141042;
-  -webkit-box-shadow: 0 0 0 4px rgba(20, 16, 66, 0.1);
-          box-shadow: 0 0 0 4px rgba(20, 16, 66, 0.1);
+  border-color: #0E0C66;
+  -webkit-box-shadow: 0 0 0 4px rgba(14, 12, 102, 0.1);
+          box-shadow: 0 0 0 4px rgba(14, 12, 102, 0.1);
 }
 .register-form .submit-btn, .login-form .submit-btn {
   width: 100%;
@@ -895,7 +930,7 @@ p.code {
   font-size: 1.1rem;
   font-weight: bold;
   color: white;
-  background-color: #141042;
+  background-color: #0E0C66;
   border: none;
   border-radius: 8px;
   cursor: pointer;
@@ -905,8 +940,8 @@ p.code {
 .register-form .submit-btn:hover, .login-form .submit-btn:hover {
   -webkit-transform: translateY(-2px);
           transform: translateY(-2px);
-  -webkit-box-shadow: 0 6px 20px rgba(20, 16, 66, 0.3);
-          box-shadow: 0 6px 20px rgba(20, 16, 66, 0.3);
+  -webkit-box-shadow: 0 6px 20px rgba(14, 12, 102, 0.3);
+          box-shadow: 0 6px 20px rgba(14, 12, 102, 0.3);
 }
 .register-form .form-footer-link, .login-form .form-footer-link {
   margin-top: 1.5rem;
@@ -914,7 +949,7 @@ p.code {
 }
 
 .required {
-  color: #141042;
+  color: #0E0C66;
 }
 
 .student-fields.hidden {
@@ -1014,7 +1049,7 @@ p.code {
 .dashboard-sidemenu .dashboard-sidemenu-header h3 {
   margin: 0;
   font-size: 1.5rem;
-  color: #141042;
+  color: #0E0C66;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1035,9 +1070,9 @@ p.code {
   transition: all 0.2s ease;
 }
 .dashboard-sidemenu nav ul li a:hover {
-  background-color: rgba(20, 16, 66, 0.05);
-  border-left-color: #141042;
-  color: #141042;
+  background-color: rgba(14, 12, 102, 0.05);
+  border-left-color: #0E0C66;
+  color: #0E0C66;
 }
 .dashboard-sidemenu nav ul li.separator {
   height: 1px;

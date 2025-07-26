@@ -1,5 +1,6 @@
 // js/favorites_handler.js
 import { showNotification } from './notification_handler.js';
+import { showLoginPrompt } from './modal_handler.js'; // <-- Importamos la nueva función
 
 async function toggleFavorite(productId, button) {
     const isCurrentlyFavorite = button.classList.contains('is-favorite');
@@ -18,7 +19,7 @@ async function toggleFavorite(productId, button) {
         if (!response.ok) {
             throw new Error(result.error || 'Error en la respuesta del servidor.');
         }
-
+        
         if (result.success) {
             button.classList.toggle('is-favorite');
             showNotification(successMessage);
@@ -32,26 +33,11 @@ async function toggleFavorite(productId, button) {
     }
 }
 
-
 export function initializeFavoritesHandler() {
-    const loginPromptModal = document.getElementById('login-prompt-modal');
-    const cancelPromptBtn = document.getElementById('login-prompt-cancel');
-
-    // Evento para cerrar la ventana modal
-    if (cancelPromptBtn && loginPromptModal) {
-        cancelPromptBtn.addEventListener('click', () => {
-            loginPromptModal.classList.remove('visible');
-            // Usamos un delay para que la animación de salida termine antes de ocultarlo
-            setTimeout(() => loginPromptModal.classList.add('hidden'), 300);
-        });
-    }
-
-    // Evento principal en los botones de favoritos
     document.body.addEventListener('click', (event) => {
         const favoriteButton = event.target.closest('.favorite-btn');
         if (favoriteButton) {
-            // MODIFICADO: Check if the main-header has the data-logged-in attribute
-            const isLoggedIn = document.querySelector('.main-header[data-logged-in="true"]');
+            const isLoggedIn = document.querySelector('.my-account-link');
 
             if (isLoggedIn) {
                 // Si el usuario ha iniciado sesión, funciona normal
@@ -59,11 +45,7 @@ export function initializeFavoritesHandler() {
                 toggleFavorite(productId, favoriteButton);
             } else {
                 // Si no ha iniciado sesión, muestra la ventana modal
-                if (loginPromptModal) {
-                    loginPromptModal.classList.remove('hidden');
-                    // Usamos un pequeño delay para que la transición de opacidad funcione
-                    setTimeout(() => loginPromptModal.classList.add('visible'), 10);
-                }
+                showLoginPrompt();
             }
         }
     });

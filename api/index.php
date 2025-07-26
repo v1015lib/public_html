@@ -6,35 +6,22 @@ if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
 
-// =======================================================================
 // LÓGICA DE CIERRE DE SESIÓN AUTOMÁTICO POR INACTIVIDAD
-// =======================================================================
-
-// 1. Definir el tiempo de inactividad en segundos (1800 segundos = 30 minutos)
-$timeout_duration = 1800;
-
-// 2. Comprobar si hay una sesión activa y si ha expirado
+$timeout_duration = 1800; // 30 minutos
 if (isset($_SESSION['id_cliente']) && isset($_SESSION['last_activity'])) {
-    $elapsed_time = time() - $_SESSION['last_activity'];
-    
-    if ($elapsed_time > $timeout_duration) {
+    if ((time() - $_SESSION['last_activity']) > $timeout_duration) {
         session_unset();
         session_destroy();
-        http_response_code(401); // Unauthorized
+        http_response_code(401);
         echo json_encode(['error' => 'Tu sesión ha expirado por inactividad.']);
-        exit; // Detenemos la ejecución
+        exit;
     }
 }
-
-// 3. Actualizar la hora de la última actividad en cada petición
-// Esto reinicia el "contador" de inactividad si el usuario está logueado
 if (isset($_SESSION['id_cliente'])) {
     $_SESSION['last_activity'] = time();
 }
 
-
-// --- El resto de tu archivo se mantiene exactamente igual ---
-
+// --- CONFIGURACIÓN Y CABECERAS ---
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 header('Content-Type: application/json');
@@ -43,8 +30,10 @@ require_once __DIR__ . '/../config/config.php';
 
 $resource = $_GET['resource'] ?? '';
 $method = $_SERVER['REQUEST_METHOD'];
+$inputData = json_decode(file_get_contents('php://input'), true);
 
 try {
+    // --- MANEJADOR DE RECURSOS (ROUTER) ---
     switch ($resource) {
         case 'products':
             handleProductsRequest($pdo);
@@ -79,6 +68,29 @@ try {
         case 'check-username':
             if ($method === 'GET') handleCheckUsernameRequest($pdo);
             break;
+        
+        // --- NUEVOS RECURSOS PARA EL PERFIL DE USUARIO ---
+        case 'profile':
+            if (!isset($_SESSION['id_cliente'])) {
+                http_response_code(401);
+                throw new Exception("Acceso no autorizado.");
+            }
+            if ($method === 'GET') {
+                handleGetProfileRequest($pdo, $_SESSION['id_cliente']);
+            } elseif ($method === 'PUT') {
+                handleUpdateProfileRequest($pdo, $_SESSION['id_cliente'], $inputData);
+            }
+            break;
+        case 'password':
+             if (!isset($_SESSION['id_cliente'])) {
+                http_response_code(401);
+                throw new Exception("Acceso no autorizado.");
+            }
+            if ($method === 'PUT') {
+                handleUpdatePasswordRequest($pdo, $_SESSION['id_cliente'], $inputData);
+            }
+            break;
+
         default:
             http_response_code(400);
             echo json_encode(['error' => 'Recurso no especificado o no válido.']);
@@ -89,7 +101,54 @@ try {
     echo json_encode(['error' => 'Error: ' . $e->getMessage()]);
 }
 
-// --- LÓGICA DE LOGIN (CORREGIDA) ---
+// --- FUNCIONES PARA EL PERFIL ---
+function handleGetProfileRequest(PDO $pdo, int $client_id) {
+    $stmt = $pdo->prepare("SELECT nombre_usuario, nombre, apellido, email, telefono FROM clientes WHERE id_cliente = :client_id");
+    $stmt->execute([':client_id' => $client_id]);
+    $profile = $stmt->fetch(PDO::FETCH_ASSOC);
+    if (!$profile) {
+        throw new Exception("Perfil no encontrado.");
+    }
+    echo json_encode(['success' => true, 'profile' => $profile]);
+}
+
+function handleUpdateProfileRequest(PDO $pdo, int $client_id, ?array $data) {
+    if (empty($data['nombre']) || empty($data['apellido']) || empty($data['email'])) {
+        throw new Exception("Nombre, apellido y email son campos obligatorios.");
+    }
+    $stmt = $pdo->prepare("UPDATE clientes SET nombre = :nombre, apellido = :apellido, email = :email, telefono = :telefono WHERE id_cliente = :client_id");
+    $stmt->execute([
+        ':nombre' => $data['nombre'],
+        ':apellido' => $data['apellido'],
+        ':email' => $data['email'],
+        ':telefono' => $data['telefono'] ?? null,
+        ':client_id' => $client_id
+    ]);
+    echo json_encode(['success' => true, 'message' => 'Perfil actualizado correctamente.']);
+}
+
+function handleUpdatePasswordRequest(PDO $pdo, int $client_id, ?array $data) {
+    if (empty($data['current_password']) || empty($data['new_password'])) {
+        throw new Exception("Todos los campos de contraseña son requeridos.");
+    }
+    
+    $stmt = $pdo->prepare("SELECT password_hash FROM clientes WHERE id_cliente = :client_id");
+    $stmt->execute([':client_id' => $client_id]);
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!$user || !password_verify($data['current_password'], $user['password_hash'])) {
+        throw new Exception("La contraseña actual es incorrecta.");
+    }
+    
+    $new_password_hash = password_hash($data['new_password'], PASSWORD_DEFAULT);
+    $stmt_update = $pdo->prepare("UPDATE clientes SET password_hash = :new_hash WHERE id_cliente = :client_id");
+    $stmt_update->execute([':new_hash' => $new_password_hash, ':client_id' => $client_id]);
+
+    echo json_encode(['success' => true, 'message' => 'Contraseña actualizada correctamente.']);
+}
+
+
+// --- RESTO DE FUNCIONES (SIN CAMBIOS) ---
 function handleLoginRequest(PDO $pdo) {
     $data = json_decode(file_get_contents('php://input'), true);
     if (empty($data['nombre_usuario']) || empty($data['password'])) throw new Exception("Nombre de usuario y contraseña son requeridos.");
@@ -101,15 +160,14 @@ function handleLoginRequest(PDO $pdo) {
     if ($user && password_verify($data['password'], $user['password_hash'])) {
         $_SESSION['id_cliente'] = $user['id_cliente'];
         $_SESSION['nombre_usuario'] = $user['nombre_usuario'];
-        // --- CORRECCIÓN: Iniciamos el temporizador de actividad aquí ---
         $_SESSION['last_activity'] = time();
         echo json_encode(['success' => true, 'message' => 'Inicio de sesión exitoso. Redirigiendo...']);
     } else {
+        http_response_code(401);
         throw new Exception("Nombre de usuario o contraseña incorrectos.");
     }
 }
 
-// --- LÓGICA DE REGISTRO (CORREGIDA) ---
 function handleRegisterRequest(PDO $pdo) {
     $data = json_decode(file_get_contents('php://input'), true);
     $required_fields = ['nombre_usuario', 'password', 'nombre', 'telefono', 'id_tipo_cliente'];
@@ -131,13 +189,10 @@ function handleRegisterRequest(PDO $pdo) {
     $new_user_id = $pdo->lastInsertId();
     $_SESSION['id_cliente'] = $new_user_id;
     $_SESSION['nombre_usuario'] = $data['nombre_usuario'];
-    // --- CORRECCIÓN: Iniciamos el temporizador de actividad aquí también ---
     $_SESSION['last_activity'] = time(); 
     echo json_encode(['success' => true, 'message' => '¡Registro exitoso! Redirigiendo...']);
 }
 
-
-// --- LÓGICA DE FAVORITOS AHORA USA SESIONES Y DEVUELVE ERRORES CLAROS ---
 function handleGetFavoritesRequest(PDO $pdo) {
     if (!isset($_SESSION['id_cliente'])) {
         echo json_encode([]);
@@ -151,7 +206,7 @@ function handleGetFavoritesRequest(PDO $pdo) {
 }
 function handleAddFavoriteRequest(PDO $pdo) {
     if (!isset($_SESSION['id_cliente'])) {
-        http_response_code(401); // Unauthorized
+        http_response_code(401);
         echo json_encode(['error' => 'Debes iniciar sesión para añadir favoritos.']);
         return;
     }
@@ -165,7 +220,7 @@ function handleAddFavoriteRequest(PDO $pdo) {
 }
 function handleRemoveFavoriteRequest(PDO $pdo) {
     if (!isset($_SESSION['id_cliente'])) {
-        http_response_code(401); // Unauthorized
+        http_response_code(401);
         echo json_encode(['error' => 'Debes iniciar sesión para quitar favoritos.']);
         return;
     }
@@ -177,11 +232,9 @@ function handleRemoveFavoriteRequest(PDO $pdo) {
     $stmt->execute([':client_id' => $client_id, ':product_id' => $product_id]);
     echo json_encode(['success' => true, 'message' => 'Producto eliminado de favoritos.']);
 }
-
-// --- LÓGICA DEL CARRITO AHORA USA SESIONES Y DEVUELVE ERRORES CLAROS ---
 function handleSetCartItemRequest(PDO $pdo) {
     if (!isset($_SESSION['id_cliente'])) {
-        http_response_code(401); // Unauthorized
+        http_response_code(401);
         echo json_encode(['error' => 'Debes iniciar sesión para modificar el carrito.']);
         return;
     }
@@ -212,8 +265,6 @@ function handleSetCartItemRequest(PDO $pdo) {
     $pdo->commit();
     echo json_encode(['success' => true, 'message' => 'Carrito actualizado.']);
 }
-
-
 function handleCartStatusRequest(PDO $pdo) {
     if (!isset($_SESSION['id_cliente'])) {
         echo json_encode(['total_price' => '0.00']); return;
@@ -225,7 +276,6 @@ function handleCartStatusRequest(PDO $pdo) {
     $total_price = $result['total_price'] ? number_format($result['total_price'], 2, '.', '') : '0.00';
     echo json_encode(['total_price' => $total_price]);
 }
-
 function handleCartDetailsRequest(PDO $pdo) {
     if (!isset($_SESSION['id_cliente'])) {
         echo json_encode(['cart_items' => [], 'total' => '0.00']); return;
@@ -242,13 +292,12 @@ function handleCartDetailsRequest(PDO $pdo) {
     foreach ($cart_items as $item) $total += $item['subtotal'];
     echo json_encode(['cart_items' => $cart_items, 'total' => number_format($total, 2, '.', '')]);
 }
-
 function handleCheckoutRequest(PDO $pdo) {
     if (!isset($_SESSION['id_cliente'])) throw new Exception('Debes iniciar sesión para finalizar la compra.');
     $client_id = $_SESSION['id_cliente'];
     $cart_id = getOrCreateCart($pdo, $client_id);
     if (!$cart_id) throw new Exception("No se encontró un carrito activo para finalizar.");
-    $stmt = $pdo->prepare("UPDATE carritos_compra SET estado_id = 20 WHERE id_carrito = :cart_id AND id_cliente = :client_id AND estado_id = 1");
+    $stmt = $pdo->prepare("UPDATE carritos_compra SET estado_id = 2 WHERE id_carrito = :cart_id AND id_cliente = :client_id AND estado_id = 1");
     $stmt->execute([':cart_id' => $cart_id, ':client_id' => $client_id]);
     if ($stmt->rowCount() > 0) {
         echo json_encode(['success' => true, 'message' => 'Compra finalizada con éxito.']);
@@ -256,8 +305,6 @@ function handleCheckoutRequest(PDO $pdo) {
         echo json_encode(['success' => true, 'message' => 'El carrito ya estaba procesado o vacío.']);
     }
 }
-
-// --- El resto de las funciones se mantienen igual ---
 function handleDeleteCartItemRequest(PDO $pdo) {
     if (!isset($_SESSION['id_cliente'])) throw new Exception('Debes iniciar sesión para modificar el carrito.');
     $data = json_decode(file_get_contents('php://input'), true);
@@ -282,8 +329,6 @@ function deleteCartItem(PDO $pdo, int $cart_id, int $product_id) {
     $stmt = $pdo->prepare("DELETE FROM detalle_carrito WHERE id_carrito = :cart_id AND id_producto = :product_id");
     $stmt->execute([':cart_id' => $cart_id, ':product_id' => $product_id]);
 }
-
-
 function handleCheckUsernameRequest(PDO $pdo) {
     $username = $_GET['username'] ?? '';
     if (empty($username)) {
@@ -291,8 +336,7 @@ function handleCheckUsernameRequest(PDO $pdo) {
     }
     $stmt = $pdo->prepare("SELECT 1 FROM clientes WHERE nombre_usuario = :nombre_usuario LIMIT 1");
     $stmt->execute([':nombre_usuario' => $username]);
-    $userExists = $stmt->rowCount() > 0;
-    $is_available = !$userExists;
+    $is_available = !$stmt->fetch();
     echo json_encode(['is_available' => $is_available]);
 }
 function handleProductsRequest(PDO $pdo) {
@@ -339,10 +383,9 @@ function handleProductsRequest(PDO $pdo) {
     $params[':limit'] = $limit;
     $params[':offset'] = $offset;
     $stmt = $pdo->prepare($sql);
-    $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
-    $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
     foreach ($params as $key => &$val) {
-        if ($key !== ':limit' && $key !== ':offset') $stmt->bindParam($key, $val);
+        $type = ($key === ':limit' || $key === ':offset') ? PDO::PARAM_INT : PDO::PARAM_STR;
+        $stmt->bindParam($key, $val, $type);
     }
     $stmt->execute();
     $products = $stmt->fetchAll(PDO::FETCH_ASSOC);

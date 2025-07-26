@@ -1,33 +1,53 @@
 // scss/_dashboard.scss
 @import 'vars';
 
+/* ==========================================================================
+   1. ESTRUCTURA Y LAYOUT GENERAL DEL DASHBOARD
+   ========================================================================== */
+
 .dashboard-layout {
     display: flex;
-    min-height: 100vh;
+    height: 100vh; 
     background-color: #f4f7f9;
 }
+
+.dashboard-main {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; 
+}
+
+.dashboard-content {
+    flex-grow: 1;
+    padding: 1.5rem 2rem; 
+    overflow-y: auto; 
+}
+
+/* ==========================================================================
+   2. ESTILOS COMPLETOS DE COMPONENTES DEL DASHBOARD
+   ========================================================================== */
 
 .dashboard-sidemenu {
     width: 260px;
     background-color: #fff;
-    border-right: 1px solid $border-color;
+    border-right: 1px solid #e0e0e0;
     flex-shrink: 0;
     transition: margin-left 0.3s ease;
+    z-index: 1001;
 
     .dashboard-sidemenu-header {
         padding: 1.5rem;
-        border-bottom: 1px solid $border-color;
+        border-bottom: 1px solid #e9ecef;
         h3 {
             margin: 0;
-            font-size: 1.5rem;
-            color: $primary-color;
-            white-space: nowrap;      // Evita que el nombre se parta en dos líneas
-            overflow: hidden;         // Oculta el texto que no quepa
-            text-overflow: ellipsis;  // Añade "..." si el nombre es muy largo
- 
+            font-size: 1.2rem;
+            color: #333;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
     }
-
     nav ul {
         list-style: none;
         padding: 1rem 0;
@@ -40,100 +60,194 @@
             font-weight: 500;
             border-left: 3px solid transparent;
             transition: all 0.2s ease;
-            &:hover {
-                background-color: rgba($primary-color, 0.05);
+            &:hover, &.active {
+                background-color: #f8f9fa;
                 border-left-color: $primary-color;
                 color: $primary-color;
             }
         }
         li.separator {
             height: 1px;
-            background-color: $border-color;
+            background-color: #e9ecef;
             margin: 1rem 0;
         }
     }
 }
 
-.dashboard-main {
-    flex-grow: 1;
-}
-
-// --- ESTILOS DEL HEADER DEL DASHBOARD MODIFICADOS ---
 .dashboard-header {
     display: flex;
     align-items: center;
-    justify-content: space-between; // Para separar logo y carrito
-    background-color: #fff;
+    justify-content: space-between;
+    background-color: $primary-color;
+    color: white;
     padding: 0.75rem 1.5rem;
-    border-bottom: 1px solid $border-color;
-    position: sticky;
-    top: 0;
+    flex-shrink: 0;
     z-index: 900;
 
     .dashboard-header-left {
         display: flex;
         align-items: center;
     }
-
     .dashboard-menu-toggle {
-        display: none; // Oculto en PC
+        display: none;
         background: none;
         border: none;
         font-size: 1.8rem;
         cursor: pointer;
         margin-right: 1rem;
+        color: white;
     }
+    .logo a img { 
+        max-height: 40px; 
+        width: auto;
+        filter: invert(1);
+    }
+    .header-right-controls{
 
-    .logo a {
-        display: flex;
-        align-items: center;
-        height: 40px;
-        img { max-height: 100%; width: auto; }
+
+        .cart-widget-container{
+
+            a{
+                .cart-icon{
+                    font-size: 1rem;
+
+                }
+                .cart-total-header{
+                    color: white;
+                }
+
+            }
+        }
     }
 }
+
+
+/* ==========================================================================
+   3. ESTILOS AISLADOS Y COMPACTOS PARA EL PERFIL (NO AFECTAN NADA MÁS)
+   ========================================================================== */
 
 .dashboard-content {
-    padding: 2rem;
-}
+    h1 {
+        font-size: 1.5rem;
+        margin-bottom: 0.25rem; 
+        color: #2c3e50; 
+    }
+    p { 
+        margin-bottom: 1.5rem; 
+        color: #6c757d; 
+        font-size: 0.95rem;
+    }
 
-// --- ESTILOS DEL CARRITO (INTEGRADOS PARA EL DASHBOARD) ---
-.header-right-controls {
-    display: flex;
-    align-items: center;
-}
-.cart-widget-container {
-    a {
-        display: flex;
-        align-items: center;
-        color: #333; // Color oscuro para fondo blanco
-        text-decoration: none;
-        padding: 0.5rem;
-        border-radius: 5px;
-        transition: background-color 0.2s ease;
-        &:hover { background-color: #f0f0f0; }
+    .profile-forms-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    .profile-forms-grid .form-container-profile {
+        background-color: #ffffff;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin: 0;
+        box-shadow: none;
+        margin-bottom: -100%;
+        h2 {
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin: 0 0 1rem 0;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #e9ecef;
+            text-align: left;
+        }
+
+        .form-group {
+            margin-bottom: 0.85rem;
+        }
+
+        label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 0.4rem;
+        }
+        
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        input[type="tel"] {
+            width: 100%;
+            font-size: 0.9rem;
+            padding: 10px 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            background-color: #fdfdfd;
+
+            &:focus {
+                outline: none;
+                border-color: #333;
+                background-color: #fff;
+                box-shadow: 0 0 0 3px rgba(44, 62, 80, 0.1);
+            }
+
+            &:disabled {
+              background-color: #f0f0f0;
+              cursor: not-allowed;
+            }
+        }
+
+        small {
+            display: block;
+            font-size: 0.8rem;
+            color: #6c757d;
+            margin-top: 0.3rem;
+        }
+
+        .submit-btn {
+            background-color: $primary-color;
+            color: white;
+            padding: 0.7rem 1.2rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            width: auto;
+            margin-top: 0.5rem;
+            cursor: pointer;
+            margin-bottom: 2em;
+            
+        }
     }
 }
-.cart-icon {
-    font-size: 1.8rem;
-    margin-right: 0.5rem;
-}
-.cart-total-header {
-    font-size: 1rem;
-    font-weight: bold;
-}
 
-// Estilos responsivos para el dashboard
-@media (max-width: $breakpoint-tablet) {
+
+/* ==========================================================================
+   4. REGLAS RESPONSIVAS
+   ========================================================================== */
+
+// --- Para móvil y tablet ---
+@media (max-width: 991px) {
     .dashboard-sidemenu {
         position: fixed;
         left: -100%;
         height: 100%;
-        z-index: 1000;
         &.active {
             left: 0;
         }
     }
     .dashboard-header .dashboard-menu-toggle {
         display: block;
+    }
+    .dashboard-content {
+        padding: 1rem;
+    }
+}
+
+// --- Para PC: activa las 2 columnas ---
+@media (min-width: 992px) {
+    .dashboard-content .profile-forms-grid {
+        grid-template-columns: 1fr 1fr;
     }
 }

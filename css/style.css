@@ -881,177 +881,206 @@ p.code {
   background-color: #f8f9fa;
 }
 
+.body-form-page {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: -ms-grid;
+  display: grid;
+  place-items: center;
+  min-height: 100vh;
+  padding: 1rem;
+}
+
 .form-container {
-  max-width: 600px;
-  margin: 3rem auto;
-  background-color: #fff;
+  background-color: #ffffff;
+  color: #333;
+  max-width: 500px;
+  width: 100%;
+  padding: 2.5rem;
   border-radius: 12px;
-  -webkit-box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-  padding: 2.5rem 3rem;
+  -webkit-box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+          box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+  margin: auto;
   max-height: 90vh;
   overflow-y: auto;
 }
-.form-container h1 {
+.form-container h1, .form-container h2 {
+  color: #2c3e50;
   text-align: center;
-  margin-bottom: 1.5rem;
-  color: #333;
+  margin-bottom: 0.5rem;
 }
 .form-container p {
+  color: #7f8c8d;
   text-align: center;
   margin-bottom: 2rem;
-  color: #6c757d;
 }
 
-.register-form .form-group, .login-form .form-group {
-  margin-bottom: 1.5rem;
+.register-form .form-group, .login-form .form-group, #profile-form .form-group, #password-form .form-group {
+  margin-bottom: 1.25rem;
 }
-.register-form label, .login-form label {
+.register-form .form-group label, .login-form .form-group label, #profile-form .form-group label, #password-form .form-group label {
   display: block;
   margin-bottom: 0.5rem;
   font-weight: 600;
+  color: #34495e;
 }
-.register-form input[type=text], .register-form input[type=email], .register-form input[type=password], .register-form input[type=tel], .login-form input[type=text], .login-form input[type=email], .login-form input[type=password], .login-form input[type=tel] {
+.register-form .form-group input[type=text],
+.register-form .form-group input[type=email],
+.register-form .form-group input[type=password],
+.register-form .form-group input[type=tel], .login-form .form-group input[type=text],
+.login-form .form-group input[type=email],
+.login-form .form-group input[type=password],
+.login-form .form-group input[type=tel], #profile-form .form-group input[type=text],
+#profile-form .form-group input[type=email],
+#profile-form .form-group input[type=password],
+#profile-form .form-group input[type=tel], #password-form .form-group input[type=text],
+#password-form .form-group input[type=email],
+#password-form .form-group input[type=password],
+#password-form .form-group input[type=tel] {
   width: 100%;
   padding: 12px 15px;
-  border: 1px solid #ccc;
+  border: 1px solid #dfe6e9;
+  background-color: #f9fafb;
+  color: #333;
   border-radius: 8px;
   font-size: 1rem;
-  -webkit-transition: all 0.3s ease;
-  transition: all 0.3s ease;
+  -webkit-transition: all 0.2s ease-in-out;
+  transition: all 0.2s ease-in-out;
 }
-.register-form input[type=text]:focus, .register-form input[type=email]:focus, .register-form input[type=password]:focus, .register-form input[type=tel]:focus, .login-form input[type=text]:focus, .login-form input[type=email]:focus, .login-form input[type=password]:focus, .login-form input[type=tel]:focus {
+.register-form .form-group input[type=text]::-webkit-input-placeholder, .register-form .form-group input[type=email]::-webkit-input-placeholder, .register-form .form-group input[type=password]::-webkit-input-placeholder, .register-form .form-group input[type=tel]::-webkit-input-placeholder, .login-form .form-group input[type=text]::-webkit-input-placeholder, .login-form .form-group input[type=email]::-webkit-input-placeholder, .login-form .form-group input[type=password]::-webkit-input-placeholder, .login-form .form-group input[type=tel]::-webkit-input-placeholder, #profile-form .form-group input[type=text]::-webkit-input-placeholder, #profile-form .form-group input[type=email]::-webkit-input-placeholder, #profile-form .form-group input[type=password]::-webkit-input-placeholder, #profile-form .form-group input[type=tel]::-webkit-input-placeholder, #password-form .form-group input[type=text]::-webkit-input-placeholder, #password-form .form-group input[type=email]::-webkit-input-placeholder, #password-form .form-group input[type=password]::-webkit-input-placeholder, #password-form .form-group input[type=tel]::-webkit-input-placeholder {
+  color: #b2bec3;
+}
+.register-form .form-group input[type=text]::-moz-placeholder, .register-form .form-group input[type=email]::-moz-placeholder, .register-form .form-group input[type=password]::-moz-placeholder, .register-form .form-group input[type=tel]::-moz-placeholder, .login-form .form-group input[type=text]::-moz-placeholder, .login-form .form-group input[type=email]::-moz-placeholder, .login-form .form-group input[type=password]::-moz-placeholder, .login-form .form-group input[type=tel]::-moz-placeholder, #profile-form .form-group input[type=text]::-moz-placeholder, #profile-form .form-group input[type=email]::-moz-placeholder, #profile-form .form-group input[type=password]::-moz-placeholder, #profile-form .form-group input[type=tel]::-moz-placeholder, #password-form .form-group input[type=text]::-moz-placeholder, #password-form .form-group input[type=email]::-moz-placeholder, #password-form .form-group input[type=password]::-moz-placeholder, #password-form .form-group input[type=tel]::-moz-placeholder {
+  color: #b2bec3;
+}
+.register-form .form-group input[type=text]:-ms-input-placeholder, .register-form .form-group input[type=email]:-ms-input-placeholder, .register-form .form-group input[type=password]:-ms-input-placeholder, .register-form .form-group input[type=tel]:-ms-input-placeholder, .login-form .form-group input[type=text]:-ms-input-placeholder, .login-form .form-group input[type=email]:-ms-input-placeholder, .login-form .form-group input[type=password]:-ms-input-placeholder, .login-form .form-group input[type=tel]:-ms-input-placeholder, #profile-form .form-group input[type=text]:-ms-input-placeholder, #profile-form .form-group input[type=email]:-ms-input-placeholder, #profile-form .form-group input[type=password]:-ms-input-placeholder, #profile-form .form-group input[type=tel]:-ms-input-placeholder, #password-form .form-group input[type=text]:-ms-input-placeholder, #password-form .form-group input[type=email]:-ms-input-placeholder, #password-form .form-group input[type=password]:-ms-input-placeholder, #password-form .form-group input[type=tel]:-ms-input-placeholder {
+  color: #b2bec3;
+}
+.register-form .form-group input[type=text]::-ms-input-placeholder, .register-form .form-group input[type=email]::-ms-input-placeholder, .register-form .form-group input[type=password]::-ms-input-placeholder, .register-form .form-group input[type=tel]::-ms-input-placeholder, .login-form .form-group input[type=text]::-ms-input-placeholder, .login-form .form-group input[type=email]::-ms-input-placeholder, .login-form .form-group input[type=password]::-ms-input-placeholder, .login-form .form-group input[type=tel]::-ms-input-placeholder, #profile-form .form-group input[type=text]::-ms-input-placeholder, #profile-form .form-group input[type=email]::-ms-input-placeholder, #profile-form .form-group input[type=password]::-ms-input-placeholder, #profile-form .form-group input[type=tel]::-ms-input-placeholder, #password-form .form-group input[type=text]::-ms-input-placeholder, #password-form .form-group input[type=email]::-ms-input-placeholder, #password-form .form-group input[type=password]::-ms-input-placeholder, #password-form .form-group input[type=tel]::-ms-input-placeholder {
+  color: #b2bec3;
+}
+.register-form .form-group input[type=text]::placeholder,
+.register-form .form-group input[type=email]::placeholder,
+.register-form .form-group input[type=password]::placeholder,
+.register-form .form-group input[type=tel]::placeholder, .login-form .form-group input[type=text]::placeholder,
+.login-form .form-group input[type=email]::placeholder,
+.login-form .form-group input[type=password]::placeholder,
+.login-form .form-group input[type=tel]::placeholder, #profile-form .form-group input[type=text]::placeholder,
+#profile-form .form-group input[type=email]::placeholder,
+#profile-form .form-group input[type=password]::placeholder,
+#profile-form .form-group input[type=tel]::placeholder, #password-form .form-group input[type=text]::placeholder,
+#password-form .form-group input[type=email]::placeholder,
+#password-form .form-group input[type=password]::placeholder,
+#password-form .form-group input[type=tel]::placeholder {
+  color: #b2bec3;
+}
+.register-form .form-group input[type=text]:focus,
+.register-form .form-group input[type=email]:focus,
+.register-form .form-group input[type=password]:focus,
+.register-form .form-group input[type=tel]:focus, .login-form .form-group input[type=text]:focus,
+.login-form .form-group input[type=email]:focus,
+.login-form .form-group input[type=password]:focus,
+.login-form .form-group input[type=tel]:focus, #profile-form .form-group input[type=text]:focus,
+#profile-form .form-group input[type=email]:focus,
+#profile-form .form-group input[type=password]:focus,
+#profile-form .form-group input[type=tel]:focus, #password-form .form-group input[type=text]:focus,
+#password-form .form-group input[type=email]:focus,
+#password-form .form-group input[type=password]:focus,
+#password-form .form-group input[type=tel]:focus {
   outline: none;
   border-color: #0E0C66;
-  -webkit-box-shadow: 0 0 0 4px rgba(14, 12, 102, 0.1);
-          box-shadow: 0 0 0 4px rgba(14, 12, 102, 0.1);
+  background-color: #fff;
+  -webkit-box-shadow: 0 0 0 3px rgba(14, 12, 102, 0.2);
+          box-shadow: 0 0 0 3px rgba(14, 12, 102, 0.2);
 }
-.register-form .submit-btn, .login-form .submit-btn {
+.register-form .submit-btn, .login-form .submit-btn, #profile-form .submit-btn, #password-form .submit-btn {
   width: 100%;
   padding: 1rem;
   font-size: 1.1rem;
   font-weight: bold;
   color: white;
-  background-color: #0E0C66;
+  background: #0E0C66;
   border: none;
   border-radius: 8px;
   cursor: pointer;
   -webkit-transition: all 0.3s ease;
   transition: all 0.3s ease;
+  margin-top: 1rem;
 }
-.register-form .submit-btn:hover, .login-form .submit-btn:hover {
-  -webkit-transform: translateY(-2px);
-          transform: translateY(-2px);
-  -webkit-box-shadow: 0 6px 20px rgba(14, 12, 102, 0.3);
-          box-shadow: 0 6px 20px rgba(14, 12, 102, 0.3);
-}
-.register-form .form-footer-link, .login-form .form-footer-link {
-  margin-top: 1.5rem;
-  text-align: center;
-}
-
-.required {
-  color: #0E0C66;
-}
-
-.student-fields.hidden {
-  display: none;
-}
-
-.form-group-checkbox {
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-align: center;
-      -ms-flex-align: center;
-          align-items: center;
-  margin-bottom: 1.5rem;
-  padding: 1rem;
-  border: 1px solid #f0f0f0;
-  border-radius: 8px;
-  background-color: #fafafa;
-}
-.form-group-checkbox input[type=checkbox] {
-  width: 1.2em;
-  height: 1.2em;
-  margin-right: 0.75rem;
-}
-.form-group-checkbox label {
-  margin-bottom: 0;
-  font-weight: 500;
-}
-
-.availability-message {
-  font-size: 0.9rem;
-  margin-top: 0.5rem;
-  font-weight: 600;
-}
-.availability-message.success {
-  color: #28a745;
-}
-.availability-message.error {
-  color: #dc3545;
+.register-form .submit-btn:hover, .login-form .submit-btn:hover, #profile-form .submit-btn:hover, #password-form .submit-btn:hover {
+  -webkit-transform: translateY(-3px);
+          transform: translateY(-3px);
+  -webkit-box-shadow: 0 8px 15px rgba(102, 126, 234, 0.3);
+          box-shadow: 0 8px 15px rgba(102, 126, 234, 0.3);
 }
 
 .form-message {
   padding: 1rem;
   margin-bottom: 1.5rem;
   border-radius: 8px;
-  display: none;
 }
 .form-message.success {
   background-color: #d4edda;
   color: #155724;
-  border: 1px solid #c3e6cb;
-  display: block;
 }
 .form-message.error {
   background-color: #f8d7da;
   color: #721c24;
-  border: 1px solid #f5c6cb;
-  display: block;
 }
 
-.success-container {
-  text-align: center;
-  padding: 2rem;
-}
-.success-container h2 {
-  color: #28a745;
-  margin-bottom: 1rem;
-}
-.success-container .submit-btn {
-  display: inline-block;
-  width: auto;
-  text-decoration: none;
-  margin-top: 1rem;
-}
-
+/* ==========================================================================
+   1. ESTRUCTURA Y LAYOUT GENERAL DEL DASHBOARD
+   ========================================================================== */
 .dashboard-layout {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
-  min-height: 100vh;
+  height: 100vh;
   background-color: #f4f7f9;
 }
 
+.dashboard-main {
+  -webkit-box-flex: 1;
+      -ms-flex-positive: 1;
+          flex-grow: 1;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  overflow: hidden;
+}
+
+.dashboard-content {
+  -webkit-box-flex: 1;
+      -ms-flex-positive: 1;
+          flex-grow: 1;
+  padding: 1.5rem 2rem;
+  overflow-y: auto;
+}
+
+/* ==========================================================================
+   2. ESTILOS COMPLETOS DE COMPONENTES DEL DASHBOARD
+   ========================================================================== */
 .dashboard-sidemenu {
   width: 260px;
   background-color: #fff;
-  border-right: 1px solid #dee2e6;
+  border-right: 1px solid #e0e0e0;
   -ms-flex-negative: 0;
       flex-shrink: 0;
   -webkit-transition: margin-left 0.3s ease;
   transition: margin-left 0.3s ease;
+  z-index: 1001;
 }
 .dashboard-sidemenu .dashboard-sidemenu-header {
   padding: 1.5rem;
-  border-bottom: 1px solid #dee2e6;
+  border-bottom: 1px solid #e9ecef;
 }
 .dashboard-sidemenu .dashboard-sidemenu-header h3 {
   margin: 0;
-  font-size: 1.5rem;
-  color: #0E0C66;
+  font-size: 1.2rem;
+  color: #333;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1071,21 +1100,15 @@ p.code {
   -webkit-transition: all 0.2s ease;
   transition: all 0.2s ease;
 }
-.dashboard-sidemenu nav ul li a:hover {
-  background-color: rgba(14, 12, 102, 0.05);
+.dashboard-sidemenu nav ul li a:hover, .dashboard-sidemenu nav ul li a.active {
+  background-color: #f8f9fa;
   border-left-color: #0E0C66;
   color: #0E0C66;
 }
 .dashboard-sidemenu nav ul li.separator {
   height: 1px;
-  background-color: #dee2e6;
+  background-color: #e9ecef;
   margin: 1rem 0;
-}
-
-.dashboard-main {
-  -webkit-box-flex: 1;
-      -ms-flex-positive: 1;
-          flex-grow: 1;
 }
 
 .dashboard-header {
@@ -1098,11 +1121,11 @@ p.code {
   -webkit-box-pack: justify;
       -ms-flex-pack: justify;
           justify-content: space-between;
-  background-color: #fff;
+  background-color: #0E0C66;
+  color: white;
   padding: 0.75rem 1.5rem;
-  border-bottom: 1px solid #dee2e6;
-  position: sticky;
-  top: 0;
+  -ms-flex-negative: 0;
+      flex-shrink: 0;
   z-index: 900;
 }
 .dashboard-header .dashboard-header-left {
@@ -1120,74 +1143,141 @@ p.code {
   font-size: 1.8rem;
   cursor: pointer;
   margin-right: 1rem;
-}
-.dashboard-header .logo a {
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-align: center;
-      -ms-flex-align: center;
-          align-items: center;
-  height: 40px;
+  color: white;
 }
 .dashboard-header .logo a img {
-  max-height: 100%;
+  max-height: 40px;
   width: auto;
+  -webkit-filter: invert(1);
+          filter: invert(1);
 }
-
-.dashboard-content {
-  padding: 2rem;
-}
-
-.header-right-controls {
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-align: center;
-      -ms-flex-align: center;
-          align-items: center;
-}
-
-.cart-widget-container a {
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-align: center;
-      -ms-flex-align: center;
-          align-items: center;
-  color: #333;
-  text-decoration: none;
-  padding: 0.5rem;
-  border-radius: 5px;
-  -webkit-transition: background-color 0.2s ease;
-  transition: background-color 0.2s ease;
-}
-.cart-widget-container a:hover {
-  background-color: #f0f0f0;
-}
-
-.cart-icon {
-  font-size: 1.8rem;
-  margin-right: 0.5rem;
-}
-
-.cart-total-header {
+.dashboard-header .header-right-controls .cart-widget-container a .cart-icon {
   font-size: 1rem;
-  font-weight: bold;
+}
+.dashboard-header .header-right-controls .cart-widget-container a .cart-total-header {
+  color: white;
 }
 
-@media (max-width: 768px) {
+/* ==========================================================================
+   3. ESTILOS AISLADOS Y COMPACTOS PARA EL PERFIL (NO AFECTAN NADA MÁS)
+   ========================================================================== */
+.dashboard-content h1 {
+  font-size: 1.5rem;
+  margin-bottom: 0.25rem;
+  color: #2c3e50;
+}
+.dashboard-content p {
+  margin-bottom: 1.5rem;
+  color: #6c757d;
+  font-size: 0.95rem;
+}
+.dashboard-content .profile-forms-grid {
+  display: -ms-grid;
+  display: grid;
+  -ms-grid-columns: 1fr;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+.dashboard-content .profile-forms-grid .form-container-profile {
+  background-color: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin: 0;
+  -webkit-box-shadow: none;
+          box-shadow: none;
+  margin-bottom: -100%;
+}
+.dashboard-content .profile-forms-grid .form-container-profile h2 {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: #2c3e50;
+  margin: 0 0 1rem 0;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #e9ecef;
+  text-align: left;
+}
+.dashboard-content .profile-forms-grid .form-container-profile .form-group {
+  margin-bottom: 0.85rem;
+}
+.dashboard-content .profile-forms-grid .form-container-profile label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 0.4rem;
+}
+.dashboard-content .profile-forms-grid .form-container-profile input[type=text],
+.dashboard-content .profile-forms-grid .form-container-profile input[type=email],
+.dashboard-content .profile-forms-grid .form-container-profile input[type=password],
+.dashboard-content .profile-forms-grid .form-container-profile input[type=tel] {
+  width: 100%;
+  font-size: 0.9rem;
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background-color: #fdfdfd;
+}
+.dashboard-content .profile-forms-grid .form-container-profile input[type=text]:focus,
+.dashboard-content .profile-forms-grid .form-container-profile input[type=email]:focus,
+.dashboard-content .profile-forms-grid .form-container-profile input[type=password]:focus,
+.dashboard-content .profile-forms-grid .form-container-profile input[type=tel]:focus {
+  outline: none;
+  border-color: #333;
+  background-color: #fff;
+  -webkit-box-shadow: 0 0 0 3px rgba(44, 62, 80, 0.1);
+          box-shadow: 0 0 0 3px rgba(44, 62, 80, 0.1);
+}
+.dashboard-content .profile-forms-grid .form-container-profile input[type=text]:disabled,
+.dashboard-content .profile-forms-grid .form-container-profile input[type=email]:disabled,
+.dashboard-content .profile-forms-grid .form-container-profile input[type=password]:disabled,
+.dashboard-content .profile-forms-grid .form-container-profile input[type=tel]:disabled {
+  background-color: #f0f0f0;
+  cursor: not-allowed;
+}
+.dashboard-content .profile-forms-grid .form-container-profile small {
+  display: block;
+  font-size: 0.8rem;
+  color: #6c757d;
+  margin-top: 0.3rem;
+}
+.dashboard-content .profile-forms-grid .form-container-profile .submit-btn {
+  background-color: #0E0C66;
+  color: white;
+  padding: 0.7rem 1.2rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  width: auto;
+  margin-top: 0.5rem;
+  cursor: pointer;
+  margin-bottom: 2em;
+}
+
+/* ==========================================================================
+   4. REGLAS RESPONSIVAS
+   ========================================================================== */
+@media (max-width: 991px) {
   .dashboard-sidemenu {
     position: fixed;
     left: -100%;
     height: 100%;
-    z-index: 1000;
   }
   .dashboard-sidemenu.active {
     left: 0;
   }
   .dashboard-header .dashboard-menu-toggle {
     display: block;
+  }
+  .dashboard-content {
+    padding: 1rem;
+  }
+}
+@media (min-width: 992px) {
+  .dashboard-content .profile-forms-grid {
+    -ms-grid-columns: 1fr 1fr;
+    grid-template-columns: 1fr 1fr;
   }
 }
 .main-footer {

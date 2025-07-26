@@ -173,8 +173,10 @@ ul, li, a {
 .main-header .cart-widget-container a:hover {
   background-color: rgba(255, 255, 255, 0.1);
 }
-.main-header .cart-icon {
-  font-size: 0.7rem;
+@media screen and (max-width: 425px) and (min-width: 320px) {
+  .main-header .cart-icon {
+    font-size: 1.2rem;
+  }
 }
 .main-header .cart-total-header { /*Total de  compra*/
   font-size: 1rem;
@@ -709,8 +711,8 @@ p.code {
 }
 
 .toast-notification {
-  background-color: #333;
-  color: red;
+  background-color: red;
+  color: white;
   padding: 15px 25px;
   border-radius: 8px;
   -webkit-box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
@@ -719,8 +721,8 @@ p.code {
   opacity: 0;
   -webkit-transform: translateX(100%);
           transform: translateX(100%);
-  -webkit-transition: all 0.4s ease-in-out;
-  transition: all 0.4s ease-in-out;
+  -webkit-transition: all 0.2s cubic-bezier(0.62, 0.76, 0.93, 0.27);
+  transition: all 0.2s cubic-bezier(0.62, 0.76, 0.93, 0.27);
 }
 .toast-notification.show {
   opacity: 1;

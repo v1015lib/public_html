@@ -121,9 +121,12 @@
     }
 
     .cart-icon {
-        font-size: $font-mobile;
 
 
+        @media screen and (max-width: 425px) and (min-width: 320px) {
+            font-size: calc($font-mobile + .5rem);
+
+        }
     }
 
     .cart-total-header {/*Total de  compra*/

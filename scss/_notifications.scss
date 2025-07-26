@@ -12,19 +12,21 @@
 }
 
 .toast-notification {
-    background-color: #333;
-    color: red;
+    background-color: red;
+    color: white;
     padding: 15px 25px;
     border-radius: 8px;
     box-shadow: 0 5px 15px rgba(0,0,0,0.2);
     margin-top: 10px;
     opacity: 0;
     transform: translateX(100%);
-    transition: all 0.4s ease-in-out;
+    transition: all 0.2s cubic-bezier(.62,.76,.93,.27);
 
     // Estilos para la animación de entrada y salida
     &.show {
         opacity: 1;
         transform: translateX(0);
+
+
     }
 }

@@ -4,6 +4,83 @@
 /* ==========================================================================
    1. ESTRUCTURA Y LAYOUT GENERAL DEL DASHBOARD
    ========================================================================== */
+@mixin forms{
+        background-color: #ffffff;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 1rem;
+        margin: 0;
+        box-shadow: none;
+        height: fit-content;
+        h2 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin: 0 0 1rem 0;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #e9ecef;
+            text-align: left;
+        }
+
+        .form-group {
+            margin-bottom: 0.85rem;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 0.4rem;
+        }
+        
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        input[type="tel"] {
+            width: 100%;
+            font-size: inherit;
+            padding: 10px 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            background-color: #fdfdfd;
+
+            &:focus {
+                outline: none;
+                border-color: #333;
+                background-color: #fff;
+                box-shadow: 0 0 0 3px rgba(44, 62, 80, 0.1);
+            }
+
+            &:disabled {
+              background-color: #f0f0f0;
+              cursor: not-allowed;
+            }
+        }
+
+        small {
+            display: block;
+            font-size: 0.8rem;
+            color: #6c757d;
+            margin-top: 0.3rem;
+        }
+
+        .submit-btn {
+            background-color: $primary-color;
+            color: white;
+            padding: 0.7rem 1.2rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            width: auto;
+            margin-top: 0.5rem;
+            cursor: pointer;
+            margin-bottom: 2em;
+            
+        }
+}/*Estilos para estos forms*/
+
+
 
 .dashboard-layout {
     display: flex;
@@ -128,12 +205,12 @@
 
 .dashboard-content {
     h1 {
-        font-size: 1.5rem;
+        font-size: 1rem;
         margin-bottom: 0.25rem; 
         color: #2c3e50; 
     }
     p { 
-        margin-bottom: 1.5rem; 
+        margin-bottom: 1rem; 
         color: #6c757d; 
         font-size: 0.95rem;
     }
@@ -142,83 +219,15 @@
         display: grid;
         grid-template-columns: 1fr;
         gap: 1.5rem;
+        border: 1px solid red;
+        min-height: 100vh;
     }
 
-    .profile-forms-grid .form-container-profile {
-        background-color: #ffffff;
-        border: 1px solid #e0e0e0;
-        border-radius: 8px;
-        padding: 1.5rem;
-        margin: 0;
-        box-shadow: none;
-        margin-bottom: -100%;
-        h2 {
-            font-size: 1.15rem;
-            font-weight: 600;
-            color: #2c3e50;
-            margin: 0 0 1rem 0;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid #e9ecef;
-            text-align: left;
-        }
-
-        .form-group {
-            margin-bottom: 0.85rem;
-        }
-
-        label {
-            display: block;
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 0.4rem;
-        }
-        
-        input[type="text"],
-        input[type="email"],
-        input[type="password"],
-        input[type="tel"] {
-            width: 100%;
-            font-size: 0.9rem;
-            padding: 10px 12px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            background-color: #fdfdfd;
-
-            &:focus {
-                outline: none;
-                border-color: #333;
-                background-color: #fff;
-                box-shadow: 0 0 0 3px rgba(44, 62, 80, 0.1);
-            }
-
-            &:disabled {
-              background-color: #f0f0f0;
-              cursor: not-allowed;
-            }
-        }
-
-        small {
-            display: block;
-            font-size: 0.8rem;
-            color: #6c757d;
-            margin-top: 0.3rem;
-        }
-
-        .submit-btn {
-            background-color: $primary-color;
-            color: white;
-            padding: 0.7rem 1.2rem;
-            border: none;
-            border-radius: 6px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            width: auto;
-            margin-top: 0.5rem;
-            cursor: pointer;
-            margin-bottom: 2em;
-            
-        }
+    .form-container-profile {
+        @include forms;
+    }
+    .form-container-pass {
+        @include forms;
     }
 }
 

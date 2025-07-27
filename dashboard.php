@@ -81,7 +81,7 @@ $view = $_GET['view'] ?? 'perfil';
                                     </form>
                                 </div>
 
-                                <div class="form-container">
+                                <div class="form-container-pass">
                                     <h2>Cambiar Contraseña</h2>
                                     <form id="password-form" novalidate>
                                         <div id="password-feedback" class="form-message" style="display:none;"></div>

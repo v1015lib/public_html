@@ -7,6 +7,7 @@
   transition: 0.2s;
   padding: 0;
   font-family: "Inter", sans-serif;
+  font-size: 1rem;
 }
 
 html {
@@ -900,7 +901,9 @@ p.code {
   -webkit-box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
           box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
   margin: auto;
-  max-height: 90vh;
+  height: -webkit-fit-content;
+  height: -moz-fit-content;
+  height: fit-content;
   overflow-y: auto;
 }
 .form-container h1, .form-container h2 {
@@ -1030,6 +1033,7 @@ p.code {
 /* ==========================================================================
    1. ESTRUCTURA Y LAYOUT GENERAL DEL DASHBOARD
    ========================================================================== */
+/*Estilos para estos forms*/
 .dashboard-layout {
   display: -webkit-box;
   display: -ms-flexbox;
@@ -1162,12 +1166,12 @@ p.code {
    3. ESTILOS AISLADOS Y COMPACTOS PARA EL PERFIL (NO AFECTAN NADA MÁS)
    ========================================================================== */
 .dashboard-content h1 {
-  font-size: 1.5rem;
+  font-size: 1rem;
   margin-bottom: 0.25rem;
   color: #2c3e50;
 }
 .dashboard-content p {
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
   color: #6c757d;
   font-size: 0.95rem;
 }
@@ -1177,19 +1181,23 @@ p.code {
   -ms-grid-columns: 1fr;
   grid-template-columns: 1fr;
   gap: 1.5rem;
+  border: 1px solid red;
+  min-height: 100vh;
 }
-.dashboard-content .profile-forms-grid .form-container-profile {
+.dashboard-content .form-container-profile {
   background-color: #ffffff;
   border: 1px solid #e0e0e0;
   border-radius: 8px;
-  padding: 1.5rem;
+  padding: 1rem;
   margin: 0;
   -webkit-box-shadow: none;
           box-shadow: none;
-  margin-bottom: -100%;
+  height: -webkit-fit-content;
+  height: -moz-fit-content;
+  height: fit-content;
 }
-.dashboard-content .profile-forms-grid .form-container-profile h2 {
-  font-size: 1.15rem;
+.dashboard-content .form-container-profile h2 {
+  font-size: 1rem;
   font-weight: 600;
   color: #2c3e50;
   margin: 0 0 1rem 0;
@@ -1197,51 +1205,127 @@ p.code {
   border-bottom: 1px solid #e9ecef;
   text-align: left;
 }
-.dashboard-content .profile-forms-grid .form-container-profile .form-group {
+.dashboard-content .form-container-profile .form-group {
   margin-bottom: 0.85rem;
 }
-.dashboard-content .profile-forms-grid .form-container-profile label {
+.dashboard-content .form-container-profile label {
   display: block;
-  font-size: 0.85rem;
   font-weight: 600;
   color: #333;
   margin-bottom: 0.4rem;
 }
-.dashboard-content .profile-forms-grid .form-container-profile input[type=text],
-.dashboard-content .profile-forms-grid .form-container-profile input[type=email],
-.dashboard-content .profile-forms-grid .form-container-profile input[type=password],
-.dashboard-content .profile-forms-grid .form-container-profile input[type=tel] {
+.dashboard-content .form-container-profile input[type=text],
+.dashboard-content .form-container-profile input[type=email],
+.dashboard-content .form-container-profile input[type=password],
+.dashboard-content .form-container-profile input[type=tel] {
   width: 100%;
-  font-size: 0.9rem;
+  font-size: inherit;
   padding: 10px 12px;
   border: 1px solid #ccc;
   border-radius: 6px;
   background-color: #fdfdfd;
 }
-.dashboard-content .profile-forms-grid .form-container-profile input[type=text]:focus,
-.dashboard-content .profile-forms-grid .form-container-profile input[type=email]:focus,
-.dashboard-content .profile-forms-grid .form-container-profile input[type=password]:focus,
-.dashboard-content .profile-forms-grid .form-container-profile input[type=tel]:focus {
+.dashboard-content .form-container-profile input[type=text]:focus,
+.dashboard-content .form-container-profile input[type=email]:focus,
+.dashboard-content .form-container-profile input[type=password]:focus,
+.dashboard-content .form-container-profile input[type=tel]:focus {
   outline: none;
   border-color: #333;
   background-color: #fff;
   -webkit-box-shadow: 0 0 0 3px rgba(44, 62, 80, 0.1);
           box-shadow: 0 0 0 3px rgba(44, 62, 80, 0.1);
 }
-.dashboard-content .profile-forms-grid .form-container-profile input[type=text]:disabled,
-.dashboard-content .profile-forms-grid .form-container-profile input[type=email]:disabled,
-.dashboard-content .profile-forms-grid .form-container-profile input[type=password]:disabled,
-.dashboard-content .profile-forms-grid .form-container-profile input[type=tel]:disabled {
+.dashboard-content .form-container-profile input[type=text]:disabled,
+.dashboard-content .form-container-profile input[type=email]:disabled,
+.dashboard-content .form-container-profile input[type=password]:disabled,
+.dashboard-content .form-container-profile input[type=tel]:disabled {
   background-color: #f0f0f0;
   cursor: not-allowed;
 }
-.dashboard-content .profile-forms-grid .form-container-profile small {
+.dashboard-content .form-container-profile small {
   display: block;
   font-size: 0.8rem;
   color: #6c757d;
   margin-top: 0.3rem;
 }
-.dashboard-content .profile-forms-grid .form-container-profile .submit-btn {
+.dashboard-content .form-container-profile .submit-btn {
+  background-color: #0E0C66;
+  color: white;
+  padding: 0.7rem 1.2rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  width: auto;
+  margin-top: 0.5rem;
+  cursor: pointer;
+  margin-bottom: 2em;
+}
+.dashboard-content .form-container-pass {
+  background-color: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 1rem;
+  margin: 0;
+  -webkit-box-shadow: none;
+          box-shadow: none;
+  height: -webkit-fit-content;
+  height: -moz-fit-content;
+  height: fit-content;
+}
+.dashboard-content .form-container-pass h2 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #2c3e50;
+  margin: 0 0 1rem 0;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #e9ecef;
+  text-align: left;
+}
+.dashboard-content .form-container-pass .form-group {
+  margin-bottom: 0.85rem;
+}
+.dashboard-content .form-container-pass label {
+  display: block;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 0.4rem;
+}
+.dashboard-content .form-container-pass input[type=text],
+.dashboard-content .form-container-pass input[type=email],
+.dashboard-content .form-container-pass input[type=password],
+.dashboard-content .form-container-pass input[type=tel] {
+  width: 100%;
+  font-size: inherit;
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background-color: #fdfdfd;
+}
+.dashboard-content .form-container-pass input[type=text]:focus,
+.dashboard-content .form-container-pass input[type=email]:focus,
+.dashboard-content .form-container-pass input[type=password]:focus,
+.dashboard-content .form-container-pass input[type=tel]:focus {
+  outline: none;
+  border-color: #333;
+  background-color: #fff;
+  -webkit-box-shadow: 0 0 0 3px rgba(44, 62, 80, 0.1);
+          box-shadow: 0 0 0 3px rgba(44, 62, 80, 0.1);
+}
+.dashboard-content .form-container-pass input[type=text]:disabled,
+.dashboard-content .form-container-pass input[type=email]:disabled,
+.dashboard-content .form-container-pass input[type=password]:disabled,
+.dashboard-content .form-container-pass input[type=tel]:disabled {
+  background-color: #f0f0f0;
+  cursor: not-allowed;
+}
+.dashboard-content .form-container-pass small {
+  display: block;
+  font-size: 0.8rem;
+  color: #6c757d;
+  margin-top: 0.3rem;
+}
+.dashboard-content .form-container-pass .submit-btn {
   background-color: #0E0C66;
   color: white;
   padding: 0.7rem 1.2rem;

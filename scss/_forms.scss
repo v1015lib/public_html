@@ -25,7 +25,7 @@
     margin: auto;
 
     // --- LA SOLUCIÓN DEFINITIVA AL SCROLL ---
-    max-height: 90vh; // El formulario nunca ocupará más del 90% de la altura de la pantalla
+    height: fit-content; // El formulario nunca ocupará más del 90% de la altura de la pantalla
     overflow-y: auto; // Si el contenido se pasa de esa altura, APARECERÁ EL SCROLL INTERNO.
 
     h1, h2 {

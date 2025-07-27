@@ -15,15 +15,22 @@
         h2 {
             font-size: 1rem;
             font-weight: 600;
-            color: #2c3e50;
             margin: 0 0 1rem 0;
             padding-bottom: 1rem;
-            border-bottom: 1px solid #e9ecef;
             text-align: left;
+            font-size: 1.3rem;
         }
 
         .form-group {
             margin-bottom: 0.85rem;
+
+
+            label{
+
+                @media (min-width: 768px) {
+
+                }
+            }
         }
 
         label {
@@ -31,6 +38,7 @@
             font-weight: 600;
             color: #333;
             margin-bottom: 0.4rem;
+            font-weight: 900;
         }
         
         input[type="text"],
@@ -43,7 +51,6 @@
             border: 1px solid #ccc;
             border-radius: 6px;
             background-color: #fdfdfd;
-
             &:focus {
                 outline: none;
                 border-color: #333;
@@ -154,6 +161,7 @@
 .dashboard-header {
     display: flex;
     align-items: center;
+    align-content: center;
     justify-content: space-between;
     background-color: $primary-color;
     color: white;
@@ -178,19 +186,26 @@
         max-height: 40px; 
         width: auto;
         filter: invert(1);
+        display: flex;
     }
     .header-right-controls{
 
 
         .cart-widget-container{
-
+            
             a{
                 .cart-icon{
                     font-size: 1rem;
+                    @media (max-width: 425px) {
+                        font-size: 1.2rem;
+                    }
 
                 }
                 .cart-total-header{
                     color: white;
+                    @media (max-width: 425px) {
+                        font-size: 1.2rem;
+                    }
                 }
 
             }
@@ -219,7 +234,7 @@
         display: grid;
         grid-template-columns: 1fr;
         gap: 1.5rem;
-        border: 1px solid red;
+
         min-height: 100vh;
     }
 

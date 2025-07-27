@@ -228,6 +228,9 @@ ul, li, a {
 .sidemenu .sidemenu-header h3 {
   margin: 0;
   font-size: 1.2rem;
+  height: -webkit-fit-content;
+  height: -moz-fit-content;
+  height: fit-content;
 }
 .sidemenu .sidemenu-header .close-sidemenu {
   display: none;
@@ -362,7 +365,9 @@ ul, li, a {
           justify-content: center;
   padding: 0.5em;
   width: 100%;
-  height: 200px;
+  height: -webkit-fit-content;
+  height: -moz-fit-content;
+  height: fit-content;
 }
 
 h3 {
@@ -371,7 +376,7 @@ h3 {
   color: #2c3e50;
   line-height: 1.8;
   margin-bottom: 0.25rem;
-  height: 2.8em;
+  height: 5em;
   overflow: hidden;
 }
 
@@ -467,7 +472,7 @@ p.code {
   position: absolute;
   top: 10px;
   right: 10px;
-  background: #fff;
+  background: #DFDFDF;
   border: 1px solid #eee;
   border-radius: 50%;
   width: 40px;
@@ -483,20 +488,20 @@ p.code {
           justify-content: center;
   cursor: pointer;
   font-size: 1.2rem;
-  color: #ccc;
+  color: #864646;
   -webkit-transition: all 0.2s ease;
   transition: all 0.2s ease;
   z-index: 5;
 }
 .favorite-btn:hover {
-  color: #ff8a80;
+  color: #FF0000;
   -webkit-transform: scale(1.1);
           transform: scale(1.1);
 }
 .favorite-btn.is-favorite {
   color: #fff; /* Corazón blanco */
   border-color: #ff5252; /* Borde rojo */
-  background-color: #ff5252; /* Fondo rojo */
+  background-color: red; /* Fondo rojo */
 }
 
 .cart-overlay {
@@ -698,7 +703,7 @@ p.code {
   position: fixed;
   bottom: 20px;
   right: 20px;
-  z-index: 9999;
+  z-index: 10000;
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -709,26 +714,34 @@ p.code {
   -webkit-box-align: end;
       -ms-flex-align: end;
           align-items: flex-end;
+  gap: 10px;
 }
 
 .toast-notification {
-  background-color: red;
-  color: white;
-  padding: 15px 25px;
+  color: #fff;
+  padding: 16px 24px;
   border-radius: 8px;
-  -webkit-box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-          box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-  margin-top: 10px;
+  -webkit-box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   opacity: 0;
-  -webkit-transform: translateX(100%);
-          transform: translateX(100%);
-  -webkit-transition: all 0.2s cubic-bezier(0.62, 0.76, 0.93, 0.27);
-  transition: all 0.2s cubic-bezier(0.62, 0.76, 0.93, 0.27);
+  -webkit-transform: translateX(120%);
+          transform: translateX(120%);
+  -webkit-transition: all 0.5s cubic-bezier(0.21, 1.02, 0.73, 1);
+  transition: all 0.5s cubic-bezier(0.21, 1.02, 0.73, 1);
 }
 .toast-notification.show {
   opacity: 1;
   -webkit-transform: translateX(0);
           transform: translateX(0);
+}
+.toast-notification.success {
+  background-color: green;
+}
+.toast-notification.error {
+  background-color: #dc3545;
+}
+.toast-notification.info {
+  background-color: red;
 }
 
 .modal-overlay {
@@ -909,6 +922,7 @@ p.code {
 .form-container h1, .form-container h2 {
   color: #2c3e50;
   text-align: center;
+  font-size: 1.5rem;
   margin-bottom: 0.5rem;
 }
 .form-container p {
@@ -925,6 +939,7 @@ p.code {
   margin-bottom: 0.5rem;
   font-weight: 600;
   color: #34495e;
+  font-weight: bold;
 }
 .register-form .form-group input[type=text],
 .register-form .form-group input[type=email],
@@ -1015,6 +1030,19 @@ p.code {
   -webkit-box-shadow: 0 8px 15px rgba(102, 126, 234, 0.3);
           box-shadow: 0 8px 15px rgba(102, 126, 234, 0.3);
 }
+.register-form .form-group-checkbox, .login-form .form-group-checkbox, #profile-form .form-group-checkbox, #password-form .form-group-checkbox {
+  font-weight: bold;
+  font-variant: all-small-caps;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+.register-form .form-group-checkbox label, .login-form .form-group-checkbox label, #profile-form .form-group-checkbox label, #password-form .form-group-checkbox label {
+  padding: 0.5rem;
+}
 
 .form-message {
   padding: 1rem;
@@ -1028,6 +1056,23 @@ p.code {
 .form-message.error {
   background-color: #f8d7da;
   color: #721c24;
+}
+
+.student-fields.hidden {
+  display: none;
+}
+
+/* ... otros estilos del formulario ... */
+.availability-message {
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+  font-weight: 600;
+}
+.availability-message.success {
+  color: green;
+}
+.availability-message.error {
+  color: red;
 }
 
 /* ==========================================================================
@@ -1122,6 +1167,8 @@ p.code {
   -webkit-box-align: center;
       -ms-flex-align: center;
           align-items: center;
+  -ms-flex-line-pack: center;
+      align-content: center;
   -webkit-box-pack: justify;
       -ms-flex-pack: justify;
           justify-content: space-between;
@@ -1154,12 +1201,25 @@ p.code {
   width: auto;
   -webkit-filter: invert(1);
           filter: invert(1);
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
 }
 .dashboard-header .header-right-controls .cart-widget-container a .cart-icon {
   font-size: 1rem;
 }
+@media (max-width: 425px) {
+  .dashboard-header .header-right-controls .cart-widget-container a .cart-icon {
+    font-size: 1.2rem;
+  }
+}
 .dashboard-header .header-right-controls .cart-widget-container a .cart-total-header {
   color: white;
+}
+@media (max-width: 425px) {
+  .dashboard-header .header-right-controls .cart-widget-container a .cart-total-header {
+    font-size: 1.2rem;
+  }
 }
 
 /* ==========================================================================
@@ -1181,7 +1241,6 @@ p.code {
   -ms-grid-columns: 1fr;
   grid-template-columns: 1fr;
   gap: 1.5rem;
-  border: 1px solid red;
   min-height: 100vh;
 }
 .dashboard-content .form-container-profile {
@@ -1199,11 +1258,10 @@ p.code {
 .dashboard-content .form-container-profile h2 {
   font-size: 1rem;
   font-weight: 600;
-  color: #2c3e50;
   margin: 0 0 1rem 0;
   padding-bottom: 1rem;
-  border-bottom: 1px solid #e9ecef;
   text-align: left;
+  font-size: 1.3rem;
 }
 .dashboard-content .form-container-profile .form-group {
   margin-bottom: 0.85rem;
@@ -1213,6 +1271,7 @@ p.code {
   font-weight: 600;
   color: #333;
   margin-bottom: 0.4rem;
+  font-weight: 900;
 }
 .dashboard-content .form-container-profile input[type=text],
 .dashboard-content .form-container-profile input[type=email],
@@ -1276,11 +1335,10 @@ p.code {
 .dashboard-content .form-container-pass h2 {
   font-size: 1rem;
   font-weight: 600;
-  color: #2c3e50;
   margin: 0 0 1rem 0;
   padding-bottom: 1rem;
-  border-bottom: 1px solid #e9ecef;
   text-align: left;
+  font-size: 1.3rem;
 }
 .dashboard-content .form-container-pass .form-group {
   margin-bottom: 0.85rem;
@@ -1290,6 +1348,7 @@ p.code {
   font-weight: 600;
   color: #333;
   margin-bottom: 0.4rem;
+  font-weight: 900;
 }
 .dashboard-content .form-container-pass input[type=text],
 .dashboard-content .form-container-pass input[type=email],

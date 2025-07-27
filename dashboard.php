@@ -55,7 +55,7 @@ $view = $_GET['view'] ?? 'perfil';
                                 <div class="form-container-profile">
                                     <h2>Datos Personales</h2>
                                     <form id="profile-form" novalidate>
-                                        <div id="profile-feedback" class="form-message" style="display:none;"></div>
+                                        
                                         <div class="form-group">
                                             <label for="profile-nombre">Nombre</label>
                                             <input type="text" id="profile-nombre" name="nombre" required>
@@ -84,7 +84,7 @@ $view = $_GET['view'] ?? 'perfil';
                                 <div class="form-container-pass">
                                     <h2>Cambiar Contraseña</h2>
                                     <form id="password-form" novalidate>
-                                        <div id="password-feedback" class="form-message" style="display:none;"></div>
+                                        
                                         <div class="form-group">
                                             <label for="current-password">Contraseña Actual</label>
                                             <input type="password" id="current-password" name="current_password" required>
@@ -122,6 +122,8 @@ $view = $_GET['view'] ?? 'perfil';
     </div>
     <div id="cart-overlay" class="cart-overlay"></div>
     
+    <div id="notification-container" class="notification-container"></div>
+
     <script type="module" src="js/dashboard.js"></script>
     <?php if ($view === 'perfil'): ?>
         <script type="module" src="js/dashboard_profile.js"></script>

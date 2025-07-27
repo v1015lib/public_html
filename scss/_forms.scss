@@ -31,7 +31,9 @@
     h1, h2 {
         color: #2c3e50; // Un color oscuro y elegante para los títulos
         text-align: center;
+        font-size: 1.5rem;
         margin-bottom: 0.5rem;
+
     }
     p {
         color: #7f8c8d; // Un gris suave para el texto descriptivo
@@ -51,6 +53,7 @@
             margin-bottom: 0.5rem;
             font-weight: 600;
             color: #34495e;
+            font-weight: bold;
         }
 
         input[type="text"],
@@ -96,11 +99,56 @@
             box-shadow: 0 8px 15px rgba(102, 126, 234, 0.3);
         }
     }
+
+    .form-group-checkbox{
+
+        font-weight: bold;
+        font-variant: all-small-caps;
+        display: flex;
+        align-items: center;
+
+        #is_student_check{
+
+
+        }
+        label{
+            padding: .5rem;
+        }
+    }
 }
 
 // === ESTILOS PARA MENSAJES DE FEEDBACK ===
 .form-message {
+    
     padding: 1rem; margin-bottom: 1.5rem; border-radius: 8px;
     &.success { background-color: #d4edda; color: #155724; }
     &.error { background-color: #f8d7da; color: #721c24; }
 }
+
+.student-fields.hidden { 
+    display: none; 
+}
+
+// scss/_forms.scss
+
+/* ... otros estilos del formulario ... */
+
+// Para el mensaje de disponibilidad de nombre de usuario
+.availability-message {
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+    font-weight: 600;
+
+    // Cuando el usuario está disponible
+    &.success { 
+        color: green; // Color verde
+    }
+
+    // Cuando el usuario NO está disponible
+    &.error { 
+        color: red; // Color rojo
+
+    }
+}
+
+

@@ -1,5 +1,8 @@
 // js/dashboard_profile.js
 
+// --- NUEVO: Importamos el manejador de notificaciones ---
+import { showNotification } from './notification_handler.js';
+
 document.addEventListener('DOMContentLoaded', () => {
 
     const profileForm = document.getElementById('profile-form');
@@ -8,15 +11,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const passwordFeedback = document.getElementById('password-feedback');
 
     /**
-     * Muestra un mensaje de feedback en el elemento especificado.
-     * @param {HTMLElement} element El elemento donde se mostrará el mensaje.
+     * Muestra un mensaje de feedback utilizando el sistema de notificaciones.
      * @param {string} message El mensaje a mostrar.
      * @param {string} type 'success' o 'error'.
      */
-    const showFeedback = (element, message, type = 'success') => {
-        element.textContent = message;
-        element.className = `form-message ${type}`; // Usa las clases de tu CSS
-        element.style.display = 'block';
+    const showFeedback = (message, type = 'success') => {
+        // En lugar de manipular un div, llamamos a la función global de notificaciones
+        showNotification(message, type);
     };
 
     /**
@@ -43,18 +44,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('profile-email').value = email;
                 document.getElementById('profile-telefono').value = telefono || '';
             } else {
-                showFeedback(profileFeedback, result.error, 'error');
+                // Usamos la nueva función de feedback
+                showFeedback(result.error, 'error');
             }
         } catch (error) {
-            showFeedback(profileFeedback, `Error al cargar perfil: ${error.message}`, 'error');
+            showFeedback(`Error al cargar perfil: ${error.message}`, 'error');
         }
     };
 
     // --- EVENT LISTENER PARA ACTUALIZAR PERFIL ---
     profileForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        profileFeedback.style.display = 'none';
-
+        
         const data = {
             nombre: document.getElementById('profile-nombre').value,
             apellido: document.getElementById('profile-apellido').value,
@@ -70,17 +71,17 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             const result = await response.json();
-            showFeedback(profileFeedback, result.message || result.error, result.success ? 'success' : 'error');
+            // Mostramos la notificación con el resultado
+            showFeedback(result.message || result.error, result.success ? 'success' : 'error');
 
         } catch (error) {
-            showFeedback(profileFeedback, 'Error de conexión al actualizar.', 'error');
+            showFeedback('Error de conexión al actualizar.', 'error');
         }
     });
     
     // --- EVENT LISTENER PARA CAMBIAR CONTRASEÑA ---
     passwordForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        passwordFeedback.style.display = 'none';
 
         const data = {
             current_password: document.getElementById('current-password').value,
@@ -97,17 +98,16 @@ document.addEventListener('DOMContentLoaded', () => {
             const result = await response.json();
             
             if (response.ok && result.success) {
-                 showFeedback(passwordFeedback, result.message, 'success');
-                 passwordForm.reset(); // Limpiar formulario si fue exitoso
+                 showFeedback(result.message, 'success');
+                 passwordForm.reset(); 
             } else {
                 throw new Error(result.error || 'No se pudo actualizar la contraseña.');
             }
            
         } catch (error) {
-            showFeedback(passwordFeedback, error.message, 'error');
+            showFeedback(error.message, 'error');
         }
     });
 
-    // Cargar los datos del perfil al iniciar la página
     loadProfileData();
 });

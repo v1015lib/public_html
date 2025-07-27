@@ -1,32 +1,48 @@
 // scss/_notifications.scss
-@import 'vars';
 
+// Contenedor principal para todas las notificaciones
 .notification-container {
     position: fixed;
     bottom: 20px;
     right: 20px;
-    z-index: 9999;
+    z-index: 10000;
     display: flex;
     flex-direction: column;
     align-items: flex-end;
+    gap: 10px; // Espacio entre notificaciones
 }
 
+// Estilo base para cada notificación individual
 .toast-notification {
-    background-color: red;
-    color: white;
-    padding: 15px 25px;
+    // --- ESTILOS GENERALES PARA TODAS LAS NOTIFICACIONES ---
+    color: #fff; // ✅ ¡Clave! Texto blanco para todas las variantes.
+    padding: 16px 24px;
     border-radius: 8px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-    margin-top: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     opacity: 0;
-    transform: translateX(100%);
-    transition: all 0.2s cubic-bezier(.62,.76,.93,.27);
+    transform: translateX(120%);
+    transition: all 0.5s cubic-bezier(0.21, 1.02, 0.73, 1);
 
-    // Estilos para la animación de entrada y salida
+    // Clase para la animación de entrada
     &.show {
         opacity: 1;
         transform: translateX(0);
+    }
 
+    // --- VARIANTES DE COLOR ---
 
+    // Estilo para notificación de éxito (fondo verde)
+    &.success {
+        background-color: green; // Fondo verde para éxito y favoritos
+    }
+
+    // Estilo para notificación de error (fondo rojo)
+    &.error {
+        background-color: #dc3545; // Fondo rojo
+    }
+    
+    // Estilo para notificación de información (fondo azul)
+    &.info {
+        background-color: red; // Fondo azul
     }
 }

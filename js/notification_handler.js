@@ -2,12 +2,15 @@
 
 const container = document.getElementById('notification-container');
 
-export function showNotification(message) {
+// ✅ SOLUCIÓN: Añadimos el parámetro 'type' y le damos un valor por defecto.
+export function showNotification(message, type = 'info') {
     if (!container) return;
 
     // Crear el elemento de la notificación
     const notification = document.createElement('div');
-    notification.className = 'toast-notification';
+    
+    // ✅ SOLUCIÓN: Añadimos la clase base Y la clase del 'type' (success, error, etc.)
+    notification.className = `toast-notification ${type}`;
     notification.textContent = message;
 
     // Añadirlo al contenedor

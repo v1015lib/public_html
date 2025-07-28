@@ -21,42 +21,43 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    const renderOrderHistory = (orders) => {
-        container.innerHTML = '';
-        orders.forEach(order => {
-            const itemsHtml = order.items.map(item => `
-                <li class="order-item">
-                    <span class="order-item-qty">${item.cantidad}x</span>
-                    <span class="order-item-name">${item.nombre_producto}</span>
-                    <span class="order-item-price">$${parseFloat(item.precio_unitario).toFixed(2)}</span>
-                </li>
-            `).join('');
+const renderOrderHistory = (orders) => {
+    container.innerHTML = '';
+    orders.forEach(order => {
+        const itemsHtml = order.items.map(item => `
+            <li class="order-item">
+                <span class="order-item-qty">${item.cantidad}x</span>
+                <span class="order-item-name">${item.nombre_producto}</span>
+                <span class="order-item-price">$${parseFloat(item.precio_unitario).toFixed(2)}</span>
+            </li>
+        `).join('');
 
-            const orderCardHtml = `
-                <div class="order-card">
-                    <div class="order-card-header">
-                        <div class="order-summary">
-                            <strong>Pedido #${order.id_pedido}</strong>
-                            <small>${order.fecha}</small>
-                        </div>
-                        <div class="order-card-actions">
-                            <span class="order-card-total">Total: <strong>$${order.total}</strong></span>
-                            <button class="details-btn toggle-details-btn">Ver detalle</button>
-                        </div>
+        const orderCardHtml = `
+            <div class="order-card">
+                <div class="order-card-header">
+                    <div class="order-summary">
+                        <strong>Orden #${order.id_pedido}</strong>
+                        <small>${order.fecha}</small>
                     </div>
-                    <div class="order-card-body">
-                        <ul class="order-items-list">${itemsHtml}</ul>
-                        <div class="order-card-footer">
-                            <button class="submit-btn reorder-btn" data-order-id="${order.id_pedido}">
-                                Repetir Pedido
-                            </button>
-                        </div>
+                    <div class="order-card-actions">
+                        <span class="order-status-badge">${order.status_name}</span>
+                        <span class="order-card-total">Total: <strong>$${order.total}</strong></span>
+                        <button class="details-btn toggle-details-btn">Ver detalle</button>
                     </div>
                 </div>
-            `;
-            container.insertAdjacentHTML('beforeend', orderCardHtml);
-        });
-    };
+                <div class="order-card-body">
+                    <ul class="order-items-list">${itemsHtml}</ul>
+                    <div class="order-card-footer">
+                        <button class="submit-btn reorder-btn" data-order-id="${order.id_pedido}">
+                            Repetir Pedido
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+        container.insertAdjacentHTML('beforeend', orderCardHtml);
+    });
+};
 
     const handleReorder = async (target) => {
         if (!target.classList.contains('reorder-btn')) return;

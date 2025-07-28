@@ -118,6 +118,60 @@ try {
             http_response_code(400);
             echo json_encode(['error' => 'Recurso no especificado o no válido.']);
             break;
+            case 'repeat-order':
+    try {
+        if (!isset($_SESSION['id_cliente'])) {
+            throw new Exception("Debes iniciar sesión para repetir un pedido.");
+        }
+        $client_id = $_SESSION['id_cliente'];
+        $data = json_decode(file_get_contents('php://input'), true);
+        $order_id = $data['order_id'] ?? null;
+
+        if (!$order_id) {
+            throw new Exception("No se especificó el ID del pedido a repetir.");
+        }
+
+        // 1. Obtener el carrito activo actual del cliente (o crear uno nuevo)
+        $current_cart_id = getOrCreateCart($pdo, $client_id);
+
+        // 2. Obtener todos los productos del pedido antiguo
+        $stmt_old_items = $pdo->prepare(
+            "SELECT id_producto, cantidad, precio_unitario FROM detalle_carrito WHERE id_carrito = :order_id"
+        );
+        $stmt_old_items->execute([':order_id' => $order_id]);
+        $old_items = $stmt_old_items->fetchAll(PDO::FETCH_ASSOC);
+
+        if (empty($old_items)) {
+            throw new Exception("El pedido que intentas repetir no tiene productos.");
+        }
+
+        $pdo->beginTransaction();
+        foreach ($old_items as $item) {
+            // Inserta el producto o actualiza la cantidad si ya existe
+            $stmt_upsert = $pdo->prepare(
+                "INSERT INTO detalle_carrito (id_carrito, id_producto, cantidad, precio_unitario)
+                 VALUES (:cart_id, :product_id, :quantity, :price)
+                 ON DUPLICATE KEY UPDATE cantidad = cantidad + VALUES(cantidad)"
+            );
+            $stmt_upsert->execute([
+                ':cart_id' => $current_cart_id,
+                ':product_id' => $item['id_producto'],
+                ':quantity' => $item['cantidad'],
+                ':price' => $item['precio_unitario']
+            ]);
+        }
+        $pdo->commit();
+
+        echo json_encode(['success' => true, 'message' => '¡Productos añadidos a tu carrito!']);
+
+    } catch (Exception $e) {
+        if ($pdo->inTransaction()) {
+            $pdo->rollBack();
+        }
+        header('Content-Type: application/json', true, 400);
+        echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+    }
+    break;
     }
 } catch (Exception $e) {
     http_response_code(500);
@@ -125,17 +179,27 @@ try {
 }
 
 /**
- * Obtiene el historial de pedidos completados de un cliente.
+ * Obtiene el historial de pedidos de un cliente, incluyendo el nuevo estado 'Pedido finalizado'.
  */
 function handleGetOrderHistory(PDO $pdo, int $client_id) {
-    // Obtener todos los carritos completados (estado 2)
+    // **AQUÍ AGREGAMOS EL 23**: Lista de todos los estados que el cliente puede ver.
+    $historical_statuses = [2, 3, 7, 8, 9, 10, 13, 14, 17, 20, 23];
+    
+    $in_clause = implode(',', array_fill(0, count($historical_statuses), '?'));
+
     $stmt_orders = $pdo->prepare("
-        SELECT id_carrito, fecha_creacion 
-        FROM carritos_compra 
-        WHERE id_cliente = :client_id AND estado_id = 2
-        ORDER BY fecha_creacion DESC
+        SELECT 
+            cc.id_carrito, 
+            cc.fecha_creacion,
+            e.nombre_estado
+        FROM carritos_compra cc
+        JOIN estados e ON cc.estado_id = e.id_estado
+        WHERE cc.id_cliente = ? AND cc.estado_id IN ($in_clause)
+        ORDER BY cc.fecha_creacion DESC
     ");
-    $stmt_orders->execute([':client_id' => $client_id]);
+    
+    $params = array_merge([$client_id], $historical_statuses);
+    $stmt_orders->execute($params);
     $orders_raw = $stmt_orders->fetchAll(PDO::FETCH_ASSOC);
 
     $orders = [];
@@ -159,13 +223,13 @@ function handleGetOrderHistory(PDO $pdo, int $client_id) {
             'id_pedido' => $order_raw['id_carrito'],
             'fecha' => date("d/m/Y H:i", strtotime($order_raw['fecha_creacion'])),
             'total' => number_format($total, 2),
+            'status_name' => $order_raw['nombre_estado'],
             'items' => $items
         ];
     }
 
     echo json_encode(['success' => true, 'orders' => $orders]);
 }
-
 /**
  * Crea un nuevo carrito con los productos de un pedido antiguo.
  * (Versión corregida del bug "invalid parameter number")
@@ -221,9 +285,8 @@ function handleReorderRequest(PDO $pdo, int $client_id, int $order_id) {
         throw new Exception("Error al repetir el pedido: " . $e->getMessage());
     }
 }
-
 /**
- * Procesa el checkout final, marcando el carrito como completado (estado 2).
+ * Procesa el checkout final, marcando el carrito como 'Pedido finalizado' (estado 23).
  */
 function handleCheckoutRequest(PDO $pdo) {
     if (!isset($_SESSION['id_cliente'])) throw new Exception('Debes iniciar sesión para finalizar la compra.');
@@ -235,13 +298,14 @@ function handleCheckoutRequest(PDO $pdo) {
         throw new Exception("Tu carrito está vacío. No hay nada que procesar.");
     }
     
-    $stmt = $pdo->prepare("UPDATE carritos_compra SET estado_id = 2 WHERE id_carrito = :cart_id AND id_cliente = :client_id AND estado_id = 1");
+    // **AQUÍ ESTÁ LA MAGIA**: El estado inicial ahora será 23.
+    $stmt = $pdo->prepare("UPDATE carritos_compra SET estado_id = 23 WHERE id_carrito = :cart_id AND id_cliente = :client_id AND estado_id = 1");
     $stmt->execute([':cart_id' => $cart_id, ':client_id' => $client_id]);
     
     if ($stmt->rowCount() > 0) {
         echo json_encode(['success' => true, 'message' => 'Compra finalizada con éxito.']);
     } else {
-        echo json_encode(['success' => true, 'message' => 'El carrito ya estaba procesado o vacío.']);
+        echo json_encode(['success' => false, 'message' => 'No se pudo procesar la compra. Es posible que el carrito ya estuviera procesado.']);
     }
 }
 

@@ -1611,13 +1611,13 @@ body.page-checkout {
   }
 }
 /* ==========================================================================
-   ESTILOS PARA LA LISTA DE FAVORITOS (LAYOUT ORIGINAL CON ANCHOS FIJOS)
+   ESTILOS PARA LA LISTA DE FAVORITOS
    ========================================================================== */
 .favorites-list-container {
   background-color: #fff;
   border: 1px solid #e0e0e0;
   border-radius: 8px;
-  overflow: hidden;
+  max-height: 100%;
 }
 
 .favorites-header, .favorites-footer {
@@ -1637,7 +1637,9 @@ body.page-checkout {
 }
 
 .favorites-list {
-  max-height: calc(100vh - 300px);
+  max-height: -webkit-fit-content;
+  max-height: -moz-fit-content;
+  max-height: fit-content;
   overflow-y: auto;
 }
 
@@ -1768,7 +1770,9 @@ body.page-checkout {
   border: 0;
 }
 
-/* ESTILOS PARA EL HISTORIAL DE PEDIDOS CON ACORDEÓN */
+/* ==========================================================================
+   ESTILOS PARA EL HISTORIAL DE PEDIDOS (CON MEJORAS RESPONSIVAS)
+   ========================================================================== */
 .order-history-container {
   display: -ms-grid;
   display: grid;
@@ -1781,28 +1785,25 @@ body.page-checkout {
   border-radius: 8px;
   -webkit-box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
           box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-  -webkit-transition: -webkit-box-shadow 0.3s ease;
-  transition: -webkit-box-shadow 0.3s ease;
-  transition: box-shadow 0.3s ease;
-  transition: box-shadow 0.3s ease, -webkit-box-shadow 0.3s ease;
-}
-.order-card:hover {
-  -webkit-box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
-          box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
 }
 
 .order-card-header {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
-  -webkit-box-pack: justify;
-      -ms-flex-pack: justify;
-          justify-content: space-between;
+  -webkit-box-pack: space-evenly;
+      -ms-flex-pack: space-evenly;
+          justify-content: space-evenly;
+  -ms-flex-line-pack: start;
+      align-content: flex-start;
   -webkit-box-align: center;
       -ms-flex-align: center;
           align-items: center;
   padding: 1rem 1.5rem;
-  cursor: pointer;
+  gap: 1rem;
+}
+.order-card-header .order-summary {
+  margin-right: auto;
 }
 .order-card-header .order-summary strong {
   font-size: 1.1rem;
@@ -1819,10 +1820,13 @@ body.page-checkout {
   -webkit-box-align: center;
       -ms-flex-align: center;
           align-items: center;
-  gap: 1.5rem;
+  gap: 1rem;
+  -ms-flex-negative: 0;
+      flex-shrink: 0;
 }
 .order-card-header .order-card-total {
   color: #333;
+  white-space: nowrap;
 }
 .order-card-header .order-card-total strong {
   color: #dc3545;
@@ -1831,35 +1835,28 @@ body.page-checkout {
   background-color: #f0f0f0;
   border: 1px solid #ddd;
   color: #333;
-  padding: 0.5rem 1rem;
+  padding: 0.5rem;
   border-radius: 5px;
   font-weight: 500;
   cursor: pointer;
-  -webkit-transition: background-color 0.2s, border-color 0.2s;
-  transition: background-color 0.2s, border-color 0.2s;
-}
-.order-card-header .details-btn:hover {
-  background-color: #e2e2e2;
-  border-color: #ccc;
+  white-space: nowrap;
 }
 
-/* El cuerpo colapsable */
 .order-card-body {
   max-height: 0;
   overflow: hidden;
-  padding: 0 1.5rem; /* Padding horizontal se mantiene, vertical es 0 */
-  border-top: 1px solid transparent; /* Borde oculto hasta que se abre */
-  -webkit-transition: max-height 0.4s ease-out, padding-top 0.4s ease-out, padding-bottom 0.4s ease-out, border-color 0.1s;
-  transition: max-height 0.4s ease-out, padding-top 0.4s ease-out, padding-bottom 0.4s ease-out, border-color 0.1s;
+  padding: 0 1.5rem;
+  border-top: 1px solid transparent;
+  -webkit-transition: max-height 0.4s ease-out, padding 0.4s ease-out, border-color 0.1s;
+  transition: max-height 0.4s ease-out, padding 0.4s ease-out, border-color 0.1s;
 }
 
-/* Estilos para la tarjeta cuando está abierta */
 .order-card.is-open .order-card-body {
-  max-height: 1000px; /* Suficientemente grande para el contenido */
+  max-height: 1000px;
   padding: 1.5rem;
-  border-color: #e0e0e0; /* Muestra el borde superior */
-  -webkit-transition: max-height 0.5s ease-in;
-  transition: max-height 0.5s ease-in;
+  border-color: #e0e0e0;
+  -webkit-transition: max-height 0.5s ease-in, padding 0.4s ease-in;
+  transition: max-height 0.5s ease-in, padding 0.4s ease-in;
 }
 
 .order-items-list {
@@ -1880,13 +1877,11 @@ body.page-checkout {
 }
 .order-items-list .order-item .order-item-qty {
   font-weight: bold;
-  color: #333;
 }
 .order-items-list .order-item .order-item-name {
   -webkit-box-flex: 1;
       -ms-flex-positive: 1;
           flex-grow: 1;
-  color: #555;
 }
 .order-items-list .order-item .order-item-price {
   color: #6c757d;
@@ -1898,28 +1893,45 @@ body.page-checkout {
 }
 .order-card-footer .reorder-btn {
   background-color: #28a745;
-}
-.order-card-footer .reorder-btn:hover {
-  background-color: #218838;
-}
-.order-card-footer .reorder-btn:disabled {
-  background-color: #ccc;
+  border: none;
+  color: white;
+  padding: 0.7rem 1.2rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  -webkit-box-shadow: 0 0 0.1rem black;
+          box-shadow: 0 0 0.1rem black;
 }
 
-/* AÑADIR ESTILOS PARA LA INSIGNIA DE ESTADO */
 .order-status-badge {
-  background-color: #e2e3e5;
-  color: #3b4045;
-  padding: 0.35em 0.65em;
-  font-size: 0.85em;
+  background-color: #0E0C66;
+  color: white;
+  padding: 0.5rem;
+  font-size: 0.8em;
   font-weight: 700;
-  line-height: 1;
-  text-align: center;
-  white-space: nowrap;
-  vertical-align: baseline;
   border-radius: 0.375rem;
+  white-space: nowrap;
 }
 
+/* --- MEJORA CLAVE PARA MÓVILES --- */
+@media (max-width: 425px) {
+  .order-card-header {
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+        -ms-flex-direction: column;
+            flex-direction: column;
+    -webkit-box-align: start;
+        -ms-flex-align: start;
+            align-items: flex-start;
+    padding: 1rem;
+  }
+  .order-card-actions {
+    width: 100%;
+    -webkit-box-pack: justify;
+        -ms-flex-pack: justify;
+            justify-content: space-between;
+  }
+}
 .main-footer {
   background-color: #f8f9fa;
   color: #6c757d;

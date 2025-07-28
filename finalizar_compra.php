@@ -41,7 +41,7 @@ try {
 
     if ($cart_id) {
         $stmt_items = $pdo->prepare(
-            "SELECT p.nombre_producto, dc.cantidad, dc.precio_unitario, (dc.cantidad * dc.precio_unitario) as subtotal
+            "SELECT p.nombre_producto, dc.cantidad, (dc.cantidad * dc.precio_unitario) as subtotal
              FROM detalle_carrito dc
              JOIN productos p ON dc.id_producto = p.id_producto
              WHERE dc.id_carrito = :cart_id"
@@ -54,35 +54,46 @@ try {
         }
     }
     
-    // --- LÓGICA PARA EL MENSAJE DE WHATSAPP (VERSIÓN LIMPIA) ---
+    // --- LÓGICA PARA EL MENSAJE DE WHATSAPP (TABLA ULTRA-COMPACTA) ---
     $whatsapp_message = "*-- DATOS DEL CLIENTE --*\n";
     $whatsapp_message .= "*ID Cliente:* " . $client_id . "\n";
-    $whatsapp_message .= "*Nombre:* " . htmlspecialchars($cliente_nombre) . "\n";
+    $whatsapp_message .= "*Usuario:* " . htmlspecialchars($cliente_nombre) . "\n";
     $whatsapp_message .= "*Teléfono:* " . htmlspecialchars($cliente_telefono) . "\n\n";
 
-    $whatsapp_message .= "¡Hola! Quisiera realizar el siguiente pedido:\n\n";
-    $whatsapp_message .= "*-- LISTA DE PRODUCTOS --*\n";
-    $whatsapp_message .= "```\n";
-    $whatsapp_message .= "| Cant | Producto             | Subtotal |\n";
-    $whatsapp_message .= "|------|----------------------|----------|\n";
-    
+    $whatsapp_message .= "¡Hola! Quisiera confirmar el siguiente pedido:\n\n";
+    $whatsapp_message .= "```\n"; // Inicia bloque de código para alineación
+
+    // Definición de anchos de columna súper compactos
+    $ancho_cant = 5;
+    $ancho_prod = 18;
+    $ancho_sub = 10;
+
+    // Encabezado
+    $whatsapp_message .= str_pad("Cant.", $ancho_cant, " ", STR_PAD_RIGHT);
+    $whatsapp_message .= str_pad("Producto", $ancho_prod, " ", STR_PAD_RIGHT);
+    $whatsapp_message .= str_pad("Total", $ancho_sub, " ", STR_PAD_LEFT) . "\n";
+    $whatsapp_message .= str_repeat("-", $ancho_cant + $ancho_prod + $ancho_sub) . "\n";
+
+    // Items
     foreach ($cart_items as $item) {
-        $cantidad = str_pad($item['cantidad'], 4, " ", STR_PAD_LEFT);
-        
-        $producto_nombre = $item['nombre_producto'];
-        if (strlen($producto_nombre) > 10) {
-            $producto_nombre = substr($producto_nombre, 0, 17) . "...";
+        $product_name = htmlspecialchars($item['nombre_producto']);
+        if (mb_strlen($product_name) > $ancho_prod - 1) {
+            $product_name = mb_substr($product_name, 0, $ancho_prod - 4) . "...";
         }
-        $producto_nombre_col = str_pad($producto_nombre, 20, " ", STR_PAD_RIGHT);
-        
-        $subtotal = str_pad("$" . number_format($item['subtotal'], 2), 9, " ", STR_PAD_LEFT);
-        
-        $whatsapp_message .= "| " . $cantidad . " | " . $producto_nombre_col . " | " . $subtotal . " |\n";
+
+        $whatsapp_message .= str_pad("x" . $item['cantidad'], $ancho_cant, " ", STR_PAD_RIGHT);
+        $whatsapp_message .= str_pad($product_name, $ancho_prod, " ", STR_PAD_RIGHT);
+        $whatsapp_message .= str_pad("$" . number_format($item['subtotal'], 2), $ancho_sub, " ", STR_PAD_LEFT) . "\n";
     }
-    
-    $whatsapp_message .= "----------------------------------------\n";
-    $whatsapp_message .= "```\n";
-    $whatsapp_message .= "\n*Total a Pagar: $" . number_format($total, 2) . "*";
+
+    $whatsapp_message .= str_repeat("-", $ancho_cant + $ancho_prod + $ancho_sub) . "\n";
+
+    // Total final
+    $whatsapp_message .= str_pad("Total a Pagar:", $ancho_cant + $ancho_prod, " ", STR_PAD_LEFT);
+    $whatsapp_message .= str_pad("$" . number_format($total, 2), $ancho_sub, " ", STR_PAD_LEFT) . "\n";
+
+    $whatsapp_message .= "```\n\n"; // Cierra bloque de código
+    $whatsapp_message .= "_Gracias por su compra._";
     
     $whatsapp_number = "50368345121"; 
     $whatsapp_url = "https://wa.me/" . $whatsapp_number . "?text=" . urlencode($whatsapp_message);
@@ -98,7 +109,6 @@ try {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Finalizar Compra</title>
     <link rel="stylesheet" href="css/style.css">
-    <?php /* EL BLOQUE <style> SE HA ELIMINADO */ ?>
 </head>
 <body class="page-checkout"> 
     <?php include 'includes/header.php'; ?>

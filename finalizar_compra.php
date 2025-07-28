@@ -70,7 +70,7 @@ try {
         $cantidad = str_pad($item['cantidad'], 4, " ", STR_PAD_LEFT);
         
         $producto_nombre = $item['nombre_producto'];
-        if (strlen($producto_nombre) > 20) {
+        if (strlen($producto_nombre) > 10) {
             $producto_nombre = substr($producto_nombre, 0, 17) . "...";
         }
         $producto_nombre_col = str_pad($producto_nombre, 20, " ", STR_PAD_RIGHT);

@@ -60,9 +60,16 @@ $view = $_GET['view'] ?? 'perfil';
                             </div>
                          <?php
                         break; // Fin del case 'favoritos'
+                        
                         case 'pedidos':
-                            echo "<h1>Historial de Pedidos</h1><p>Aquí se mostrará tu historial de compras.</p>";
-                            break;
+                        ?>
+                            <h1>Historial de Pedidos</h1>
+                            <p>Aquí puedes ver tus compras anteriores y repetirlas fácilmente.</p>
+                            <div id="order-history-container" class="order-history-container">
+                                </div>
+                        <?php
+                            break; // Fin del case 'pedidos'
+
                         case 'ofertas':
                              echo "<h1>Mis Ofertas</h1><p>Aquí se mostrarán ofertas especiales para ti.</p>";
                             break;
@@ -152,6 +159,9 @@ $view = $_GET['view'] ?? 'perfil';
     <?php endif; ?>
     <?php if ($view === 'favoritos'): ?>
         <script type="module" src="js/dashboard_favorites.js"></script>
+    <?php endif; ?>
+    <?php if ($view === 'pedidos'): ?>
+        <script type="module" src="js/dashboard_orders.js"></script>
     <?php endif; ?>
 </body>
 </html>

@@ -90,7 +90,6 @@ try {
             }
             break;
 
-        // --- **INICIO DE LA CORRECCIÓN: CASES FALTANTES AÑADIDOS** ---
         case 'get-favorite-details':
             if ($method === 'GET' && isset($_SESSION['id_cliente'])) {
                 handleGetFavoriteDetailsRequest($pdo, $_SESSION['id_cliente']);
@@ -102,7 +101,18 @@ try {
                 handleAddMultipleToCartRequest($pdo, $_SESSION['id_cliente'], $inputData['product_ids'] ?? []);
             }
             break;
-        // --- **FIN DE LA CORRECCIÓN** ---
+        
+        case 'order-history':
+            if ($method === 'GET' && isset($_SESSION['id_cliente'])) {
+                handleGetOrderHistory($pdo, $_SESSION['id_cliente']);
+            }
+            break;
+        
+        case 'reorder':
+            if ($method === 'POST' && isset($_SESSION['id_cliente'])) {
+                handleReorderRequest($pdo, $_SESSION['id_cliente'], $inputData['order_id'] ?? 0);
+            }
+            break;
 
         default:
             http_response_code(400);
@@ -114,7 +124,126 @@ try {
     echo json_encode(['error' => 'Error: ' . $e->getMessage()]);
 }
 
-// === NUEVAS FUNCIONES PARA LA LÓGICA DE FAVORITOS ===
+/**
+ * Obtiene el historial de pedidos completados de un cliente.
+ */
+function handleGetOrderHistory(PDO $pdo, int $client_id) {
+    // Obtener todos los carritos completados (estado 2)
+    $stmt_orders = $pdo->prepare("
+        SELECT id_carrito, fecha_creacion 
+        FROM carritos_compra 
+        WHERE id_cliente = :client_id AND estado_id = 2
+        ORDER BY fecha_creacion DESC
+    ");
+    $stmt_orders->execute([':client_id' => $client_id]);
+    $orders_raw = $stmt_orders->fetchAll(PDO::FETCH_ASSOC);
+
+    $orders = [];
+    $stmt_details = $pdo->prepare("
+        SELECT p.nombre_producto, dc.cantidad, dc.precio_unitario
+        FROM detalle_carrito dc
+        JOIN productos p ON dc.id_producto = p.id_producto
+        WHERE dc.id_carrito = :cart_id
+    ");
+
+    foreach ($orders_raw as $order_raw) {
+        $stmt_details->execute([':cart_id' => $order_raw['id_carrito']]);
+        $items = $stmt_details->fetchAll(PDO::FETCH_ASSOC);
+        
+        $total = 0;
+        foreach ($items as $item) {
+            $total += $item['cantidad'] * $item['precio_unitario'];
+        }
+
+        $orders[] = [
+            'id_pedido' => $order_raw['id_carrito'],
+            'fecha' => date("d/m/Y H:i", strtotime($order_raw['fecha_creacion'])),
+            'total' => number_format($total, 2),
+            'items' => $items
+        ];
+    }
+
+    echo json_encode(['success' => true, 'orders' => $orders]);
+}
+
+/**
+ * Crea un nuevo carrito con los productos de un pedido antiguo.
+ * (Versión corregida del bug "invalid parameter number")
+ */
+function handleReorderRequest(PDO $pdo, int $client_id, int $order_id) {
+    if ($order_id <= 0) {
+        http_response_code(400);
+        throw new Exception("ID de pedido no válido.");
+    }
+
+    $stmt_old_items = $pdo->prepare("SELECT id_producto, cantidad FROM detalle_carrito WHERE id_carrito = :order_id");
+    $stmt_old_items->execute([':order_id' => $order_id]);
+    $old_items = $stmt_old_items->fetchAll(PDO::FETCH_ASSOC);
+
+    if (empty($old_items)) {
+        http_response_code(404);
+        throw new Exception("No se encontraron productos en el pedido a repetir.");
+    }
+    
+    $pdo->beginTransaction();
+    try {
+        $new_cart_id = getOrCreateCart($pdo, $client_id);
+        
+        $stmt_price = $pdo->prepare("SELECT precio_venta FROM productos WHERE id_producto = :product_id");
+        
+        $stmt_insert = $pdo->prepare("
+            INSERT INTO detalle_carrito (id_carrito, id_producto, cantidad, precio_unitario)
+            VALUES (:cart_id, :product_id, :quantity, :unit_price)
+            ON DUPLICATE KEY UPDATE 
+                cantidad = cantidad + VALUES(cantidad), 
+                precio_unitario = VALUES(precio_unitario)
+        ");
+
+        foreach ($old_items as $item) {
+            $stmt_price->execute([':product_id' => $item['id_producto']]);
+            $current_price = $stmt_price->fetchColumn();
+
+            if ($current_price !== false) {
+                $stmt_insert->execute([
+                    ':cart_id'      => $new_cart_id,
+                    ':product_id'   => $item['id_producto'],
+                    ':quantity'     => $item['cantidad'],
+                    ':unit_price'   => $current_price
+                ]);
+            }
+        }
+        
+        $pdo->commit();
+        echo json_encode(['success' => true, 'message' => 'El pedido se ha añadido a tu carrito.']);
+    } catch (Exception $e) {
+        $pdo->rollBack();
+        http_response_code(500);
+        throw new Exception("Error al repetir el pedido: " . $e->getMessage());
+    }
+}
+
+/**
+ * Procesa el checkout final, marcando el carrito como completado (estado 2).
+ */
+function handleCheckoutRequest(PDO $pdo) {
+    if (!isset($_SESSION['id_cliente'])) throw new Exception('Debes iniciar sesión para finalizar la compra.');
+    
+    $client_id = $_SESSION['id_cliente'];
+    $cart_id = getOrCreateCart($pdo, $client_id, false);
+    
+    if (!$cart_id) {
+        throw new Exception("Tu carrito está vacío. No hay nada que procesar.");
+    }
+    
+    $stmt = $pdo->prepare("UPDATE carritos_compra SET estado_id = 2 WHERE id_carrito = :cart_id AND id_cliente = :client_id AND estado_id = 1");
+    $stmt->execute([':cart_id' => $cart_id, ':client_id' => $client_id]);
+    
+    if ($stmt->rowCount() > 0) {
+        echo json_encode(['success' => true, 'message' => 'Compra finalizada con éxito.']);
+    } else {
+        echo json_encode(['success' => true, 'message' => 'El carrito ya estaba procesado o vacío.']);
+    }
+}
 
 function handleGetFavoriteDetailsRequest(PDO $pdo, int $client_id) {
     $stmt = $pdo->prepare("
@@ -126,30 +255,23 @@ function handleGetFavoriteDetailsRequest(PDO $pdo, int $client_id) {
     ");
     $stmt->execute([':client_id' => $client_id]);
     $favorites = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    
     echo json_encode(['success' => true, 'favorites' => $favorites]);
 }
 
 function handleAddMultipleToCartRequest(PDO $pdo, int $client_id, array $product_ids) {
-    if (empty($product_ids)) {
-        throw new Exception("No se proporcionaron productos para añadir.");
-    }
-    
+    if (empty($product_ids)) throw new Exception("No se proporcionaron productos para añadir.");
     $cart_id = getOrCreateCart($pdo, $client_id);
-    
     $stmt_price = $pdo->prepare("SELECT precio_venta FROM productos WHERE id_producto = :product_id");
     $stmt_insert = $pdo->prepare("
         INSERT INTO detalle_carrito (id_carrito, id_producto, cantidad, precio_unitario)
         VALUES (:cart_id, :product_id, 1, :unit_price)
         ON DUPLICATE KEY UPDATE cantidad = cantidad + 1
     ");
-
     $pdo->beginTransaction();
     try {
         foreach ($product_ids as $product_id) {
             $stmt_price->execute([':product_id' => (int)$product_id]);
             $unit_price = $stmt_price->fetchColumn();
-
             if ($unit_price !== false) {
                 $stmt_insert->execute([
                     ':cart_id' => $cart_id,
@@ -166,63 +288,39 @@ function handleAddMultipleToCartRequest(PDO $pdo, int $client_id, array $product
     }
 }
 
-
-// --- FUNCIONES PARA EL PERFIL ---
 function handleGetProfileRequest(PDO $pdo, int $client_id) {
     $stmt = $pdo->prepare("SELECT nombre_usuario, nombre, apellido, email, telefono FROM clientes WHERE id_cliente = :client_id");
     $stmt->execute([':client_id' => $client_id]);
     $profile = $stmt->fetch(PDO::FETCH_ASSOC);
-    if (!$profile) {
-        throw new Exception("Perfil no encontrado.");
-    }
+    if (!$profile) throw new Exception("Perfil no encontrado.");
     echo json_encode(['success' => true, 'profile' => $profile]);
 }
 
 function handleUpdateProfileRequest(PDO $pdo, int $client_id, ?array $data) {
-    if (empty($data['nombre']) || empty($data['apellido']) || empty($data['email'])) {
-        throw new Exception("Nombre, apellido y email son campos obligatorios.");
-    }
+    if (empty($data['nombre']) || empty($data['apellido']) || empty($data['email'])) throw new Exception("Nombre, apellido y email son campos obligatorios.");
     $stmt = $pdo->prepare("UPDATE clientes SET nombre = :nombre, apellido = :apellido, email = :email, telefono = :telefono WHERE id_cliente = :client_id");
-    $stmt->execute([
-        ':nombre' => $data['nombre'],
-        ':apellido' => $data['apellido'],
-        ':email' => $data['email'],
-        ':telefono' => $data['telefono'] ?? null,
-        ':client_id' => $client_id
-    ]);
+    $stmt->execute([':nombre' => $data['nombre'], ':apellido' => $data['apellido'], ':email' => $data['email'], ':telefono' => $data['telefono'] ?? null, ':client_id' => $client_id]);
     echo json_encode(['success' => true, 'message' => 'Perfil actualizado correctamente.']);
 }
 
 function handleUpdatePasswordRequest(PDO $pdo, int $client_id, ?array $data) {
-    if (empty($data['current_password']) || empty($data['new_password'])) {
-        throw new Exception("Todos los campos de contraseña son requeridos.");
-    }
-    
+    if (empty($data['current_password']) || empty($data['new_password'])) throw new Exception("Todos los campos de contraseña son requeridos.");
     $stmt = $pdo->prepare("SELECT password_hash FROM clientes WHERE id_cliente = :client_id");
     $stmt->execute([':client_id' => $client_id]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    if (!$user || !password_verify($data['current_password'], $user['password_hash'])) {
-        throw new Exception("La contraseña actual es incorrecta.");
-    }
-    
+    if (!$user || !password_verify($data['current_password'], $user['password_hash'])) throw new Exception("La contraseña actual es incorrecta.");
     $new_password_hash = password_hash($data['new_password'], PASSWORD_DEFAULT);
     $stmt_update = $pdo->prepare("UPDATE clientes SET password_hash = :new_hash WHERE id_cliente = :client_id");
     $stmt_update->execute([':new_hash' => $new_password_hash, ':client_id' => $client_id]);
-
     echo json_encode(['success' => true, 'message' => 'Contraseña actualizada correctamente.']);
 }
 
-
-// --- RESTO DE FUNCIONES ---
 function handleLoginRequest(PDO $pdo) {
     $data = json_decode(file_get_contents('php://input'), true);
     if (empty($data['nombre_usuario']) || empty($data['password'])) throw new Exception("Nombre de usuario y contraseña son requeridos.");
-    
     $stmt = $pdo->prepare("SELECT id_cliente, nombre_usuario, password_hash FROM clientes WHERE nombre_usuario = :nombre_usuario");
     $stmt->execute([':nombre_usuario' => $data['nombre_usuario']]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
-
     if ($user && password_verify($data['password'], $user['password_hash'])) {
         $_SESSION['id_cliente'] = $user['id_cliente'];
         $_SESSION['nombre_usuario'] = $user['nombre_usuario'];
@@ -237,9 +335,7 @@ function handleLoginRequest(PDO $pdo) {
 function handleRegisterRequest(PDO $pdo) {
     $data = json_decode(file_get_contents('php://input'), true);
     $required_fields = ['nombre_usuario', 'password', 'nombre', 'telefono', 'id_tipo_cliente'];
-    foreach ($required_fields as $field) {
-        if (empty($data[$field])) throw new Exception("El campo '$field' es obligatorio.");
-    }
+    foreach ($required_fields as $field) if (empty($data[$field])) throw new Exception("El campo '$field' es obligatorio.");
     $stmt_check = $pdo->prepare("SELECT id_cliente FROM clientes WHERE nombre_usuario = :nombre_usuario");
     $stmt_check->execute([':nombre_usuario' => $data['nombre_usuario']]);
     if ($stmt_check->fetch()) throw new Exception("El nombre de usuario ya está en uso.");
@@ -260,22 +356,16 @@ function handleRegisterRequest(PDO $pdo) {
 }
 
 function handleGetFavoritesRequest(PDO $pdo) {
-    if (!isset($_SESSION['id_cliente'])) {
-        echo json_encode([]);
-        return;
-    }
+    if (!isset($_SESSION['id_cliente'])) { echo json_encode([]); return; }
     $client_id = $_SESSION['id_cliente'];
     $stmt = $pdo->prepare("SELECT id_producto FROM favoritos WHERE id_cliente = :client_id");
     $stmt->execute([':client_id' => $client_id]);
     $favorites = $stmt->fetchAll(PDO::FETCH_COLUMN, 0);
     echo json_encode($favorites);
 }
+
 function handleAddFavoriteRequest(PDO $pdo) {
-    if (!isset($_SESSION['id_cliente'])) {
-        http_response_code(401);
-        echo json_encode(['error' => 'Debes iniciar sesión para añadir favoritos.']);
-        return;
-    }
+    if (!isset($_SESSION['id_cliente'])) { http_response_code(401); echo json_encode(['error' => 'Debes iniciar sesión para añadir favoritos.']); return; }
     $data = json_decode(file_get_contents('php://input'), true);
     if (!isset($data['product_id'])) throw new Exception('Falta el ID del producto.');
     $product_id = (int)$data['product_id'];
@@ -284,12 +374,9 @@ function handleAddFavoriteRequest(PDO $pdo) {
     $stmt->execute([':client_id' => $client_id, ':product_id' => $product_id]);
     echo json_encode(['success' => true, 'message' => 'Producto añadido a favoritos.']);
 }
+
 function handleRemoveFavoriteRequest(PDO $pdo) {
-    if (!isset($_SESSION['id_cliente'])) {
-        http_response_code(401);
-        echo json_encode(['error' => 'Debes iniciar sesión para quitar favoritos.']);
-        return;
-    }
+    if (!isset($_SESSION['id_cliente'])) { http_response_code(401); echo json_encode(['error' => 'Debes iniciar sesión para quitar favoritos.']); return; }
     $data = json_decode(file_get_contents('php://input'), true);
     if (!isset($data['product_id'])) throw new Exception('Falta el ID del producto.');
     $product_id = (int)$data['product_id'];
@@ -298,12 +385,9 @@ function handleRemoveFavoriteRequest(PDO $pdo) {
     $stmt->execute([':client_id' => $client_id, ':product_id' => $product_id]);
     echo json_encode(['success' => true, 'message' => 'Producto eliminado de favoritos.']);
 }
+
 function handleSetCartItemRequest(PDO $pdo) {
-    if (!isset($_SESSION['id_cliente'])) {
-        http_response_code(401);
-        echo json_encode(['error' => 'Debes iniciar sesión para modificar el carrito.']);
-        return;
-    }
+    if (!isset($_SESSION['id_cliente'])) { http_response_code(401); echo json_encode(['error' => 'Debes iniciar sesión para modificar el carrito.']); return; }
     $data = json_decode(file_get_contents('php://input'), true);
     $product_id = (int)$data['product_id'];
     $quantity = (int)$data['quantity'];
@@ -331,10 +415,9 @@ function handleSetCartItemRequest(PDO $pdo) {
     $pdo->commit();
     echo json_encode(['success' => true, 'message' => 'Carrito actualizado.']);
 }
+
 function handleCartStatusRequest(PDO $pdo) {
-    if (!isset($_SESSION['id_cliente'])) {
-        echo json_encode(['total_price' => '0.00']); return;
-    }
+    if (!isset($_SESSION['id_cliente'])) { echo json_encode(['total_price' => '0.00']); return; }
     $client_id = $_SESSION['id_cliente'];
     $stmt = $pdo->prepare("SELECT SUM(dc.cantidad * dc.precio_unitario) as total_price FROM detalle_carrito dc JOIN carritos_compra cc ON dc.id_carrito = cc.id_carrito WHERE cc.id_cliente = :client_id AND cc.estado_id = 1");
     $stmt->execute([':client_id' => $client_id]);
@@ -342,15 +425,12 @@ function handleCartStatusRequest(PDO $pdo) {
     $total_price = $result['total_price'] ? number_format($result['total_price'], 2, '.', '') : '0.00';
     echo json_encode(['total_price' => $total_price]);
 }
+
 function handleCartDetailsRequest(PDO $pdo) {
-    if (!isset($_SESSION['id_cliente'])) {
-        echo json_encode(['cart_items' => [], 'total' => '0.00']); return;
-    }
+    if (!isset($_SESSION['id_cliente'])) { echo json_encode(['cart_items' => [], 'total' => '0.00']); return; }
     $client_id = $_SESSION['id_cliente'];
     $cart_id = getOrCreateCart($pdo, $client_id);
-    if (!$cart_id) {
-        echo json_encode(['cart_items' => [], 'total' => '0.00']); return;
-    }
+    if (!$cart_id) { echo json_encode(['cart_items' => [], 'total' => '0.00']); return; }
     $stmt_items = $pdo->prepare("SELECT p.id_producto, p.nombre_producto, p.url_imagen, dc.cantidad, dc.precio_unitario, (dc.cantidad * dc.precio_unitario) as subtotal FROM detalle_carrito dc JOIN productos p ON dc.id_producto = p.id_producto WHERE dc.id_carrito = :cart_id");
     $stmt_items->execute([':cart_id' => $cart_id]);
     $cart_items = $stmt_items->fetchAll(PDO::FETCH_ASSOC);
@@ -358,19 +438,7 @@ function handleCartDetailsRequest(PDO $pdo) {
     foreach ($cart_items as $item) $total += $item['subtotal'];
     echo json_encode(['cart_items' => $cart_items, 'total' => number_format($total, 2, '.', '')]);
 }
-function handleCheckoutRequest(PDO $pdo) {
-    if (!isset($_SESSION['id_cliente'])) throw new Exception('Debes iniciar sesión para finalizar la compra.');
-    $client_id = $_SESSION['id_cliente'];
-    $cart_id = getOrCreateCart($pdo, $client_id);
-    if (!$cart_id) throw new Exception("No se encontró un carrito activo para finalizar.");
-    $stmt = $pdo->prepare("UPDATE carritos_compra SET estado_id = 20 WHERE id_carrito = :cart_id AND id_cliente = :client_id AND estado_id = 1");
-    $stmt->execute([':cart_id' => $cart_id, ':client_id' => $client_id]);
-    if ($stmt->rowCount() > 0) {
-        echo json_encode(['success' => true, 'message' => 'Compra finalizada con éxito.']);
-    } else {
-        echo json_encode(['success' => true, 'message' => 'El carrito ya estaba procesado o vacío.']);
-    }
-}
+
 function handleDeleteCartItemRequest(PDO $pdo) {
     if (!isset($_SESSION['id_cliente'])) throw new Exception('Debes iniciar sesión para modificar el carrito.');
     $data = json_decode(file_get_contents('php://input'), true);
@@ -380,31 +448,33 @@ function handleDeleteCartItemRequest(PDO $pdo) {
     deleteCartItem($pdo, $cart_id, $product_id);
     echo json_encode(['success' => true, 'message' => 'Producto eliminado.']);
 }
-function getOrCreateCart(PDO $pdo, int $client_id) {
+
+function getOrCreateCart(PDO $pdo, int $client_id, bool $create_if_not_found = true) {
     $stmt = $pdo->prepare("SELECT id_carrito FROM carritos_compra WHERE id_cliente = :client_id AND estado_id = 1");
     $stmt->execute([':client_id' => $client_id]);
     $cart_id = $stmt->fetchColumn();
-    if (!$cart_id) {
+    if (!$cart_id && $create_if_not_found) {
         $stmt_new = $pdo->prepare("INSERT INTO carritos_compra (id_cliente, estado_id) VALUES (:client_id, 1)");
         $stmt_new->execute([':client_id' => $client_id]);
         return $pdo->lastInsertId();
     }
     return $cart_id;
 }
+
 function deleteCartItem(PDO $pdo, int $cart_id, int $product_id) {
     $stmt = $pdo->prepare("DELETE FROM detalle_carrito WHERE id_carrito = :cart_id AND id_producto = :product_id");
     $stmt->execute([':cart_id' => $cart_id, ':product_id' => $product_id]);
 }
+
 function handleCheckUsernameRequest(PDO $pdo) {
     $username = $_GET['username'] ?? '';
-    if (empty($username)) {
-        echo json_encode(['is_available' => false]); return;
-    }
+    if (empty($username)) { echo json_encode(['is_available' => false]); return; }
     $stmt = $pdo->prepare("SELECT 1 FROM clientes WHERE nombre_usuario = :nombre_usuario LIMIT 1");
     $stmt->execute([':nombre_usuario' => $username]);
     $is_available = !$stmt->fetch();
     echo json_encode(['is_available' => $is_available]);
 }
+
 function handleProductsRequest(PDO $pdo) {
     $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
     $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 25;
@@ -457,6 +527,7 @@ function handleProductsRequest(PDO $pdo) {
     $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
     echo json_encode(['products' => $products, 'total_products' => (int) $total_products, 'total_pages' => $total_pages, 'current_page' => $page, 'limit' => $limit, 'filter_name' => $filter_name]);
 }
+
 function handleDepartmentsRequest(PDO $pdo) {
     $stmt = $pdo->query("SELECT id_departamento, codigo_departamento, departamento FROM departamentos ORDER BY departamento ASC");
     $departments = $stmt->fetchAll(PDO::FETCH_ASSOC);

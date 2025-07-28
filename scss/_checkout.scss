@@ -1,0 +1,149 @@
+// Estilos para la página de Finalizar Compra (Versión Final con Scroll Corregido)
+
+body.page-checkout {
+    overflow: hidden; 
+    background-color: #f4f7f9;
+}
+
+.summary-container {
+    max-width: 1100px;
+    margin: 2rem auto;
+    height: calc(100vh - 4rem);
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.07);
+    overflow: hidden;
+}
+
+// Columna principal (izquierda en escritorio)
+.summary-main {
+    display: flex;
+    flex-direction: column;
+    // --- LA CORRECCIÓN CLAVE ESTÁ AQUÍ ---
+    // Esta línea obliga a la columna principal a respetar sus límites
+    // y permite que el contenedor de la tabla (su hijo) pueda tener scroll.
+    overflow: hidden;
+}
+
+.summary-header {
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid #e9ecef;
+    flex-shrink: 0;
+    h1 {
+        margin: 0;
+        font-size: 1.6rem;
+    }
+}
+
+.summary-table-container {
+    flex-grow: 1;
+    overflow-y: auto; // Ahora este scroll funcionará correctamente
+    padding: 1rem 2rem;
+}
+
+.summary-table {
+    width: 100%;
+    border-collapse: collapse;
+    th, td {
+        padding: 1rem 0;
+        border-bottom: 1px solid #f1f1f1;
+        text-align: left;
+    }
+    th {
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        color: #6c757d;
+        font-weight: 600;
+        padding-bottom: 1rem;
+    }
+    .col-quantity { text-align: center; }
+    .col-subtotal { text-align: right; }
+    td:nth-child(2) { text-align: center; }
+    td:nth-child(3) { text-align: right; }
+}
+
+.cart-empty-message {
+    padding: 3rem 2rem;
+    text-align: center;
+}
+
+// Columna lateral (derecha en escritorio)
+.summary-sidebar {
+    padding: 2rem;
+    background-color: #f8f9fa;
+    border-top: 1px solid #e9ecef;
+}
+
+.summary-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    span { font-size: 1.1rem; }
+    strong { font-size: 1.8rem; }
+}
+
+.whatsapp-button {
+    display: block;
+    width: 100%;
+    background-color: #25D366;
+    color: white;
+    padding: 1rem;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 1.1rem;
+    text-align: center;
+    transition: all 0.2s ease;
+    &:hover { background-color: #1DA851; transform: translateY(-2px); }
+}
+
+.cancel-button {
+    display: block;
+    text-align: center;
+    margin-top: 1rem;
+    padding: 0.5rem;
+    color: #6c757d;
+    text-decoration: none;
+    font-weight: 500;
+    border-radius: 5px;
+    transition: all 0.2s ease;
+    &:hover { background-color: #e9ecef; color: #333; }
+}
+
+
+// --- ESTILOS PARA ESCRITORIO (2 COLUMNAS) ---
+@media (min-width: 992px) {
+    .summary-container {
+        display: grid;
+        grid-template-columns: 1fr 380px; 
+    }
+
+    .summary-sidebar {
+        border-top: none;
+        border-left: 1px solid #e9ecef;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+    }
+}
+
+
+// --- RESPONSIVIDAD MÓVIL (AJUSTES FINALES) ---
+@media (max-width: 991px) {
+    body.page-checkout {
+        overflow-y: auto;
+    }
+    .summary-container {
+        margin: 0;
+        height: auto;
+        min-height: 100vh;
+        border-radius: 0;
+        box-shadow: none;
+    }
+    .summary-header, .summary-sidebar, .summary-table-container {
+        padding: 1.25rem;
+    }
+}

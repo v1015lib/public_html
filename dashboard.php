@@ -35,9 +35,31 @@ $view = $_GET['view'] ?? 'perfil';
             <div class="dashboard-content">
                 <?php
                     switch ($view) {
+                        
                         case 'favoritos':
-                            echo "<h1>Mis Favoritos</h1><p>Aquí se mostrarán tus productos favoritos.</p>";
-                            break;
+                        ?>
+                            <h1>Mis Favoritos</h1>
+                            <p>Selecciona los productos que deseas añadir a tu carrito de compras.</p>
+
+                            <div class="favorites-list-container">
+                                <div class="favorites-header">
+                                    <div class="form-group-checkbox select-all-container">
+                                        <input type="checkbox" id="select-all-favorites">
+                                        <label for="select-all-favorites">Seleccionar Todos</label>
+                                    </div>
+                                </div>
+
+                                <div id="favorites-list" class="favorites-list">
+                                    </div>
+
+                                <div class="favorites-footer">
+                                    <button id="add-favorites-to-cart-btn" class="submit-btn" disabled>
+                                        Añadir Seleccionados al Carrito
+                                    </button>
+                                </div>
+                            </div>
+                         <?php
+                        break; // Fin del case 'favoritos'
                         case 'pedidos':
                             echo "<h1>Historial de Pedidos</h1><p>Aquí se mostrará tu historial de compras.</p>";
                             break;
@@ -128,6 +150,8 @@ $view = $_GET['view'] ?? 'perfil';
     <?php if ($view === 'perfil'): ?>
         <script type="module" src="js/dashboard_profile.js"></script>
     <?php endif; ?>
-
+    <?php if ($view === 'favoritos'): ?>
+        <script type="module" src="js/dashboard_favorites.js"></script>
+    <?php endif; ?>
 </body>
 </html>

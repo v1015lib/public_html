@@ -1,7 +1,7 @@
 // js/cart_quantity_handler.js
 import { updateCartHeader } from './cart_updater.js';
 import { loadCartDetails } from './cart_view_handler.js';
-import { showLoginPrompt } from './modal_handler.js'; // <-- Importamos la nueva función
+import { showLoginPrompt } from './modal_handler.js';
 
 async function updateCartAPI(productId, quantity) {
     try {
@@ -15,11 +15,7 @@ async function updateCartAPI(productId, quantity) {
         if (!data.success) throw new Error(data.message || 'Error del API.');
 
         await updateCartHeader();
-
-        const cartPanel = document.getElementById('cart-panel');
-        if (cartPanel && cartPanel.classList.contains('visible')) {
-            await loadCartDetails();
-        }
+        await loadCartDetails();
 
         const productCardInput = document.querySelector(`.product-card[data-product-id="${productId}"] .quantity-input`);
         if (productCardInput) {
@@ -32,11 +28,13 @@ async function updateCartAPI(productId, quantity) {
 }
 
 function handleQuantityInteraction(event) {
-    const isLoggedIn = document.querySelector('.my-account-link');
+    // --- LA CORRECCIÓN DEFINITIVA ESTÁ AQUÍ ---
+    // Ahora, la variable `isLoggedIn` será verdadera si encuentra el enlace de "Mi Cuenta"
+    // O si encuentra el layout principal del dashboard, lo que soluciona el problema.
+    const isLoggedIn = document.querySelector('.my-account-link') || document.querySelector('.dashboard-layout');
+
     if (!isLoggedIn) {
-        // --- Llama a la nueva ventana modal en lugar de la alerta ---
         showLoginPrompt();
-        // Reseteamos el input a 0 para evitar confusión.
         const input = event.target.closest('.quantity-selector')?.querySelector('.quantity-input');
         if (input) input.value = 0;
         return;
@@ -71,11 +69,14 @@ function handleQuantityInteraction(event) {
 }
 
 export function initializeQuantityHandlers() {
+    // Volvemos al listener en el body, que tus propias pruebas demostraron que sí funciona.
+    // Esto es más simple y robusto para capturar todos los clics.
     document.body.addEventListener('click', event => {
         if (event.target.matches('.quantity-btn')) {
             handleQuantityInteraction(event);
         }
     });
+
     document.body.addEventListener('input', event => {
         if (event.target.matches('.quantity-input')) {
             handleQuantityInteraction(event);

@@ -275,3 +275,150 @@
         grid-template-columns: 1fr 1fr;
     }
 }
+// scss/_dashboard.scss
+
+// ... (todos tus estilos existentes del dashboard)
+
+/* ==========================================================================
+   ESTILOS PARA LA LISTA DE FAVORITOS (LAYOUT ORIGINAL CON ANCHOS FIJOS)
+   ========================================================================== */
+
+.favorites-list-container {
+    background-color: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    overflow: hidden; 
+}
+
+.favorites-header, .favorites-footer {
+    padding: 0.75rem 1.5rem;
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.favorites-footer {
+    border-top: 1px solid #e0e0e0;
+    border-bottom: none;
+    text-align: right;
+}
+
+.select-all-container {
+    margin: 0;
+}
+
+.favorites-list {
+    max-height: calc(100vh - 300px);
+    overflow-y: auto;
+}
+
+.favorite-item {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1.5rem;
+    border-bottom: 1px solid #f2f2f2;
+    transition: background-color 0.2s;
+
+    &:last-child {
+        border-bottom: none;
+    }
+
+    &:hover {
+        background-color: #f8f9fa;
+    }
+}
+
+// --- CAMBIO CLAVE: ANCHOS FIJOS PARA CADA ELEMENTO DE LA FILA ---
+
+.favorite-item .form-group-checkbox {
+    flex-basis: 40px; // Ancho para el checkbox
+    flex-shrink: 0;
+}
+
+.favorite-item-image {
+    width: 50px; // Ancho para la imagen  
+    height: 50px;     
+    object-fit: contain;
+    border-radius: 4px;
+    margin-right: 1rem;
+    flex-shrink: 0; // Evita que se encoja
+}
+
+.favorite-item-details {
+    // Este contenedor ahora es el más importante para el layout
+    display: flex;
+    flex-grow: 1; // Le decimos que ocupe todo el espacio sobrante
+    align-items: center;
+    min-width: 0; // Truco CLAVE para que el ellipsis funcione en los hijos
+}
+
+.favorite-item-name {
+    // Asignamos un ancho base, pero puede crecer si hay espacio
+    flex-basis: 150px; 
+    flex-grow: 1; // Permite que crezca y ocupe el espacio disponible
+    font-weight: 500;
+    color: #333;
+    font-size: 0.9rem;
+    margin-right: 1rem;
+    // --- CLAVE PARA EL TEXTO LARGO ---
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.favorite-item-price {
+    flex-basis: 70px; // Ancho fijo para el precio
+    flex-shrink: 0; // No se encoge
+    color: #6c757d;
+    font-size: 0.9rem; 
+    font-weight: 500;
+    text-align: right;
+    margin-right: 1rem;
+}
+
+.favorite-item-remove-btn {
+    flex-basis: 30px; // Ancho para el botón
+    flex-shrink: 0;
+    background: none;
+    border: none;
+    color: #dc3545;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    
+    &:hover {
+        background-color: #f8d7da;
+        border-radius: 50%;
+    }
+}
+
+#add-favorites-to-cart-btn {
+    padding: 0.7rem 1.2rem;
+    font-size: 0.9rem;
+    &:disabled {
+        background-color: #ccc;
+        cursor: not-allowed;
+    }
+}
+
+// --- RESPONSIVIDAD MÓVIL ---
+@media (max-width: 768px) {
+    .favorite-item-details {
+        flex-wrap: wrap; // Permite que el precio pase abajo si no cabe
+    }
+    .favorite-item-price {
+        flex-basis: 100%; // Ocupa toda la línea de abajo
+        text-align: left;
+        margin-top: -0.25rem;
+        margin-left: 0;
+    }
+}
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}

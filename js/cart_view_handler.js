@@ -6,7 +6,6 @@ const closeCartBtn = document.getElementById('close-cart-btn');
 const openCartTrigger = document.querySelector('.cart-widget-container');
 const cartContent = document.getElementById('cart-content');
 const cartTotalPrice = document.getElementById('cart-total-price');
-// --- NUEVO: Referencia al botón de finalizar compra ---
 const checkoutBtn = document.querySelector('.checkout-btn');
 
 export async function loadCartDetails() {
@@ -63,8 +62,6 @@ function toggleCartPanel(event) {
 export function initializeCartView() {
     if (openCartTrigger) {
         openCartTrigger.addEventListener('click', toggleCartPanel);
-    } else {
-        console.error("No se encontró el disparador del carrito: '.cart-widget-container'");
     }
 
     if (closeCartBtn) {
@@ -75,12 +72,8 @@ export function initializeCartView() {
         cartOverlay.addEventListener('click', toggleCartPanel);
     }
     
-    // ======================================================
-    // LÓGICA DEL BOTÓN DE FINALIZAR COMPRA (INTEGRADA AQUÍ)
-    // ======================================================
     if (checkoutBtn) {
         checkoutBtn.addEventListener('click', () => {
-            // Simplemente redirigimos a la nueva página de resumen
             window.location.href = 'finalizar_compra.php';
         });
     }

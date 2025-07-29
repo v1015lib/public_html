@@ -1,154 +1,634 @@
 // scss/_forms.scss
-@import 'vars'; // Asegúrate que aquí esté definido tu $primary-color
+@import 'vars';
 
-// === ESTILOS PARA LA PÁGINA DE FONDO ===
-// Esto centrará el formulario y le dará un fondo atractivo.
-.body-form-page {
-    // Un gradiente suave y moderno
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    display: grid; // Usamos Grid para un centrado perfecto
-    place-items: center; // Centra el .form-container vertical y horizontalmente
-    min-height: 100vh;
-    padding: 1rem; // Espacio para que no se pegue a los bordes en móvil
-}
+/* ==========================================================================
+   1. ESTILOS BASE PARA FORMULARIOS
+   ========================================================================== */
 
-// === ESTILOS PARA EL CONTENEDOR DEL FORMULARIO ===
-// Ahora el formulario tiene un fondo claro para máxima legibilidad.
+// Contenedor genérico para páginas con formularios centrados (Login, etc.)
 .form-container {
     background-color: #ffffff;
-    color: #333; // Texto oscuro sobre fondo claro
+    color: #333;
     max-width: 500px;
     width: 100%;
-    padding: 2.5rem;
+    padding: 1.5rem;
     border-radius: 12px;
-    box-shadow: 0 15px 35px rgba(0,0,0,0.15);
-    margin: auto;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+    margin: 1rem auto;
 
-    // --- LA SOLUCIÓN DEFINITIVA AL SCROLL ---
-    height: fit-content; // El formulario nunca ocupará más del 90% de la altura de la pantalla
-    overflow-y: auto; // Si el contenido se pasa de esa altura, APARECERÁ EL SCROLL INTERNO.
+    // Responsividad móvil
+    @media (max-width: 480px) {
+        padding: 1rem;
+        margin: 0.5rem auto;
+        border-radius: 8px;
+    }
 
     h1, h2 {
-        color: #2c3e50; // Un color oscuro y elegante para los títulos
         text-align: center;
-        font-size: 1.5rem;
+        font-size: 1.4rem;
+        margin-bottom: 0.5rem;
+        color: #2c3e50;
+
+        @media (max-width: 480px) {
+            font-size: 1.2rem;
+        }
+    }
+
+    p {
+        text-align: center;
+        font-size: 0.9rem;
+        color: #7f8c8d;
+        margin-bottom: 1.5rem;
+
+        @media (max-width: 480px) {
+            font-size: 0.8rem;
+            margin-bottom: 1rem;
+        }
+    }
+}
+
+// Estilos aplicados a todos los grupos de campos
+.form-group {
+    margin-bottom: 1.1rem;
+
+    @media (max-width: 480px) {
+        margin-bottom: 0.9rem;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 0.4rem;
+        font-weight: 600;
+        font-size: 0.85rem;
+        color: #34495e;
+
+        @media (max-width: 480px) {
+            font-size: 0.8rem;
+            margin-bottom: 0.3rem;
+        }
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    input[type="tel"] {
+        width: 100%;
+        padding: 10px 14px;
+        border: 1px solid #dfe6e9;
+        background-color: #f9fafb;
+        color: #333;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        transition: all 0.2s ease-in-out;
+        box-sizing: border-box;
+
+        @media (max-width: 480px) {
+            padding: 12px 14px;
+            font-size: 16px; // Evita el zoom en iOS
+            border-radius: 6px;
+        }
+
+        &:focus {
+            outline: none;
+            border-color: $primary-color;
+            background-color: #fff;
+            box-shadow: 0 0 0 3px rgba($primary-color, 0.2);
+        }
+    }
+}
+
+// Botón de envío principal
+.submit-btn {
+    width: 100%;
+    padding: 0.9rem 1.5rem;
+    font-size: 1rem;
+    font-weight: bold;
+    color: white;
+    background: $primary-color;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    margin-top: 0.5rem;
+
+    @media (max-width: 480px) {
+        padding: 1rem;
+        font-size: 0.95rem;
+        border-radius: 6px;
+    }
+
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(102, 126, 234, 0.25);
+
+        @media (max-width: 480px) {
+            transform: none; // Desactivar hover en móvil
+        }
+    }
+}
+
+// Botón secundario (Atrás, Cancelar, etc.)
+.btn-secondary {
+    @extend .submit-btn;
+    background-color: #6c757d;
+
+    &:hover {
+        background-color: darken(#6c757d, 8%);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+
+        @media (max-width: 480px) {
+            transform: none;
+        }
+    }
+}
+
+/* ==========================================================================
+   2. ESTILOS PARA EL ASISTENTE DE REGISTRO (WIZARD)
+   ========================================================================== */
+
+.wizard-container {
+    display: flex;
+    flex-direction: column;
+    max-width: 850px;
+    margin: 2rem auto;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+    overflow: hidden;
+    padding: 0;
+
+    // Responsividad móvil
+    @media (max-width: 767px) {
+        margin: 0.5rem;
+        border-radius: 8px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    }
+
+    @media (max-width: 480px) {
+        margin: 0.25rem;
+        border-radius: 6px;
+    }
+}
+
+// Columna lateral (Sidebar)
+.wizard-sidebar {
+    padding: 2rem 2.5rem;
+    background: #f8f9fa;
+    text-align: center;
+
+    @media (max-width: 767px) {
+        padding: 1.5rem;
+        text-align: left;
+    }
+
+    @media (max-width: 480px) {
+        padding: 1rem;
+    }
+
+    h1 {
+        font-size: 1.6rem;
         margin-bottom: 0.5rem;
 
+        @media (max-width: 480px) {
+            font-size: 1.3rem;
+        }
     }
+
     p {
-        color: #7f8c8d; // Un gris suave para el texto descriptivo
-        text-align: center;
-        margin-bottom: 2rem;
+        font-size: 0.9rem;
+        color: #6c757d;
+
+        @media (max-width: 480px) {
+            font-size: 0.8rem;
+        }
     }
 }
 
+// Contenido principal del formulario
+.wizard-content {
+    padding: 2rem 2.5rem;
+    overflow-y: auto;
+    max-height: calc(100vh - 120px); // Altura máxima para permitir scroll
+    position: relative;
 
-// === ESTILOS PARA LOS CAMPOS, ETIQUETAS Y BOTONES ===
-.register-form, .login-form, #profile-form, #password-form {
-    .form-group {
-        margin-bottom: 1.25rem;
-
-        label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 600;
-            color: #34495e;
-            font-weight: bold;
-        }
-
-        input[type="text"],
-        input[type="email"],
-        input[type="password"],
-        input[type="tel"] {
-            width: 100%;
-            padding: 12px 15px;
-            border: 1px solid #dfe6e9;
-            background-color: #f9fafb;
-            color: #333;
-            border-radius: 8px;
-            font-size: 1rem;
-            transition: all 0.2s ease-in-out;
-
-            &::placeholder { color: #b2bec3; }
-
-            &:focus {
-                outline: none;
-                border-color: $primary-color;
-                background-color: #fff;
-                box-shadow: 0 0 0 3px rgba($primary-color, 0.2);
-            }
-        }
+    @media (max-width: 767px) {
+        padding: 1.5rem;
+        max-height: calc(100vh - 100px);
     }
 
-    .submit-btn {
-        width: 100%;
+    @media (max-width: 480px) {
         padding: 1rem;
-        font-size: 1.1rem;
-        font-weight: bold;
-        color: white;
-        // Usamos el mismo gradiente del fondo para el botón
-        background: $primary-color;
-        border: none;
-        border-radius: 8px;
-        cursor: pointer;
-        transition: all 0.3s ease;
+        max-height: calc(100vh - 80px);
+    }
+}
+
+// Barra de progreso de los pasos
+.progress-bar {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-top: 2rem;
+    gap: 1.25rem;
+
+    @media (max-width: 767px) {
+        flex-direction: row;
+        justify-content: space-between;
         margin-top: 1rem;
-
-        &:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 15px rgba(102, 126, 234, 0.3);
-        }
+        gap: 0.5rem;
     }
 
-    .form-group-checkbox{
-
-        font-weight: bold;
-        font-variant: all-small-caps;
-        display: flex;
-        align-items: center;
-
-        #is_student_check{
-
-
-        }
-        label{
-            padding: .5rem;
-        }
+    @media (max-width: 480px) {
+        gap: 0.25rem;
     }
 }
 
-// === ESTILOS PARA MENSAJES DE FEEDBACK ===
-.form-message {
-    
-    padding: 1rem; margin-bottom: 1.5rem; border-radius: 8px;
-    &.success { background-color: #d4edda; color: #155724; }
-    &.error { background-color: #f8d7da; color: #721c24; }
-}
-
-.student-fields.hidden { 
-    display: none; 
-}
-
-// scss/_forms.scss
-
-/* ... otros estilos del formulario ... */
-
-// Para el mensaje de disponibilidad de nombre de usuario
-.availability-message {
+.progress-step {
+    display: flex;
+    align-items: center;
+    color: #b0b0b0;
     font-size: 0.9rem;
-    margin-top: 0.5rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+
+    @media (max-width: 767px) {
+        flex-direction: column;
+        text-align: center;
+        font-size: 0.8rem;
+        flex: 1;
+    }
+
+    @media (max-width: 480px) {
+        font-size: 0.7rem;
+    }
+    
+    strong {
+        height: 28px;
+        width: 28px;
+        line-height: 24px;
+        border: 2px solid #e0e0e0;
+        border-radius: 50%;
+        margin-right: 0.8rem;
+        background: #fff;
+        text-align: center;
+        font-size: 0.85rem;
+
+        @media (max-width: 767px) {
+            margin-right: 0;
+            margin-bottom: 0.3rem;
+            height: 24px;
+            width: 24px;
+            line-height: 20px;
+            font-size: 0.75rem;
+        }
+
+        @media (max-width: 480px) {
+            height: 20px;
+            width: 20px;
+            line-height: 16px;
+            font-size: 0.7rem;
+        }
+    }
+    
+    &.active {
+        color: $primary-color;
+        font-weight: 600;
+        strong {
+            border-color: $primary-color;
+            background-color: $primary-color;
+            color: #fff;
+        }
+    }
+}
+
+// Visibilidad de los pasos del formulario
+.form-step {
+    display: none;
+    animation: fadeIn 0.4s ease-in-out;
+    min-height: auto; // Cambiado para permitir altura dinámica
+    padding-bottom: 1rem; // Espacio para los botones
+
+    @media (max-width: 480px) {
+        padding-bottom: 0.8rem;
+    }
+
+    &.active {
+        display: block;
+    }
+}
+
+// Navegación (botones Siguiente/Atrás)
+.form-navigation {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1.5rem;
+    border-top: 1px solid #e9ecef;
+    padding-top: 1.5rem;
+    gap: 1rem;
+    position: sticky;
+    bottom: 0;
+    background-color: #fff;
+    z-index: 10;
+
+    @media (max-width: 480px) {
+        flex-direction: column-reverse;
+        gap: 0.75rem;
+        padding-top: 1rem;
+        margin-top: 1rem;
+        position: sticky;
+        bottom: 0;
+    }
+
+    .submit-btn, .btn-secondary {
+        width: auto;
+        min-width: 120px;
+
+        @media (max-width: 480px) {
+            width: 100%;
+            min-width: unset;
+        }
+    }
+}
+
+/* ==========================================================================
+   3. COMPONENTES ADICIONALES DEL FORMULARIO
+   ========================================================================== */
+
+// Checkbox para "Soy estudiante"
+.form-group-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+
+    @media (max-width: 480px) {
+        margin-bottom: 0.8rem;
+    }
+
+    label {
+        font-weight: 600;
+        font-size: 0.9rem;
+        margin: 0;
+        cursor: pointer;
+
+        @media (max-width: 480px) {
+            font-size: 0.85rem;
+        }
+    }
+
+    input[type="checkbox"] {
+        cursor: pointer;
+        transform: scale(1.2);
+
+        @media (max-width: 480px) {
+            transform: scale(1.1);
+        }
+    }
+}
+
+// Campos que aparecen al marcar "Soy estudiante"
+.student-fields {
+    transition: all 0.3s ease;
+    overflow: hidden;
+    
+    &.hidden {
+        display: none;
+    }
+    
+    // Cuando se muestran los campos, asegurar scroll suave
+    &:not(.hidden) {
+        animation: expandFields 0.3s ease-out;
+    }
+}
+
+// Animación para la expansión de campos de estudiante
+@keyframes expandFields {
+    from {
+        opacity: 0;
+        max-height: 0;
+        margin-top: 0;
+    }
+    to {
+        opacity: 1;
+        max-height: 200px;
+        margin-top: 1rem;
+    }
+}
+
+// Mensaje de disponibilidad de nombre de usuario
+.availability-message {
+    font-size: 0.85rem;
+    margin-top: 0.4rem;
     font-weight: 600;
 
-    // Cuando el usuario está disponible
-    &.success { 
-        color: green; // Color verde
+    @media (max-width: 480px) {
+        font-size: 0.8rem;
     }
 
-    // Cuando el usuario NO está disponible
-    &.error { 
-        color: red; // Color rojo
+    &.success { color: #28a745; }
+    &.error { color: #dc3545; }
+}
 
+// Grupo de checkboxes para intereses (CON SCROLL)
+.checkbox-group {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 0.75rem;
+    background-color: #f8f9fa;
+    padding: 1rem;
+    border-radius: 8px;
+    max-height: 220px;
+    overflow-y: auto;
+    border: 1px solid #e9ecef;
+
+    @media (max-width: 767px) {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 0.5rem;
+        padding: 0.8rem;
+        max-height: 180px;
+    }
+
+    @media (max-width: 480px) {
+        grid-template-columns: 1fr;
+        gap: 0.4rem;
+        padding: 0.6rem;
+        max-height: 150px;
+        border-radius: 6px;
     }
 }
 
+.checkbox-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.25rem;
 
+    @media (max-width: 480px) {
+        padding: 0.2rem;
+    }
+
+    label {
+        font-weight: 500;
+        font-size: 0.85rem;
+        cursor: pointer;
+        margin: 0;
+        flex: 1;
+
+        @media (max-width: 480px) {
+            font-size: 0.8rem;
+        }
+    }
+
+    input[type="checkbox"] {
+        cursor: pointer;
+        transform: scale(1.1);
+        flex-shrink: 0;
+
+        @media (max-width: 480px) {
+            transform: scale(1);
+        }
+    }
+}
+
+// Fieldset para los intereses
+fieldset.form-group {
+    border: none;
+    padding: 0;
+    margin-bottom: 1.1rem;
+
+    legend {
+        font-weight: 600;
+        font-size: 0.9rem;
+        color: #34495e;
+        margin-bottom: 0.5rem;
+        padding: 0;
+
+        @media (max-width: 480px) {
+            font-size: 0.85rem;
+        }
+    }
+}
+
+// Enlaces del footer del formulario
+.form-footer-link {
+    text-align: center;
+    margin-top: 1.5rem;
+    font-size: 0.9rem;
+    color: #6c757d;
+
+    @media (max-width: 480px) {
+        font-size: 0.85rem;
+        margin-top: 1rem;
+    }
+
+    a {
+        color: $primary-color;
+        text-decoration: none;
+        font-weight: 600;
+
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+}
+
+// Marcador de campos requeridos
+.required {
+    color: #dc3545;
+    font-weight: bold;
+}
+
+/* ==========================================================================
+   4. RESPONSIVIDAD Y AJUSTES FINALES
+   ========================================================================== */
+
+// Layout para escritorio (2 columnas en el wizard)
+@media (min-width: 768px) {
+    .wizard-container {
+        flex-direction: row;
+        max-height: 90vh; // Altura máxima del contenedor completo
+    }
+    .wizard-sidebar {
+        flex: 0 0 300px;
+        text-align: left;
+        overflow-y: auto;
+    }
+    .wizard-content {
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        max-height: 90vh;
+    }
+    .progress-bar {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+    
+    // Hacer que el área del formulario sea scrolleable
+    .form-step {
+        flex-grow: 1;
+        overflow-y: auto;
+        padding-right: 0.5rem; // Espacio para scrollbar
+    }
+    
+    // Los botones se mantienen fijos en la parte inferior
+    .form-navigation {
+        flex-shrink: 0;
+        margin-top: auto;
+    }
+}
+
+// Ajustes específicos para pantallas muy pequeñas
+@media (max-width: 320px) {
+    .wizard-container {
+        margin: 0.1rem;
+    }
+    
+    .wizard-sidebar,
+    .wizard-content {
+        padding: 0.8rem;
+    }
+    
+    .form-group input {
+        padding: 10px 12px;
+    }
+    
+    .progress-step {
+        font-size: 0.65rem;
+        
+        strong {
+            height: 18px;
+            width: 18px;
+            line-height: 14px;
+            font-size: 0.65rem;
+        }
+    }
+}
+
+// Mejoras para la experiencia táctil en dispositivos móviles
+@media (hover: none) and (pointer: coarse) {
+    .submit-btn,
+    .btn-secondary {
+        &:hover {
+            transform: none;
+            box-shadow: none;
+        }
+        
+        &:active {
+            transform: scale(0.98);
+        }
+    }
+    
+    .checkbox-item label,
+    .form-group-checkbox label {
+        padding: 0.5rem 0;
+    }
+}
+
+// --- Animación de entrada para los pasos ---
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}

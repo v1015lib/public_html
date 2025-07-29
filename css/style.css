@@ -1082,186 +1082,742 @@ body.page-checkout {
     padding: 1.25rem;
   }
 }
-.body-form-page {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  display: -ms-grid;
-  display: grid;
-  place-items: center;
-  min-height: 100vh;
-  padding: 1rem;
-}
-
+/* ==========================================================================
+   1. ESTILOS BASE PARA FORMULARIOS
+   ========================================================================== */
 .form-container {
   background-color: #ffffff;
   color: #333;
   max-width: 500px;
   width: 100%;
-  padding: 2.5rem;
+  padding: 1.5rem;
   border-radius: 12px;
-  -webkit-box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
-          box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
-  margin: auto;
-  height: -webkit-fit-content;
-  height: -moz-fit-content;
-  height: fit-content;
-  overflow-y: auto;
+  -webkit-box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+  margin: 1rem auto;
+}
+@media (max-width: 480px) {
+  .form-container {
+    padding: 1rem;
+    margin: 0.5rem auto;
+    border-radius: 8px;
+  }
 }
 .form-container h1, .form-container h2 {
-  color: #2c3e50;
   text-align: center;
-  font-size: 1.5rem;
+  font-size: 1.4rem;
   margin-bottom: 0.5rem;
+  color: #2c3e50;
+}
+@media (max-width: 480px) {
+  .form-container h1, .form-container h2 {
+    font-size: 1.2rem;
+  }
 }
 .form-container p {
-  color: #7f8c8d;
   text-align: center;
-  margin-bottom: 2rem;
+  font-size: 0.9rem;
+  color: #7f8c8d;
+  margin-bottom: 1.5rem;
+}
+@media (max-width: 480px) {
+  .form-container p {
+    font-size: 0.8rem;
+    margin-bottom: 1rem;
+  }
 }
 
-.register-form .form-group, .login-form .form-group, #profile-form .form-group, #password-form .form-group {
-  margin-bottom: 1.25rem;
+.form-group {
+  margin-bottom: 1.1rem;
 }
-.register-form .form-group label, .login-form .form-group label, #profile-form .form-group label, #password-form .form-group label {
+@media (max-width: 480px) {
+  .form-group {
+    margin-bottom: 0.9rem;
+  }
+}
+.form-group label {
   display: block;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.4rem;
   font-weight: 600;
+  font-size: 0.85rem;
   color: #34495e;
-  font-weight: bold;
 }
-.register-form .form-group input[type=text],
-.register-form .form-group input[type=email],
-.register-form .form-group input[type=password],
-.register-form .form-group input[type=tel], .login-form .form-group input[type=text],
-.login-form .form-group input[type=email],
-.login-form .form-group input[type=password],
-.login-form .form-group input[type=tel], #profile-form .form-group input[type=text],
-#profile-form .form-group input[type=email],
-#profile-form .form-group input[type=password],
-#profile-form .form-group input[type=tel], #password-form .form-group input[type=text],
-#password-form .form-group input[type=email],
-#password-form .form-group input[type=password],
-#password-form .form-group input[type=tel] {
+@media (max-width: 480px) {
+  .form-group label {
+    font-size: 0.8rem;
+    margin-bottom: 0.3rem;
+  }
+}
+.form-group input[type=text],
+.form-group input[type=email],
+.form-group input[type=password],
+.form-group input[type=tel] {
   width: 100%;
-  padding: 12px 15px;
+  padding: 10px 14px;
   border: 1px solid #dfe6e9;
   background-color: #f9fafb;
   color: #333;
   border-radius: 8px;
-  font-size: 1rem;
+  font-size: 0.9rem;
   -webkit-transition: all 0.2s ease-in-out;
   transition: all 0.2s ease-in-out;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
 }
-.register-form .form-group input[type=text]::-webkit-input-placeholder, .register-form .form-group input[type=email]::-webkit-input-placeholder, .register-form .form-group input[type=password]::-webkit-input-placeholder, .register-form .form-group input[type=tel]::-webkit-input-placeholder, .login-form .form-group input[type=text]::-webkit-input-placeholder, .login-form .form-group input[type=email]::-webkit-input-placeholder, .login-form .form-group input[type=password]::-webkit-input-placeholder, .login-form .form-group input[type=tel]::-webkit-input-placeholder, #profile-form .form-group input[type=text]::-webkit-input-placeholder, #profile-form .form-group input[type=email]::-webkit-input-placeholder, #profile-form .form-group input[type=password]::-webkit-input-placeholder, #profile-form .form-group input[type=tel]::-webkit-input-placeholder, #password-form .form-group input[type=text]::-webkit-input-placeholder, #password-form .form-group input[type=email]::-webkit-input-placeholder, #password-form .form-group input[type=password]::-webkit-input-placeholder, #password-form .form-group input[type=tel]::-webkit-input-placeholder {
-  color: #b2bec3;
+@media (max-width: 480px) {
+  .form-group input[type=text],
+  .form-group input[type=email],
+  .form-group input[type=password],
+  .form-group input[type=tel] {
+    padding: 12px 14px;
+    font-size: 16px;
+    border-radius: 6px;
+  }
 }
-.register-form .form-group input[type=text]::-moz-placeholder, .register-form .form-group input[type=email]::-moz-placeholder, .register-form .form-group input[type=password]::-moz-placeholder, .register-form .form-group input[type=tel]::-moz-placeholder, .login-form .form-group input[type=text]::-moz-placeholder, .login-form .form-group input[type=email]::-moz-placeholder, .login-form .form-group input[type=password]::-moz-placeholder, .login-form .form-group input[type=tel]::-moz-placeholder, #profile-form .form-group input[type=text]::-moz-placeholder, #profile-form .form-group input[type=email]::-moz-placeholder, #profile-form .form-group input[type=password]::-moz-placeholder, #profile-form .form-group input[type=tel]::-moz-placeholder, #password-form .form-group input[type=text]::-moz-placeholder, #password-form .form-group input[type=email]::-moz-placeholder, #password-form .form-group input[type=password]::-moz-placeholder, #password-form .form-group input[type=tel]::-moz-placeholder {
-  color: #b2bec3;
-}
-.register-form .form-group input[type=text]:-ms-input-placeholder, .register-form .form-group input[type=email]:-ms-input-placeholder, .register-form .form-group input[type=password]:-ms-input-placeholder, .register-form .form-group input[type=tel]:-ms-input-placeholder, .login-form .form-group input[type=text]:-ms-input-placeholder, .login-form .form-group input[type=email]:-ms-input-placeholder, .login-form .form-group input[type=password]:-ms-input-placeholder, .login-form .form-group input[type=tel]:-ms-input-placeholder, #profile-form .form-group input[type=text]:-ms-input-placeholder, #profile-form .form-group input[type=email]:-ms-input-placeholder, #profile-form .form-group input[type=password]:-ms-input-placeholder, #profile-form .form-group input[type=tel]:-ms-input-placeholder, #password-form .form-group input[type=text]:-ms-input-placeholder, #password-form .form-group input[type=email]:-ms-input-placeholder, #password-form .form-group input[type=password]:-ms-input-placeholder, #password-form .form-group input[type=tel]:-ms-input-placeholder {
-  color: #b2bec3;
-}
-.register-form .form-group input[type=text]::-ms-input-placeholder, .register-form .form-group input[type=email]::-ms-input-placeholder, .register-form .form-group input[type=password]::-ms-input-placeholder, .register-form .form-group input[type=tel]::-ms-input-placeholder, .login-form .form-group input[type=text]::-ms-input-placeholder, .login-form .form-group input[type=email]::-ms-input-placeholder, .login-form .form-group input[type=password]::-ms-input-placeholder, .login-form .form-group input[type=tel]::-ms-input-placeholder, #profile-form .form-group input[type=text]::-ms-input-placeholder, #profile-form .form-group input[type=email]::-ms-input-placeholder, #profile-form .form-group input[type=password]::-ms-input-placeholder, #profile-form .form-group input[type=tel]::-ms-input-placeholder, #password-form .form-group input[type=text]::-ms-input-placeholder, #password-form .form-group input[type=email]::-ms-input-placeholder, #password-form .form-group input[type=password]::-ms-input-placeholder, #password-form .form-group input[type=tel]::-ms-input-placeholder {
-  color: #b2bec3;
-}
-.register-form .form-group input[type=text]::placeholder,
-.register-form .form-group input[type=email]::placeholder,
-.register-form .form-group input[type=password]::placeholder,
-.register-form .form-group input[type=tel]::placeholder, .login-form .form-group input[type=text]::placeholder,
-.login-form .form-group input[type=email]::placeholder,
-.login-form .form-group input[type=password]::placeholder,
-.login-form .form-group input[type=tel]::placeholder, #profile-form .form-group input[type=text]::placeholder,
-#profile-form .form-group input[type=email]::placeholder,
-#profile-form .form-group input[type=password]::placeholder,
-#profile-form .form-group input[type=tel]::placeholder, #password-form .form-group input[type=text]::placeholder,
-#password-form .form-group input[type=email]::placeholder,
-#password-form .form-group input[type=password]::placeholder,
-#password-form .form-group input[type=tel]::placeholder {
-  color: #b2bec3;
-}
-.register-form .form-group input[type=text]:focus,
-.register-form .form-group input[type=email]:focus,
-.register-form .form-group input[type=password]:focus,
-.register-form .form-group input[type=tel]:focus, .login-form .form-group input[type=text]:focus,
-.login-form .form-group input[type=email]:focus,
-.login-form .form-group input[type=password]:focus,
-.login-form .form-group input[type=tel]:focus, #profile-form .form-group input[type=text]:focus,
-#profile-form .form-group input[type=email]:focus,
-#profile-form .form-group input[type=password]:focus,
-#profile-form .form-group input[type=tel]:focus, #password-form .form-group input[type=text]:focus,
-#password-form .form-group input[type=email]:focus,
-#password-form .form-group input[type=password]:focus,
-#password-form .form-group input[type=tel]:focus {
+.form-group input[type=text]:focus,
+.form-group input[type=email]:focus,
+.form-group input[type=password]:focus,
+.form-group input[type=tel]:focus {
   outline: none;
   border-color: #0E0C66;
   background-color: #fff;
   -webkit-box-shadow: 0 0 0 3px rgba(14, 12, 102, 0.2);
           box-shadow: 0 0 0 3px rgba(14, 12, 102, 0.2);
 }
-.register-form .submit-btn, .login-form .submit-btn, #profile-form .submit-btn, #password-form .submit-btn {
+
+.submit-btn, .btn-secondary {
   width: 100%;
-  padding: 1rem;
-  font-size: 1.1rem;
+  padding: 0.9rem 1.5rem;
+  font-size: 1rem;
   font-weight: bold;
   color: white;
   background: #0E0C66;
   border: none;
   border-radius: 8px;
   cursor: pointer;
+  text-decoration: none;
   -webkit-transition: all 0.3s ease;
   transition: all 0.3s ease;
-  margin-top: 1rem;
+  margin-top: 0.5rem;
 }
-.register-form .submit-btn:hover, .login-form .submit-btn:hover, #profile-form .submit-btn:hover, #password-form .submit-btn:hover {
-  -webkit-transform: translateY(-3px);
-          transform: translateY(-3px);
-  -webkit-box-shadow: 0 8px 15px rgba(102, 126, 234, 0.3);
-          box-shadow: 0 8px 15px rgba(102, 126, 234, 0.3);
+@media (max-width: 480px) {
+  .submit-btn, .btn-secondary {
+    padding: 1rem;
+    font-size: 0.95rem;
+    border-radius: 6px;
+  }
 }
-.register-form .form-group-checkbox, .login-form .form-group-checkbox, #profile-form .form-group-checkbox, #password-form .form-group-checkbox {
-  font-weight: bold;
-  font-variant: all-small-caps;
+.submit-btn:hover, .btn-secondary:hover {
+  -webkit-transform: translateY(-2px);
+          transform: translateY(-2px);
+  -webkit-box-shadow: 0 6px 12px rgba(102, 126, 234, 0.25);
+          box-shadow: 0 6px 12px rgba(102, 126, 234, 0.25);
+}
+@media (max-width: 480px) {
+  .submit-btn:hover, .btn-secondary:hover {
+    -webkit-transform: none;
+            transform: none;
+  }
+}
+
+.btn-secondary {
+  background-color: #6c757d;
+}
+.btn-secondary:hover {
+  background-color: #596167;
+  -webkit-transform: translateY(-2px);
+          transform: translateY(-2px);
+  -webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+          box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+@media (max-width: 480px) {
+  .btn-secondary:hover {
+    -webkit-transform: none;
+            transform: none;
+  }
+}
+
+/* ==========================================================================
+   2. ESTILOS PARA EL ASISTENTE DE REGISTRO (WIZARD)
+   ========================================================================== */
+.wizard-container {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  max-width: 850px;
+  margin: 2rem auto;
+  background: #fff;
+  border-radius: 12px;
+  -webkit-box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+          box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  padding: 0;
+}
+@media (max-width: 767px) {
+  .wizard-container {
+    margin: 0.5rem;
+    border-radius: 8px;
+    -webkit-box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  }
+}
+@media (max-width: 480px) {
+  .wizard-container {
+    margin: 0.25rem;
+    border-radius: 6px;
+  }
+}
+
+.wizard-sidebar {
+  padding: 2rem 2.5rem;
+  background: #f8f9fa;
+  text-align: center;
+}
+@media (max-width: 767px) {
+  .wizard-sidebar {
+    padding: 1.5rem;
+    text-align: left;
+  }
+}
+@media (max-width: 480px) {
+  .wizard-sidebar {
+    padding: 1rem;
+  }
+}
+.wizard-sidebar h1 {
+  font-size: 1.6rem;
+  margin-bottom: 0.5rem;
+}
+@media (max-width: 480px) {
+  .wizard-sidebar h1 {
+    font-size: 1.3rem;
+  }
+}
+.wizard-sidebar p {
+  font-size: 0.9rem;
+  color: #6c757d;
+}
+@media (max-width: 480px) {
+  .wizard-sidebar p {
+    font-size: 0.8rem;
+  }
+}
+
+.wizard-content {
+  padding: 2rem 2.5rem;
+  overflow-y: auto;
+  max-height: calc(100vh - 120px);
+  position: relative;
+}
+@media (max-width: 767px) {
+  .wizard-content {
+    padding: 1.5rem;
+    max-height: calc(100vh - 100px);
+  }
+}
+@media (max-width: 480px) {
+  .wizard-content {
+    padding: 1rem;
+    max-height: calc(100vh - 80px);
+  }
+}
+
+.progress-bar {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-align: start;
+      -ms-flex-align: start;
+          align-items: flex-start;
+  margin-top: 2rem;
+  gap: 1.25rem;
+}
+@media (max-width: 767px) {
+  .progress-bar {
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: normal;
+        -ms-flex-direction: row;
+            flex-direction: row;
+    -webkit-box-pack: justify;
+        -ms-flex-pack: justify;
+            justify-content: space-between;
+    margin-top: 1rem;
+    gap: 0.5rem;
+  }
+}
+@media (max-width: 480px) {
+  .progress-bar {
+    gap: 0.25rem;
+  }
+}
+
+.progress-step {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
   -webkit-box-align: center;
       -ms-flex-align: center;
           align-items: center;
+  color: #b0b0b0;
+  font-size: 0.9rem;
+  font-weight: 500;
+  -webkit-transition: all 0.3s ease;
+  transition: all 0.3s ease;
 }
-.register-form .form-group-checkbox label, .login-form .form-group-checkbox label, #profile-form .form-group-checkbox label, #password-form .form-group-checkbox label {
-  padding: 0.5rem;
+@media (max-width: 767px) {
+  .progress-step {
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+        -ms-flex-direction: column;
+            flex-direction: column;
+    text-align: center;
+    font-size: 0.8rem;
+    -webkit-box-flex: 1;
+        -ms-flex: 1;
+            flex: 1;
+  }
+}
+@media (max-width: 480px) {
+  .progress-step {
+    font-size: 0.7rem;
+  }
+}
+.progress-step strong {
+  height: 28px;
+  width: 28px;
+  line-height: 24px;
+  border: 2px solid #e0e0e0;
+  border-radius: 50%;
+  margin-right: 0.8rem;
+  background: #fff;
+  text-align: center;
+  font-size: 0.85rem;
+}
+@media (max-width: 767px) {
+  .progress-step strong {
+    margin-right: 0;
+    margin-bottom: 0.3rem;
+    height: 24px;
+    width: 24px;
+    line-height: 20px;
+    font-size: 0.75rem;
+  }
+}
+@media (max-width: 480px) {
+  .progress-step strong {
+    height: 20px;
+    width: 20px;
+    line-height: 16px;
+    font-size: 0.7rem;
+  }
+}
+.progress-step.active {
+  color: #0E0C66;
+  font-weight: 600;
+}
+.progress-step.active strong {
+  border-color: #0E0C66;
+  background-color: #0E0C66;
+  color: #fff;
 }
 
-.form-message {
-  padding: 1rem;
-  margin-bottom: 1.5rem;
-  border-radius: 8px;
+.form-step {
+  display: none;
+  -webkit-animation: fadeIn 0.4s ease-in-out;
+          animation: fadeIn 0.4s ease-in-out;
+  min-height: auto;
+  padding-bottom: 1rem;
 }
-.form-message.success {
-  background-color: #d4edda;
-  color: #155724;
+@media (max-width: 480px) {
+  .form-step {
+    padding-bottom: 0.8rem;
+  }
 }
-.form-message.error {
-  background-color: #f8d7da;
-  color: #721c24;
+.form-step.active {
+  display: block;
 }
 
+.form-navigation {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  margin-top: 1.5rem;
+  border-top: 1px solid #e9ecef;
+  padding-top: 1.5rem;
+  gap: 1rem;
+  position: sticky;
+  bottom: 0;
+  background-color: #fff;
+  z-index: 10;
+}
+@media (max-width: 480px) {
+  .form-navigation {
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: reverse;
+        -ms-flex-direction: column-reverse;
+            flex-direction: column-reverse;
+    gap: 0.75rem;
+    padding-top: 1rem;
+    margin-top: 1rem;
+    position: sticky;
+    bottom: 0;
+  }
+}
+.form-navigation .submit-btn, .form-navigation .btn-secondary {
+  width: auto;
+  min-width: 120px;
+}
+@media (max-width: 480px) {
+  .form-navigation .submit-btn, .form-navigation .btn-secondary {
+    width: 100%;
+    min-width: unset;
+  }
+}
+
+/* ==========================================================================
+   3. COMPONENTES ADICIONALES DEL FORMULARIO
+   ========================================================================== */
+.form-group-checkbox {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+@media (max-width: 480px) {
+  .form-group-checkbox {
+    margin-bottom: 0.8rem;
+  }
+}
+.form-group-checkbox label {
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin: 0;
+  cursor: pointer;
+}
+@media (max-width: 480px) {
+  .form-group-checkbox label {
+    font-size: 0.85rem;
+  }
+}
+.form-group-checkbox input[type=checkbox] {
+  cursor: pointer;
+  -webkit-transform: scale(1.2);
+          transform: scale(1.2);
+}
+@media (max-width: 480px) {
+  .form-group-checkbox input[type=checkbox] {
+    -webkit-transform: scale(1.1);
+            transform: scale(1.1);
+  }
+}
+
+.student-fields {
+  -webkit-transition: all 0.3s ease;
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
 .student-fields.hidden {
   display: none;
 }
+.student-fields:not(.hidden) {
+  -webkit-animation: expandFields 0.3s ease-out;
+          animation: expandFields 0.3s ease-out;
+}
 
-/* ... otros estilos del formulario ... */
+@-webkit-keyframes expandFields {
+  from {
+    opacity: 0;
+    max-height: 0;
+    margin-top: 0;
+  }
+  to {
+    opacity: 1;
+    max-height: 200px;
+    margin-top: 1rem;
+  }
+}
+
+@keyframes expandFields {
+  from {
+    opacity: 0;
+    max-height: 0;
+    margin-top: 0;
+  }
+  to {
+    opacity: 1;
+    max-height: 200px;
+    margin-top: 1rem;
+  }
+}
 .availability-message {
-  font-size: 0.9rem;
-  margin-top: 0.5rem;
+  font-size: 0.85rem;
+  margin-top: 0.4rem;
   font-weight: 600;
 }
+@media (max-width: 480px) {
+  .availability-message {
+    font-size: 0.8rem;
+  }
+}
 .availability-message.success {
-  color: green;
+  color: #28a745;
 }
 .availability-message.error {
-  color: red;
+  color: #dc3545;
 }
 
+.checkbox-group {
+  display: -ms-grid;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 0.75rem;
+  background-color: #f8f9fa;
+  padding: 1rem;
+  border-radius: 8px;
+  max-height: 220px;
+  overflow-y: auto;
+  border: 1px solid #e9ecef;
+}
+@media (max-width: 767px) {
+  .checkbox-group {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 0.5rem;
+    padding: 0.8rem;
+    max-height: 180px;
+  }
+}
+@media (max-width: 480px) {
+  .checkbox-group {
+    -ms-grid-columns: 1fr;
+    grid-template-columns: 1fr;
+    gap: 0.4rem;
+    padding: 0.6rem;
+    max-height: 150px;
+    border-radius: 6px;
+  }
+}
+
+.checkbox-item {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem;
+}
+@media (max-width: 480px) {
+  .checkbox-item {
+    padding: 0.2rem;
+  }
+}
+.checkbox-item label {
+  font-weight: 500;
+  font-size: 0.85rem;
+  cursor: pointer;
+  margin: 0;
+  -webkit-box-flex: 1;
+      -ms-flex: 1;
+          flex: 1;
+}
+@media (max-width: 480px) {
+  .checkbox-item label {
+    font-size: 0.8rem;
+  }
+}
+.checkbox-item input[type=checkbox] {
+  cursor: pointer;
+  -webkit-transform: scale(1.1);
+          transform: scale(1.1);
+  -ms-flex-negative: 0;
+      flex-shrink: 0;
+}
+@media (max-width: 480px) {
+  .checkbox-item input[type=checkbox] {
+    -webkit-transform: scale(1);
+            transform: scale(1);
+  }
+}
+
+fieldset.form-group {
+  border: none;
+  padding: 0;
+  margin-bottom: 1.1rem;
+}
+fieldset.form-group legend {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #34495e;
+  margin-bottom: 0.5rem;
+  padding: 0;
+}
+@media (max-width: 480px) {
+  fieldset.form-group legend {
+    font-size: 0.85rem;
+  }
+}
+
+.form-footer-link {
+  text-align: center;
+  margin-top: 1.5rem;
+  font-size: 0.9rem;
+  color: #6c757d;
+}
+@media (max-width: 480px) {
+  .form-footer-link {
+    font-size: 0.85rem;
+    margin-top: 1rem;
+  }
+}
+.form-footer-link a {
+  color: #0E0C66;
+  text-decoration: none;
+  font-weight: 600;
+}
+.form-footer-link a:hover {
+  text-decoration: underline;
+}
+
+.required {
+  color: #dc3545;
+  font-weight: bold;
+}
+
+/* ==========================================================================
+   4. RESPONSIVIDAD Y AJUSTES FINALES
+   ========================================================================== */
+@media (min-width: 768px) {
+  .wizard-container {
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: normal;
+        -ms-flex-direction: row;
+            flex-direction: row;
+    max-height: 90vh;
+  }
+  .wizard-sidebar {
+    -webkit-box-flex: 0;
+        -ms-flex: 0 0 300px;
+            flex: 0 0 300px;
+    text-align: left;
+    overflow-y: auto;
+  }
+  .wizard-content {
+    -webkit-box-flex: 1;
+        -ms-flex-positive: 1;
+            flex-grow: 1;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+        -ms-flex-direction: column;
+            flex-direction: column;
+    max-height: 90vh;
+  }
+  .progress-bar {
+    -webkit-box-align: start;
+        -ms-flex-align: start;
+            align-items: flex-start;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+        -ms-flex-direction: column;
+            flex-direction: column;
+  }
+  .form-step {
+    -webkit-box-flex: 1;
+        -ms-flex-positive: 1;
+            flex-grow: 1;
+    overflow-y: auto;
+    padding-right: 0.5rem;
+  }
+  .form-navigation {
+    -ms-flex-negative: 0;
+        flex-shrink: 0;
+    margin-top: auto;
+  }
+}
+@media (max-width: 320px) {
+  .wizard-container {
+    margin: 0.1rem;
+  }
+  .wizard-sidebar,
+  .wizard-content {
+    padding: 0.8rem;
+  }
+  .form-group input {
+    padding: 10px 12px;
+  }
+  .progress-step {
+    font-size: 0.65rem;
+  }
+  .progress-step strong {
+    height: 18px;
+    width: 18px;
+    line-height: 14px;
+    font-size: 0.65rem;
+  }
+}
+@media (hover: none) and (pointer: coarse) {
+  .submit-btn:hover,
+  .btn-secondary:hover {
+    -webkit-transform: none;
+            transform: none;
+    -webkit-box-shadow: none;
+            box-shadow: none;
+  }
+  .submit-btn:active,
+  .btn-secondary:active {
+    -webkit-transform: scale(0.98);
+            transform: scale(0.98);
+  }
+  .checkbox-item label,
+  .form-group-checkbox label {
+    padding: 0.5rem 0;
+  }
+}
+@-webkit-keyframes fadeIn {
+  from {
+    opacity: 0;
+    -webkit-transform: translateY(10px);
+            transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    -webkit-transform: translateY(0);
+            transform: translateY(0);
+  }
+}
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    -webkit-transform: translateY(10px);
+            transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    -webkit-transform: translateY(0);
+            transform: translateY(0);
+  }
+}
 /* ==========================================================================
    1. ESTRUCTURA Y LAYOUT GENERAL DEL DASHBOARD
    ========================================================================== */
@@ -1494,7 +2050,7 @@ body.page-checkout {
   color: #6c757d;
   margin-top: 0.3rem;
 }
-.dashboard-content .form-container-profile .submit-btn {
+.dashboard-content .form-container-profile .submit-btn, .dashboard-content .form-container-profile .btn-secondary {
   background-color: #0E0C66;
   color: white;
   padding: 0.7rem 1.2rem;
@@ -1571,7 +2127,7 @@ body.page-checkout {
   color: #6c757d;
   margin-top: 0.3rem;
 }
-.dashboard-content .form-container-pass .submit-btn {
+.dashboard-content .form-container-pass .submit-btn, .dashboard-content .form-container-pass .btn-secondary {
   background-color: #0E0C66;
   color: white;
   padding: 0.7rem 1.2rem;
@@ -2023,4 +2579,167 @@ body.page-checkout {
   color: #555;
   padding-left: 0.5rem;
   border-left: 3px solid #007bff;
+}
+
+/* ===== CORRECCIONES PARA CHROME MÓVIL ===== */
+/* 1. Viewport Base más flexible */
+@media (max-width: 768px) {
+  body {
+    overflow-y: auto !important;
+    height: auto !important;
+    min-height: 100vh;
+  }
+}
+/* 2. Header más responsivo */
+@media (max-width: 768px) {
+  .main-header .header-content {
+    -ms-flex-wrap: wrap;
+        flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .main-header .search-bar {
+    -webkit-box-ordinal-group: 4;
+        -ms-flex-order: 3;
+            order: 3;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0.5rem 0 0 0 !important;
+  }
+  .main-header input[type=text] {
+    font-size: 16px; /* Evita zoom en iOS */
+  }
+}
+/* 3. Grid más flexible */
+@media (max-width: 768px) {
+  .product-grid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)) !important;
+    gap: 1rem;
+    padding: 0 0.5rem;
+  }
+}
+@media (max-width: 480px) {
+  .product-grid {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)) !important;
+  }
+}
+/* 4. Sidemenu responsivo */
+@media (max-width: 768px) {
+  .sidemenu {
+    width: 280px !important;
+    max-width: 80vw;
+  }
+  .dashboard-sidemenu {
+    width: 280px !important;
+    max-width: 80vw;
+  }
+}
+/* 5. Cards más compactas */
+@media (max-width: 480px) {
+  .product-card {
+    min-height: auto;
+  }
+  .product-image-container {
+    width: 100%;
+    max-width: 120px;
+  }
+  h3 {
+    font-size: 0.9rem;
+    height: auto;
+    line-height: 1.3;
+  }
+  p.price {
+    font-size: 1.2rem;
+  }
+}
+/* 6. Modal responsive */
+@media (max-width: 480px) {
+  .modal-content {
+    width: 95vw !important;
+    max-width: 95vw !important;
+    margin: 1rem;
+  }
+}
+/* 7. Formularios móviles */
+@media (max-width: 480px) {
+  .form-container {
+    margin: 0.5rem !important;
+    padding: 1rem !important;
+  }
+  .form-group input[type=text],
+  .form-group input[type=email],
+  .form-group input[type=password],
+  .form-group input[type=tel] {
+    font-size: 16px !important; /* Evita zoom */
+    padding: 12px 14px;
+  }
+}
+/* 8. Dashboard móvil */
+@media (max-width: 991px) {
+  .dashboard-content {
+    padding: 1rem !important;
+  }
+  .dashboard-content .profile-forms-grid {
+    -ms-grid-columns: 1fr !important;
+    grid-template-columns: 1fr !important;
+    gap: 1rem;
+  }
+}
+/* 9. Cart panel responsive */
+@media (max-width: 480px) {
+  .cart-panel {
+    width: 100vw !important;
+    max-width: 100vw !important;
+  }
+}
+/* 10. Texto más legible en móvil */
+@media (max-width: 480px) {
+  .main-nav ul li a {
+    font-size: 0.9rem !important; /* Más legible que 0.7rem */
+  }
+  .cart-total-header {
+    font-size: 0.9rem !important;
+  }
+}
+/* 11. Fix para elementos que se salen */
+* {
+  -webkit-box-sizing: border-box !important;
+          box-sizing: border-box !important;
+}
+
+@media (max-width: 768px) {
+  .main-container,
+  .products-container,
+  .summary-container {
+    overflow-x: hidden;
+  }
+}
+/* 12. Mejora de z-index */
+.sidemenu {
+  z-index: 1500 !important;
+}
+
+.cart-overlay {
+  z-index: 1800 !important;
+}
+
+.cart-panel {
+  z-index: 1900 !important;
+}
+
+.modal-overlay {
+  z-index: 2500 !important;
+}
+
+/* 13. Fix específico para Chrome móvil - viewport units */
+@supports (-webkit-touch-callout: none) {
+  .summary-container {
+    height: calc(100vh - 4rem) !important;
+    min-height: calc(100vh - 4rem) !important;
+  }
+  @media (max-width: 991px) {
+    .summary-container {
+      height: auto !important;
+      min-height: 100vh !important;
+    }
+  }
 }

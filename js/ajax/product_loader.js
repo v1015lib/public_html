@@ -117,21 +117,47 @@ export function setupPagination(paginationControlsId, totalPages, currentPage, p
     if (!paginationControlsElement) return;
     paginationControlsElement.innerHTML = '';
     if (totalPages <= 1) return;
-    const maxPagesToShow = 5;
+
+    // ✅ Lógica para determinar cuántos botones mostrar según el ancho de la pantalla
+    const maxPagesToShow = window.innerWidth < 768 ? 3 : 5; 
+
     let startPage = Math.max(1, currentPage - Math.floor(maxPagesToShow / 2));
     let endPage = Math.min(totalPages, startPage + maxPagesToShow - 1);
-    if (endPage - startPage + 1 < maxPagesToShow) startPage = Math.max(1, endPage - maxPagesToShow + 1);
-    if (currentPage > 1) paginationControlsElement.appendChild(createPageButton('Anterior', currentPage - 1, productListId, paginationControlsId));
-    for (let i = startPage; i <= endPage; i++) paginationControlsElement.appendChild(createPageButton(i, i, productListId, paginationControlsId, i === currentPage));
-    if (currentPage < totalPages) paginationControlsElement.appendChild(createPageButton('Siguiente', currentPage + 1, productListId, paginationControlsId));
+
+    if (endPage - startPage + 1 < maxPagesToShow) {
+        startPage = Math.max(1, endPage - maxPagesToShow + 1);
+    }
+    
+    // Botón "Anterior"
+    if (currentPage > 1) {
+        paginationControlsElement.appendChild(createPageButton('Anterior', currentPage - 1, productListId, paginationControlsId));
+    }
+    
+    // ✅ Botones de número de página (con una nueva clase para CSS)
+    for (let i = startPage; i <= endPage; i++) {
+        paginationControlsElement.appendChild(createPageButton(i, i, productListId, paginationControlsId, i === currentPage, true));
+    }
+
+    // Botón "Siguiente"
+    if (currentPage < totalPages) {
+        paginationControlsElement.appendChild(createPageButton('Siguiente', currentPage + 1, productListId, paginationControlsId));
+    }
 }
 
-function createPageButton(text, page, productListId, paginationControlsId, isActive = false) {
+function createPageButton(text, page, productListId, paginationControlsId, isActive = false, isPageNumber = false) {
     const button = document.createElement('button');
     button.textContent = text;
-    if (isActive) button.classList.add('active');
+    if (isActive) {
+        button.classList.add('active');
+    }
+    // ✅ Añadimos la clase 'page-number' si es un botón de número
+    if (isPageNumber) {
+        button.classList.add('page-number');
+    }
     button.addEventListener('click', () => {
-        loadProducts(productListId, paginationControlsId, { page: page });
+        // Aseguramos que se mantengan los parámetros de búsqueda o departamento al cambiar de página
+        currentProductParams.page = page;
+        loadProducts(productListId, paginationControlsId, currentProductParams);
     });
     return button;
 }

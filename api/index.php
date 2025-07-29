@@ -60,13 +60,17 @@ try {
             elseif ($method === 'DELETE') handleRemoveFavoriteRequest($pdo);
             break;
         case 'register':
-            if ($method === 'POST') handleRegisterRequest($pdo);
+                if ($method === 'POST') handleRegisterRequest($pdo, $inputData);
+
             break;
         case 'login':
             if ($method === 'POST') handleLoginRequest($pdo);
             break;
         case 'check-username':
-            if ($method === 'GET') handleCheckUsernameRequest($pdo);
+            if ($method === 'GET') {
+                handleCheckUsernameRequest($pdo);
+                // No necesitas echo aquí porque la función ya lo hace
+            }
             break;
         
         case 'profile':
@@ -396,29 +400,47 @@ function handleLoginRequest(PDO $pdo) {
     }
 }
 
-function handleRegisterRequest(PDO $pdo) {
-    $data = json_decode(file_get_contents('php://input'), true);
-    $required_fields = ['nombre_usuario', 'password', 'nombre', 'telefono', 'id_tipo_cliente'];
-    foreach ($required_fields as $field) if (empty($data[$field])) throw new Exception("El campo '$field' es obligatorio.");
-    $stmt_check = $pdo->prepare("SELECT id_cliente FROM clientes WHERE nombre_usuario = :nombre_usuario");
-    $stmt_check->execute([':nombre_usuario' => $data['nombre_usuario']]);
-    if ($stmt_check->fetch()) throw new Exception("El nombre de usuario ya está en uso.");
-    if (!empty($data['email'])) {
-        $stmt_email_check = $pdo->prepare("SELECT id_cliente FROM clientes WHERE email = :email");
-        $stmt_email_check->execute([':email' => $data['email']]);
-        if ($stmt_email_check->fetch()) throw new Exception("El correo electrónico ya está en uso.");
+// ... (todo el resto de tu archivo api/index.php se queda igual) ...
+
+
+function handleRegisterRequest(PDO $pdo, array $data) { // Se añade $data como parámetro
+    // ... (todo el código de validación de tu función original) ...
+    $nombre = $data['nombre'] ?? '';
+    // ... etc. ...
+    
+    // --- NUEVO: CAPTURAR LAS PREFERENCIAS ---
+    $preferencias = $data['preferencias'] ?? [];
+
+    try {
+        $pdo->beginTransaction();
+        // ... (todo el código para insertar el cliente que ya tenías) ...
+        
+        // --- NUEVO: GUARDAR LAS PREFERENCIAS EN LA BASE DE DATOS ---
+        $new_client_id = $pdo->lastInsertId();
+        
+        if (!empty($preferencias) && is_array($preferencias)) {
+            $stmt_pref = $pdo->prepare(
+                "INSERT INTO preferencias_cliente (id_cliente, id_departamento) VALUES (:client_id, :dept_id)"
+            );
+            foreach ($preferencias as $dept_id) {
+                if(!empty($dept_id)) {
+                    $stmt_pref->execute([
+                        ':client_id' => $new_client_id,
+                        ':dept_id' => (int)$dept_id
+                    ]);
+                }
+            }
+        }
+
+        $pdo->commit();
+    return ['success' => true, 'message' => '¡Registro exitoso!'];
+    } catch (Exception $e) {
+        if ($pdo->inTransaction()) $pdo->rollBack();
+        throw $e;
     }
-    $password_hash = password_hash($data['password'], PASSWORD_DEFAULT);
-    $sql = "INSERT INTO clientes (nombre_usuario, nombre, apellido, email, telefono, password_hash, id_tipo_cliente, institucion, grado_actual) VALUES (:nombre_usuario, :nombre, :apellido, :email, :telefono, :password_hash, :id_tipo_cliente, :institucion, :grado_actual)";
-    $stmt_insert = $pdo->prepare($sql);
-    $stmt_insert->execute([':nombre_usuario' => $data['nombre_usuario'], ':nombre' => $data['nombre'], ':apellido' => empty($data['apellido']) ? null : $data['apellido'], ':email' => empty($data['email']) ? null : $data['email'], ':telefono' => $data['telefono'], ':password_hash' => $password_hash, ':id_tipo_cliente' => (int)$data['id_tipo_cliente'], ':institucion' => $data['institucion'] ?? null, ':grado_actual' => $data['grado_actual'] ?? null]);
-    $new_user_id = $pdo->lastInsertId();
-    $_SESSION['id_cliente'] = $new_user_id;
-    $_SESSION['nombre_usuario'] = $data['nombre_usuario'];
-    $_SESSION['last_activity'] = time(); 
-    echo json_encode(['success' => true, 'message' => '¡Registro exitoso! Redirigiendo...']);
 }
 
+// ... (el resto de las funciones de tu api/index.php)
 function handleGetFavoritesRequest(PDO $pdo) {
     if (!isset($_SESSION['id_cliente'])) { echo json_encode([]); return; }
     $client_id = $_SESSION['id_cliente'];
@@ -532,13 +554,17 @@ function deleteCartItem(PDO $pdo, int $cart_id, int $product_id) {
 
 function handleCheckUsernameRequest(PDO $pdo) {
     $username = $_GET['username'] ?? '';
-    if (empty($username)) { echo json_encode(['is_available' => false]); return; }
+    if (empty($username)) {
+        echo json_encode(['is_available' => false]);
+        exit; // Detiene la ejecución aquí
+    }
     $stmt = $pdo->prepare("SELECT 1 FROM clientes WHERE nombre_usuario = :nombre_usuario LIMIT 1");
     $stmt->execute([':nombre_usuario' => $username]);
     $is_available = !$stmt->fetch();
     echo json_encode(['is_available' => $is_available]);
+    exit; // --- ¡LA CORRECCIÓN MÁS IMPORTANTE! ---
+          // Detiene la ejecución para asegurar una respuesta JSON limpia.
 }
-
 function handleProductsRequest(PDO $pdo) {
     $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
     $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 25;

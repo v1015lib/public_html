@@ -43,5 +43,176 @@
     color: #555;
     padding-left: 0.5rem;
     border-left: 3px solid #007bff;
+
 }
 
+
+/* ===== CORRECCIONES PARA CHROME MÓVIL ===== */
+
+/* 1. Viewport Base más flexible */
+@media (max-width: 768px) {
+  body {
+    overflow-y: auto !important;
+    height: auto !important;
+    min-height: 100vh;
+  }
+}
+
+/* 2. Header más responsivo */
+@media (max-width: 768px) {
+  .main-header .header-content {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  
+  .main-header .search-bar {
+    order: 3;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0.5rem 0 0 0 !important;
+  }
+  
+  .main-header input[type="text"] {
+    font-size: 16px; /* Evita zoom en iOS */
+  }
+}
+
+/* 3. Grid más flexible */
+@media (max-width: 768px) {
+  .product-grid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)) !important;
+    gap: 1rem;
+    padding: 0 0.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .product-grid {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)) !important;
+  }
+}
+
+/* 4. Sidemenu responsivo */
+@media (max-width: 768px) {
+  .sidemenu {
+    width: 280px !important;
+    max-width: 80vw;
+  }
+  
+  .dashboard-sidemenu {
+    width: 280px !important;
+    max-width: 80vw;
+  }
+}
+
+/* 5. Cards más compactas */
+@media (max-width: 480px) {
+  .product-card {
+    min-height: auto;
+  }
+  
+  .product-image-container {
+    width: 100%;
+    max-width: 120px;
+  }
+  
+  h3 {
+    font-size: 0.9rem;
+    height: auto;
+    line-height: 1.3;
+  }
+  
+  p.price {
+    font-size: 1.2rem;
+  }
+}
+
+/* 6. Modal responsive */
+@media (max-width: 480px) {
+  .modal-content {
+    width: 95vw !important;
+    max-width: 95vw !important;
+    margin: 1rem;
+  }
+}
+
+/* 7. Formularios móviles */
+@media (max-width: 480px) {
+  .form-container {
+    margin: 0.5rem !important;
+    padding: 1rem !important;
+  }
+  
+  .form-group input[type="text"],
+  .form-group input[type="email"],
+  .form-group input[type="password"],
+  .form-group input[type="tel"] {
+    font-size: 16px !important; /* Evita zoom */
+    padding: 12px 14px;
+  }
+}
+
+/* 8. Dashboard móvil */
+@media (max-width: 991px) {
+  .dashboard-content {
+    padding: 1rem !important;
+  }
+  
+  .dashboard-content .profile-forms-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1rem;
+  }
+}
+
+/* 9. Cart panel responsive */
+@media (max-width: 480px) {
+  .cart-panel {
+    width: 100vw !important;
+    max-width: 100vw !important;
+  }
+}
+
+/* 10. Texto más legible en móvil */
+@media (max-width: 480px) {
+  .main-nav ul li a {
+    font-size: 0.9rem !important; /* Más legible que 0.7rem */
+  }
+  
+  .cart-total-header {
+    font-size: 0.9rem !important;
+  }
+}
+
+/* 11. Fix para elementos que se salen */
+* {
+  box-sizing: border-box !important;
+}
+
+@media (max-width: 768px) {
+  .main-container,
+  .products-container,
+  .summary-container {
+    overflow-x: hidden;
+  }
+}
+
+/* 12. Mejora de z-index */
+.sidemenu { z-index: 1500 !important; }
+.cart-overlay { z-index: 1800 !important; }
+.cart-panel { z-index: 1900 !important; }
+.modal-overlay { z-index: 2500 !important; }
+
+/* 13. Fix específico para Chrome móvil - viewport units */
+@supports (-webkit-touch-callout: none) {
+  .summary-container {
+    height: calc(100vh - 4rem) !important;
+    min-height: calc(100vh - 4rem) !important;
+  }
+  
+  @media (max-width: 991px) {
+    .summary-container {
+      height: auto !important;
+      min-height: 100vh !important;
+    }
+  }
+}

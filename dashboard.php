@@ -70,10 +70,15 @@ $view = $_GET['view'] ?? 'perfil';
                                 </div>
                         <?php
                             break; // Fin del case 'pedidos'
-
-                        case 'ofertas':
-                             echo "<h1>Mis Ofertas</h1><p>Aquí se mostrarán ofertas especiales para ti.</p>";
-                            break;
+case 'ofertas':
+?>
+    <h1>Mis Ofertas</h1>
+    <p>Estos son los productos en oferta según tus departamentos de interés.</p>
+    
+    <div id="ofertas-container" class="product-grid">
+        </div>
+<?php
+    break; // Fin del case 'ofertas'
                         case 'perfil':
                         default:
                 ?>
@@ -153,6 +158,10 @@ $view = $_GET['view'] ?? 'perfil';
     <div id="cart-overlay" class="cart-overlay"></div>
     
     <div id="notification-container" class="notification-container"></div>
+
+    <?php if ($view === 'ofertas'): ?>
+        <script type="module" src="js/dashboards_offers.js"></script>
+    <?php endif; ?>
 
     <script type="module" src="js/dashboard.js"></script>
     <?php if ($view === 'perfil'): ?>

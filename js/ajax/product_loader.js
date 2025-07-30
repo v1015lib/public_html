@@ -52,7 +52,6 @@ export async function loadProducts(productListId, paginationControlsId, params =
     productListElement.innerHTML = '<div class="loading-spinner">Cargando...</div>';
     paginationControlsElement.innerHTML = '';
     
-    // Obtenemos el estado del carrito Y los favoritos del usuario
     const [cartState, userFavorites] = await Promise.all([getCartState(), getUserFavorites()]);
 
     const urlParams = new URLSearchParams({ resource: 'products' });
@@ -75,21 +74,44 @@ export async function loadProducts(productListId, paginationControlsId, params =
         if (data.products && data.products.length > 0) {
             data.products.forEach(product => {
                 const currentQuantity = cartState[product.id_producto] || 0;
-                // Verificamos si el producto está en la lista de favoritos
                 const isFavorite = userFavorites.has(parseInt(product.id_producto, 10));
+
+                // --- INICIO: LÓGICA DE PRECIOS INTEGRADA ---
+                const precioVenta = parseFloat(product.precio_venta);
+                const precioOferta = parseFloat(product.precio_oferta);
+                
+                // Por defecto, se usa la estructura original del precio
+                let priceHtml = `
+                    <p class="price">$${precioVenta.toFixed(2)}</p>
+                    <p class="code"># ${product.codigo_producto}</p>
+                `;
+                // La etiqueta de descuento está vacía por defecto
+                let discountBadgeHtml = '';
+
+                // Si hay una oferta válida, se sobreescribe el HTML
+                if (precioOferta && precioOferta > 0 && precioOferta < precioVenta) {
+                    priceHtml = `
+                        <p class="price" style="color: #28a745;">$${precioOferta.toFixed(2)}</p>
+                        <p class="code" style="text-decoration: line-through; color: #6c757d;">$${precioVenta.toFixed(2)}</p>
+                    `;
+                    const discountPercent = Math.round(((precioVenta - precioOferta) / precioVenta) * 100);
+                    // Y se crea la etiqueta de descuento
+                    discountBadgeHtml = `<div class="discount-badge">-${discountPercent}%</div>`;
+                }
+                // --- FIN: LÓGICA DE PRECIOS INTEGRADA ---
 
                 const productCardHtml = `
                     <div class="product-card" data-product-id="${product.id_producto}">
                         <button class="favorite-btn ${isFavorite ? 'is-favorite' : ''}" data-product-id="${product.id_producto}" aria-label="Añadir a favoritos">❤️</button>
                         <div class="product-image-container">
                             <img src="${product.url_imagen || 'https://via.placeholder.com/200'}" alt="${product.nombre_producto}">
+                            ${discountBadgeHtml}
                         </div>
                         <div class="product-info">
                             <h3>${product.nombre_producto}</h3>
                             <p class="department">Depto: ${product.nombre_departamento}</p>
                             <div class="price-container">
-                                <p class="price">$${parseFloat(product.precio_venta).toFixed(2)}</p>
-                                <p class="code"># ${product.codigo_producto}</p>
+                                ${priceHtml}
                             </div>
                             <div class="quantity-selector">
                                 <button class="quantity-btn minus" data-action="decrease">-</button>
@@ -130,7 +152,7 @@ export function setupPagination(paginationControlsId, totalPages, currentPage, p
     
     // Botón "Anterior"
     if (currentPage > 1) {
-        paginationControlsElement.appendChild(createPageButton('Anterior', currentPage - 1, productListId, paginationControlsId));
+        paginationControlsElement.appendChild(createPageButton('<', currentPage - 1, productListId, paginationControlsId));
     }
     
     // ✅ Botones de número de página (con una nueva clase para CSS)
@@ -140,7 +162,7 @@ export function setupPagination(paginationControlsId, totalPages, currentPage, p
 
     // Botón "Siguiente"
     if (currentPage < totalPages) {
-        paginationControlsElement.appendChild(createPageButton('Siguiente', currentPage + 1, productListId, paginationControlsId));
+        paginationControlsElement.appendChild(createPageButton('>', currentPage + 1, productListId, paginationControlsId));
     }
 }
 

@@ -117,6 +117,44 @@ try {
                 handleReorderRequest($pdo, $_SESSION['id_cliente'], $inputData['order_id'] ?? 0);
             }
             break;
+        case 'ofertas':
+    // Se usa el ID del cliente que ha iniciado sesión para más seguridad.
+    if (isset($_SESSION['id_cliente'])) {
+        $id_cliente = $_SESSION['id_cliente'];
+
+        // Se prepara la consulta usando los métodos de PDO.
+        $stmt = $pdo->prepare("
+            SELECT 
+                p.id_producto,
+                p.nombre_producto,
+                p.precio_venta,
+                p.precio_oferta,
+                p.url_imagen,
+                d.departamento AS nombre_departamento
+            FROM productos p
+            JOIN departamentos d ON p.departamento = d.id_departamento
+            JOIN preferencias_cliente pc ON p.departamento = pc.id_departamento
+            WHERE 
+                pc.id_cliente = :id_cliente 
+                AND p.precio_oferta IS NOT NULL 
+                AND p.precio_oferta > 0
+        ");
+
+        // Se ejecuta la consulta pasando los parámetros de forma segura.
+        $stmt->execute([':id_cliente' => $id_cliente]);
+        
+        // Se obtienen todos los resultados.
+        $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // Se devuelven los datos en formato JSON.
+        echo json_encode(['success' => true, 'ofertas' => $data]);
+
+    } else {
+        // Si no hay sesión iniciada, se niega el acceso.
+        http_response_code(401); // No autorizado
+        echo json_encode(["success" => false, "message" => "Debes iniciar sesión para ver tus ofertas."]);
+    }
+    break;
 
         default:
             http_response_code(400);
@@ -473,35 +511,65 @@ function handleRemoveFavoriteRequest(PDO $pdo) {
 }
 
 function handleSetCartItemRequest(PDO $pdo) {
-    if (!isset($_SESSION['id_cliente'])) { http_response_code(401); echo json_encode(['error' => 'Debes iniciar sesión para modificar el carrito.']); return; }
-    $data = json_decode(file_get_contents('php://input'), true);
-    $product_id = (int)$data['product_id'];
-    $quantity = (int)$data['quantity'];
-    $client_id = $_SESSION['id_cliente'];
-    $pdo->beginTransaction();
-    $cart_id = getOrCreateCart($pdo, $client_id);
-    if ($quantity <= 0) {
-        deleteCartItem($pdo, $cart_id, $product_id);
-    } else {
-        $stmt_check = $pdo->prepare("SELECT id_detalle_carrito FROM detalle_carrito WHERE id_carrito = :cart_id AND id_producto = :product_id");
-        $stmt_check->execute([':cart_id' => $cart_id, ':product_id' => $product_id]);
-        $detail_id = $stmt_check->fetchColumn();
-        if ($detail_id) {
-            $stmt_update = $pdo->prepare("UPDATE detalle_carrito SET cantidad = :quantity WHERE id_detalle_carrito = :detail_id");
-            $stmt_update->execute([':quantity' => $quantity, ':detail_id' => $detail_id]);
-        } else {
-            $stmt_price = $pdo->prepare("SELECT precio_venta FROM productos WHERE id_producto = :product_id");
-            $stmt_price->execute([':product_id' => $product_id]);
-            $unit_price = $stmt_price->fetchColumn();
-            if ($unit_price === false) throw new Exception("Producto no encontrado.");
-            $stmt_insert = $pdo->prepare("INSERT INTO detalle_carrito (id_carrito, id_producto, cantidad, precio_unitario) VALUES (:cart_id, :product_id, :quantity, :unit_price)");
-            $stmt_insert->execute([':cart_id' => $cart_id, ':product_id' => $product_id, ':quantity' => $quantity, ':unit_price' => $unit_price]);
-        }
+    if (!isset($_SESSION['id_cliente'])) { 
+        http_response_code(401); 
+        echo json_encode(['error' => 'Debes iniciar sesión para modificar el carrito.']); 
+        return; 
     }
-    $pdo->commit();
-    echo json_encode(['success' => true, 'message' => 'Carrito actualizado.']);
-}
+    
+    $data = json_decode(file_get_contents('php://input'), true);
+    $product_id = (int)($data['product_id'] ?? 0);
+    $quantity = (int)($data['quantity'] ?? 0);
+    $client_id = $_SESSION['id_cliente'];
+    
+    $pdo->beginTransaction();
+    try {
+        $cart_id = getOrCreateCart($pdo, $client_id);
+        
+        if ($quantity <= 0) {
+            deleteCartItem($pdo, $cart_id, $product_id);
+        } else {
+            // 1. OBTENEMOS LOS PRECIOS DEL PRODUCTO PRIMERO
+            $stmt_price = $pdo->prepare("SELECT precio_venta, precio_oferta FROM productos WHERE id_producto = :product_id");
+            $stmt_price->execute([':product_id' => $product_id]);
+            $prices = $stmt_price->fetch(PDO::FETCH_ASSOC);
 
+            if (!$prices) {
+                throw new Exception("Producto no encontrado.");
+            }
+
+            // 2. DECIDIMOS QUÉ PRECIO USAR
+            $unit_price = ($prices['precio_oferta'] !== null && $prices['precio_oferta'] > 0)
+                ? $prices['precio_oferta']  // Usar precio de oferta si es válido
+                : $prices['precio_venta'];  // Si no, usar precio normal
+
+            // 3. USAMOS LA LÓGICA ANTIGUA (SEGURA) CON EL PRECIO CORRECTO
+            $stmt_check = $pdo->prepare("SELECT id_detalle_carrito FROM detalle_carrito WHERE id_carrito = :cart_id AND id_producto = :product_id");
+            $stmt_check->execute([':cart_id' => $cart_id, ':product_id' => $product_id]);
+            $detail_id = $stmt_check->fetchColumn();
+
+            if ($detail_id) {
+                // Si el producto ya existe, ACTUALIZAMOS cantidad Y precio
+                $stmt_update = $pdo->prepare("UPDATE detalle_carrito SET cantidad = :quantity, precio_unitario = :unit_price WHERE id_detalle_carrito = :detail_id");
+                $stmt_update->execute([':quantity' => $quantity, ':unit_price' => $unit_price, ':detail_id' => $detail_id]);
+            } else {
+                // Si es un producto nuevo, lo INSERTAMOS con el precio correcto
+                $stmt_insert = $pdo->prepare("INSERT INTO detalle_carrito (id_carrito, id_producto, cantidad, precio_unitario) VALUES (:cart_id, :product_id, :quantity, :unit_price)");
+                $stmt_insert->execute([':cart_id' => $cart_id, ':product_id' => $product_id, ':quantity' => $quantity, ':unit_price' => $unit_price]);
+            }
+        }
+        
+        $pdo->commit();
+        echo json_encode(['success' => true, 'message' => 'Carrito actualizado.']);
+
+    } catch (Exception $e) {
+        if ($pdo->inTransaction()) {
+            $pdo->rollBack();
+        }
+        http_response_code(500);
+        echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+    }
+}
 function handleCartStatusRequest(PDO $pdo) {
     if (!isset($_SESSION['id_cliente'])) { echo json_encode(['total_price' => '0.00']); return; }
     $client_id = $_SESSION['id_cliente'];
@@ -574,12 +642,27 @@ function handleProductsRequest(PDO $pdo) {
     $sort_by = isset($_GET['sort_by']) ? $_GET['sort_by'] : 'random';
     $order = isset($_GET['order']) ? strtoupper($_GET['order']) : 'ASC';
     $filter_name = '';
+    
     $allowedSorts = ['nombre_producto', 'precio_venta', 'precio_compra'];
     if (!in_array($sort_by, $allowedSorts) && $sort_by !== 'random') $sort_by = 'random';
     if (!in_array($order, ['ASC', 'DESC'])) $order = 'ASC';
+
+    // --- INICIO DE LA CORRECCIÓN ---
+    // Por defecto, se seleccionan todos los campos para usuarios logueados.
+    $select_fields = "p.*"; 
+
+    // Si el usuario NO ha iniciado sesión, modificamos los campos a seleccionar.
+    if (!isset($_SESSION['id_cliente'])) {
+        // Seleccionamos todos los campos EXCEPTO 'precio_oferta', al cual le asignamos NULL.
+        // Esto asegura que los usuarios no logueados nunca vean un precio de oferta.
+        $select_fields = "p.id_producto, p.codigo_producto, p.nombre_producto, p.departamento, p.precio_compra, p.precio_venta, NULL AS precio_oferta, p.precio_mayoreo, p.url_imagen, p.stock_actual, p.stock_minimo, p.stock_maximo, p.tipo_de_venta, p.estado, p.fecha_creacion, p.fecha_actualizacion, p.creado_por, p.proveedor";
+    }
+    // --- FIN DE LA CORRECIÓN ---
+
     $base_sql = "FROM productos p INNER JOIN departamentos d ON p.departamento = d.id_departamento";
     $where_clauses = ["1=1"];
     $params = [];
+    
     if ($department_id !== null && $department_id > 0) {
         $where_clauses[] = "p.departamento = :department_id";
         $params[':department_id'] = $department_id;
@@ -596,25 +679,34 @@ function handleProductsRequest(PDO $pdo) {
     if (isset($_GET['hide_no_image']) && $_GET['hide_no_image'] === 'true') {
         $where_clauses[] = "(p.url_imagen IS NOT NULL AND p.url_imagen != '')";
     }
+
     $where_sql = " WHERE " . implode(" AND ", $where_clauses);
+    
     $countSql = "SELECT COUNT(*) " . $base_sql . $where_sql;
     $stmtCount = $pdo->prepare($countSql);
     $stmtCount->execute($params);
     $total_products = $stmtCount->fetchColumn();
     $total_pages = ceil($total_products / $limit);
-    $sql = "SELECT p.*, d.departamento AS nombre_departamento " . $base_sql . $where_sql;
+    
+    // Usamos los campos de selección dinámicos en la consulta principal.
+    $sql = "SELECT " . $select_fields . ", d.departamento AS nombre_departamento " . $base_sql . $where_sql;
+    
     if ($sort_by === 'random') $sql .= " ORDER BY RAND()";
     else $sql .= " ORDER BY " . $sort_by . " " . $order;
+    
     $sql .= " LIMIT :limit OFFSET :offset";
     $params[':limit'] = $limit;
     $params[':offset'] = $offset;
+    
     $stmt = $pdo->prepare($sql);
     foreach ($params as $key => &$val) {
         $type = ($key === ':limit' || $key === ':offset') ? PDO::PARAM_INT : PDO::PARAM_STR;
         $stmt->bindParam($key, $val, $type);
     }
+    
     $stmt->execute();
     $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
     echo json_encode(['products' => $products, 'total_products' => (int) $total_products, 'total_pages' => $total_pages, 'current_page' => $page, 'limit' => $limit, 'filter_name' => $filter_name]);
 }
 

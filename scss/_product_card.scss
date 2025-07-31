@@ -23,9 +23,10 @@
 .product-grid{
     display: grid;
     justify-content: center;
-    min-height: 100vh;
-    margin-bottom: 4rem;
+    min-height: 100%;
+    margin-bottom: 3rem;
     background: white;
+
     grid-template-columns: repeat(1, .7fr );
 
     @media (min-width: 325px){
@@ -48,6 +49,7 @@
         background: #F8F8F8;
         border-radius: .5rem;
         margin: .3rem;
+        height: fit-content;
 
       .product-image-container {
         width: 150px;
@@ -184,6 +186,7 @@
 
 
             padding-bottom: 1rem;
+
           .quantity-input {
             flex-grow: 1;
             all: unset;

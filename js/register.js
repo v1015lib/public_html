@@ -1,3 +1,5 @@
+// js/register.js
+
 // --- 1. IMPORTAMOS LA FUNCIÓN PARA MOSTRAR NOTIFICACIONES ---
 import { showNotification } from './notification_handler.js';
 
@@ -11,18 +13,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const wizardContainer = document.querySelector('.wizard-container');
     const successContainer = document.getElementById('success-container');
     const formFooterLink = document.querySelector('.form-footer-link');
-
-    // Elementos del formulario original para validaciones
-    const studentCheck = document.getElementById('is_student_check');
-    const studentFields = document.getElementById('student-fields');
-    const userTypeInput = document.getElementById('id_tipo_cliente');
+    
+    // --- Elementos específicos para validación ---
     const usernameInput = document.getElementById('nombre_usuario');
     const usernameAvailabilityDiv = document.getElementById('username-availability');
+    const userTypeInput = document.getElementById('id_tipo_cliente');
     
     let currentStep = 1;
     let debounceTimer;
 
-    // --- CÓDIGO ORIGINAL PARA VALIDACIÓN DE USUARIO EN TIEMPO REAL (FUNCIONA) ---
+    // --- FUNCIÓN PARA VALIDACIÓN DE USUARIO (DE TU CÓDIGO ORIGINAL) ---
     usernameInput.addEventListener('input', () => {
         const username = usernameInput.value.trim();
         usernameAvailabilityDiv.textContent = '';
@@ -49,15 +49,21 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 500);
     });
 
-    // --- LÓGICA DEL FORMULARIO INTERACTIVO (CORREGIDA) ---
-
+    // --- LÓGICA DEL ASISTENTE (WIZARD) ---
     const updateWizardUI = () => {
-        formSteps.forEach(step => step.classList.toggle('active', parseInt(step.dataset.step) === currentStep));
-        progressSteps.forEach((step, index) => step.classList.toggle('active', (index + 1) <= currentStep));
-        prevBtn.style.visibility = currentStep === 1 ? 'hidden' : 'visible';
-        nextBtn.textContent = currentStep === formSteps.length ? 'Crear Cuenta' : 'Siguiente';
-    };
+        formSteps.forEach(step => {
+            step.classList.toggle('active', parseInt(step.dataset.step) === currentStep);
+        });
 
+        progressSteps.forEach((step, index) => {
+            step.classList.toggle('active', (index + 1) <= currentStep);
+        });
+        
+        prevBtn.style.display = currentStep > 1 ? 'inline-block' : 'none';
+        nextBtn.textContent = currentStep === formSteps.length ? 'Finalizar Registro' : 'Siguiente';
+    };
+    
+    // --- LÓGICA DE VALIDACIÓN POR PASO ---
     const validateCurrentStep = () => {
         const activeStep = document.querySelector(`.form-step.active`);
         if (!activeStep) return false;
@@ -65,68 +71,37 @@ document.addEventListener('DOMContentLoaded', () => {
         const requiredInputs = activeStep.querySelectorAll('input[required]');
         for (const input of requiredInputs) {
             if (!input.value.trim()) {
-                // --- 2. USAMOS LA NOTIFICACIÓN EN LUGAR DE ALERT ---
                 showNotification(`Por favor, completa el campo "${input.labels[0].textContent.replace('*', '').trim()}".`, 'error');
                 input.focus();
                 return false;
             }
         }
         
-        if (currentStep === 1) {
+        if (currentStep === 2) { // Paso de Seguridad
             if (usernameAvailabilityDiv.classList.contains('error')) {
                 showNotification('Por favor, elige un nombre de usuario disponible.', 'error');
                 usernameInput.focus();
                 return false;
             }
-        }
-        
-        if (currentStep === 2) {
-             const password = document.getElementById('password').value;
-             const confirm = document.getElementById('password_confirm').value;
-             if (password !== confirm) {
-                 showNotification('Las contraseñas no coinciden.', 'error');
-                 return false;
-             }
+            const password = document.getElementById('password').value;
+            const confirm = document.getElementById('password_confirm').value;
+            if (password !== confirm) {
+                showNotification('Las contraseñas no coinciden.', 'error');
+                return false;
+            }
         }
         return true;
     };
 
-    nextBtn.addEventListener('click', async () => {
-        if (!validateCurrentStep()) {
-            return; // Detiene si la validación falla
-        }
+    // --- EVENTOS DE LOS BOTONES DE NAVEGACIÓN ---
+    nextBtn.addEventListener('click', () => {
+        if (!validateCurrentStep()) return;
 
         if (currentStep < formSteps.length) {
             currentStep++;
             updateWizardUI();
         } else {
-            // Lógica de envío final
-            const formData = new FormData(registerForm);
-            const data = Object.fromEntries(formData.entries());
-            data.preferencias = formData.getAll('preferencias[]');
-            
-            try {
-                const response = await fetch('api/index.php?resource=register', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
-                });
-                const result = await response.json();
-                if (!response.ok) throw new Error(result.error || 'Error en el servidor.');
-
-                wizardContainer.style.display = 'none';
-                formFooterLink.style.display = 'none';
-                successContainer.innerHTML = `
-                    <div class="wizard-content" style="text-align:center; padding: 4rem;">
-                        <h2>¡Registro Exitoso!</h2>
-                        <p>Tu cuenta ha sido creada. Ahora puedes iniciar sesión.</p>
-                        <a href="login.php" class="submit-btn" style="width: auto; padding: 0.8rem 2rem;">Ir a Iniciar Sesión</a>
-                    </div>`;
-                successContainer.style.display = 'block';
-
-            } catch (error) {
-                showNotification(error.message, 'error');
-            }
+            registerForm.dispatchEvent(new Event('submit', { cancelable: true }));
         }
     });
     
@@ -137,17 +112,70 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Lógica para el checkbox de estudiante (de tu script original)
-    if (studentCheck && studentFields) {
-        studentCheck.addEventListener('change', () => {
-            studentFields.classList.toggle('hidden', !studentCheck.checked);
-            const studentInstitution = document.getElementById('institucion');
-            const studentGrade = document.getElementById('grado_actual');
-            studentInstitution.required = studentCheck.checked;
-            studentGrade.required = studentCheck.checked;
-            userTypeInput.value = studentCheck.checked ? '2' : '1';
-        });
-    }
+    // --- LÓGICA PARA DIAPOSITIVA DE ESTUDIANTE ---
+    const studentChoiceButtons = document.querySelectorAll('.btn-choice');
+    const studentFields = document.getElementById('student-fields');
+    const isStudentInputHidden = document.getElementById('is_student_check');
 
-    updateWizardUI(); // Para inicializar la vista
+    studentChoiceButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const isStudent = button.dataset.student === 'true';
+            isStudentInputHidden.value = isStudent ? '1' : '0';
+            userTypeInput.value = isStudent ? '2' : '1';
+
+            document.getElementById('institucion').required = isStudent;
+            document.getElementById('grado_actual').required = isStudent;
+            
+            if (isStudent) {
+                studentFields.classList.remove('hidden');
+            } else {
+                studentFields.classList.add('hidden');
+                setTimeout(() => {
+                    if (currentStep < formSteps.length) {
+                       currentStep++;
+                       updateWizardUI();
+                    }
+                }, 200);
+            }
+        });
+    });
+
+    // --- ENVÍO FINAL DEL FORMULARIO ---
+    registerForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        nextBtn.disabled = true;
+        nextBtn.textContent = 'Procesando...';
+
+        const formData = new FormData(registerForm);
+        const data = Object.fromEntries(formData.entries());
+        data.preferencias = formData.getAll('preferencias[]');
+        
+        try {
+            const response = await fetch('api/index.php?resource=register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            const result = await response.json();
+            if (!response.ok) throw new Error(result.error || 'Error en el servidor.');
+
+            wizardContainer.style.display = 'none';
+            formFooterLink.style.display = 'none';
+            successContainer.innerHTML = `
+                <div class="wizard-content" style="text-align:center; padding: 4rem;">
+                    <h2>¡Registro Exitoso!</h2>
+                    <p>Tu cuenta ha sido creada. Ahora puedes iniciar sesión.</p>
+                    <a href="login.php" class="submit-btn" style="text-decoration:none; display:inline-block; margin-top:20px;">Ir a Iniciar Sesión</a>
+                </div>`;
+            successContainer.style.display = 'block';
+
+        } catch (error) {
+            showNotification(error.message, 'error');
+            nextBtn.disabled = false;
+            nextBtn.textContent = 'Finalizar Registro';
+        }
+    });
+    
+    updateWizardUI(); // Inicializa la vista del wizard
 });

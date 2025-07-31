@@ -2,6 +2,8 @@
 @import 'vars';
 
 .main-footer {
+    position: sticky;
+    bottom: 0;
     background-color: #f8f9fa; // Un color de fondo suave
     color: #6c757d; // Texto de color gris
 

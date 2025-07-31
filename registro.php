@@ -18,7 +18,8 @@ try {
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body class="page-register">
-    <?php include 'includes/header.php'; ?>
+     <a class="link-back" href="index.php">Regresar a la Tienda</a>
+   
 
     <div class="form-container">
         <div class="form-header">

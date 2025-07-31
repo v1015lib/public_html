@@ -46,7 +46,7 @@ try {
             elseif ($method === 'DELETE') handleDeleteCartItemRequest($pdo);
             break;
         case 'cart-status':
-             handleCartStatusRequest($pdo);
+            handleCartStatusRequest($pdo);
             break;
         case 'cart-details':
             handleCartDetailsRequest($pdo);
@@ -60,190 +60,98 @@ try {
             elseif ($method === 'DELETE') handleRemoveFavoriteRequest($pdo);
             break;
         case 'register':
-                if ($method === 'POST') handleRegisterRequest($pdo, $inputData);
-
+            if ($method === 'POST') handleRegisterRequest($pdo, $inputData);
             break;
         case 'login':
             if ($method === 'POST') handleLoginRequest($pdo);
             break;
         case 'check-username':
-            if ($method === 'GET') {
-                handleCheckUsernameRequest($pdo);
-                // No necesitas echo aquí porque la función ya lo hace
-            }
-            break;
-        
-        case 'profile':
-            if (!isset($_SESSION['id_cliente'])) {
-                http_response_code(401);
-                throw new Exception("Acceso no autorizado.");
-            }
-            if ($method === 'GET') {
-                handleGetProfileRequest($pdo, $_SESSION['id_cliente']);
-            } elseif ($method === 'PUT') {
-                handleUpdateProfileRequest($pdo, $_SESSION['id_cliente'], $inputData);
-            }
-            break;
-        case 'password':
-             if (!isset($_SESSION['id_cliente'])) {
-                http_response_code(401);
-                throw new Exception("Acceso no autorizado.");
-            }
-            if ($method === 'PUT') {
-                handleUpdatePasswordRequest($pdo, $_SESSION['id_cliente'], $inputData);
-            }
-            break;
-
-        case 'get-favorite-details':
-            if ($method === 'GET' && isset($_SESSION['id_cliente'])) {
-                handleGetFavoriteDetailsRequest($pdo, $_SESSION['id_cliente']);
-            }
-            break;
-
-        case 'add-multiple-to-cart':
-            if ($method === 'POST' && isset($_SESSION['id_cliente'])) {
-                handleAddMultipleToCartRequest($pdo, $_SESSION['id_cliente'], $inputData['product_ids'] ?? []);
-            }
-            break;
-        
-        case 'order-history':
-            if ($method === 'GET' && isset($_SESSION['id_cliente'])) {
-                handleGetOrderHistory($pdo, $_SESSION['id_cliente']);
-            }
+            handleCheckUsernameRequest($pdo);
             break;
         case 'check-phone':
             $phone = $_GET['phone'] ?? '';
-            if (empty($phone)) {
-                echo json_encode(['is_available' => false]);
-                exit;
-            }
+            if (empty($phone)) { echo json_encode(['is_available' => false]); exit; }
             $stmt = $pdo->prepare("SELECT 1 FROM clientes WHERE telefono = :phone LIMIT 1");
             $stmt->execute([':phone' => $phone]);
-            $is_available = !$stmt->fetch();
-            echo json_encode(['is_available' => $is_available]);
+            echo json_encode(['is_available' => !$stmt->fetch()]);
             exit;
-
         case 'check-email':
             $email = $_GET['email'] ?? '';
-            if (empty($email)) {
-                echo json_encode(['is_available' => false]);
-                exit;
-            }
+            if (empty($email)) { echo json_encode(['is_available' => false]); exit; }
             $stmt = $pdo->prepare("SELECT 1 FROM clientes WHERE email = :email LIMIT 1");
             $stmt->execute([':email' => $email]);
-            $is_available = !$stmt->fetch();
-            echo json_encode(['is_available' => $is_available]);
+            echo json_encode(['is_available' => !$stmt->fetch()]);
             exit;
-     
-        
+        case 'profile':
+            if (!isset($_SESSION['id_cliente'])) { throw new Exception("Acceso no autorizado.", 401); }
+            if ($method === 'GET') { handleGetProfileRequest($pdo, $_SESSION['id_cliente']); }
+            elseif ($method === 'PUT') { handleUpdateProfileRequest($pdo, $_SESSION['id_cliente'], $inputData); }
+            break;
+        case 'password':
+            if (!isset($_SESSION['id_cliente'])) { throw new Exception("Acceso no autorizado.", 401); }
+            if ($method === 'PUT') { handleUpdatePasswordRequest($pdo, $_SESSION['id_cliente'], $inputData); }
+            break;
+        case 'get-favorite-details':
+            if ($method === 'GET' && isset($_SESSION['id_cliente'])) { handleGetFavoriteDetailsRequest($pdo, $_SESSION['id_cliente']); }
+            break;
+        case 'add-multiple-to-cart':
+            if ($method === 'POST' && isset($_SESSION['id_cliente'])) { handleAddMultipleToCartRequest($pdo, $_SESSION['id_cliente'], $inputData['product_ids'] ?? []); }
+            break;
+        case 'order-history':
+            if ($method === 'GET' && isset($_SESSION['id_cliente'])) { handleGetOrderHistory($pdo, $_SESSION['id_cliente']); }
+            break;
         case 'reorder':
-            if ($method === 'POST' && isset($_SESSION['id_cliente'])) {
-                handleReorderRequest($pdo, $_SESSION['id_cliente'], $inputData['order_id'] ?? 0);
-            }
+            if ($method === 'POST' && isset($_SESSION['id_cliente'])) { handleReorderRequest($pdo, $_SESSION['id_cliente'], $inputData['order_id'] ?? 0); }
             break;
         case 'ofertas':
-    // Se usa el ID del cliente que ha iniciado sesión para más seguridad.
-        if (isset($_SESSION['id_cliente'])) {
-        $id_cliente = $_SESSION['id_cliente'];
-
-        // Se prepara la consulta usando los métodos de PDO.
-        $stmt = $pdo->prepare("
-            SELECT 
-                p.id_producto,
-                p.nombre_producto,
-                p.codigo_producto,
-                p.precio_venta,
-                p.precio_oferta,
-                p.url_imagen,
-                d.departamento AS nombre_departamento
-            FROM productos p
-            JOIN departamentos d ON p.departamento = d.id_departamento
-            JOIN preferencias_cliente pc ON p.departamento = pc.id_departamento
-            WHERE 
-                pc.id_cliente = :id_cliente 
-                AND p.precio_oferta IS NOT NULL 
-                AND p.precio_oferta > 0
-        ");
-
-        // Se ejecuta la consulta pasando los parámetros de forma segura.
-        $stmt->execute([':id_cliente' => $id_cliente]);
-        
-        // Se obtienen todos los resultados.
-        $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-        // Se devuelven los datos en formato JSON.
-        echo json_encode(['success' => true, 'ofertas' => $data]);
-
-    } else {
-        // Si no hay sesión iniciada, se niega el acceso.
-        http_response_code(401); // No autorizado
-        echo json_encode(["success" => false, "message" => "Debes iniciar sesión para ver tus ofertas."]);
-    }
-    break;
-
-        default:
-            http_response_code(400);
-            echo json_encode(['error' => 'Recurso no especificado o no válido.']);
+            if (isset($_SESSION['id_cliente'])) {
+                $id_cliente = $_SESSION['id_cliente'];
+                $stmt = $pdo->prepare("
+                    SELECT p.id_producto, p.nombre_producto, p.codigo_producto, p.precio_venta, p.precio_oferta, p.url_imagen, d.departamento AS nombre_departamento
+                    FROM productos p
+                    JOIN departamentos d ON p.departamento = d.id_departamento
+                    JOIN preferencias_cliente pc ON p.departamento = pc.id_departamento
+                    WHERE pc.id_cliente = :id_cliente AND p.precio_oferta IS NOT NULL AND p.precio_oferta > 0
+                ");
+                $stmt->execute([':id_cliente' => $id_cliente]);
+                $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                echo json_encode(['success' => true, 'ofertas' => $data]);
+            } else {
+                http_response_code(401);
+                echo json_encode(["success" => false, "message" => "Debes iniciar sesión para ver tus ofertas."]);
+            }
             break;
-            case 'repeat-order':
-    try {
-        if (!isset($_SESSION['id_cliente'])) {
-            throw new Exception("Debes iniciar sesión para repetir un pedido.");
-        }
-        $client_id = $_SESSION['id_cliente'];
-        $data = json_decode(file_get_contents('php://input'), true);
-        $order_id = $data['order_id'] ?? null;
-
-        if (!$order_id) {
-            throw new Exception("No se especificó el ID del pedido a repetir.");
-        }
-
-        // 1. Obtener el carrito activo actual del cliente (o crear uno nuevo)
-        $current_cart_id = getOrCreateCart($pdo, $client_id);
-
-        // 2. Obtener todos los productos del pedido antiguo
-        $stmt_old_items = $pdo->prepare(
-            "SELECT id_producto, cantidad, precio_unitario FROM detalle_carrito WHERE id_carrito = :order_id"
-        );
-        $stmt_old_items->execute([':order_id' => $order_id]);
-        $old_items = $stmt_old_items->fetchAll(PDO::FETCH_ASSOC);
-
-        if (empty($old_items)) {
-            throw new Exception("El pedido que intentas repetir no tiene productos.");
-        }
-
-        $pdo->beginTransaction();
-        foreach ($old_items as $item) {
-            // Inserta el producto o actualiza la cantidad si ya existe
-            $stmt_upsert = $pdo->prepare(
-                "INSERT INTO detalle_carrito (id_carrito, id_producto, cantidad, precio_unitario)
-                 VALUES (:cart_id, :product_id, :quantity, :price)
-                 ON DUPLICATE KEY UPDATE cantidad = cantidad + VALUES(cantidad)"
-            );
-            $stmt_upsert->execute([
-                ':cart_id' => $current_cart_id,
-                ':product_id' => $item['id_producto'],
-                ':quantity' => $item['cantidad'],
-                ':price' => $item['precio_unitario']
-            ]);
-        }
-        $pdo->commit();
-
-        echo json_encode(['success' => true, 'message' => '¡Productos añadidos a tu carrito!']);
-
-    } catch (Exception $e) {
-        if ($pdo->inTransaction()) {
-            $pdo->rollBack();
-        }
-        header('Content-Type: application/json', true, 400);
-        echo json_encode(['success' => false, 'message' => $e->getMessage()]);
-    }
-    break;
+        case 'repeat-order':
+            if (!isset($_SESSION['id_cliente'])) { throw new Exception("Debes iniciar sesión para repetir un pedido.");}
+            $client_id = $_SESSION['id_cliente'];
+            $data = json_decode(file_get_contents('php://input'), true);
+            $order_id = $data['order_id'] ?? null;
+            if (!$order_id) { throw new Exception("No se especificó el ID del pedido a repetir.");}
+            $current_cart_id = getOrCreateCart($pdo, $client_id);
+            $stmt_old_items = $pdo->prepare("SELECT id_producto, cantidad, precio_unitario FROM detalle_carrito WHERE id_carrito = :order_id");
+            $stmt_old_items->execute([':order_id' => $order_id]);
+            $old_items = $stmt_old_items->fetchAll(PDO::FETCH_ASSOC);
+            if (empty($old_items)) { throw new Exception("El pedido que intentas repetir no tiene productos.");}
+            $pdo->beginTransaction();
+            foreach ($old_items as $item) {
+                $stmt_upsert = $pdo->prepare("INSERT INTO detalle_carrito (id_carrito, id_producto, cantidad, precio_unitario) VALUES (:cart_id, :product_id, :quantity, :price) ON DUPLICATE KEY UPDATE cantidad = cantidad + VALUES(cantidad)");
+                $stmt_upsert->execute([':cart_id' => $current_cart_id, ':product_id' => $item['id_producto'], ':quantity' => $item['cantidad'], ':price' => $item['precio_unitario']]);
+            }
+            $pdo->commit();
+            echo json_encode(['success' => true, 'message' => '¡Productos añadidos a tu carrito!']);
+            break;
+        default:
+            http_response_code(404);
+            echo json_encode(['error' => 'Recurso no encontrado.']);
+            break;
     }
 } catch (Exception $e) {
-    http_response_code(500);
-    echo json_encode(['error' => 'Error: ' . $e->getMessage()]);
+    if ($pdo->inTransaction()) { $pdo->rollBack(); }
+    $code = is_int($e->getCode()) && $e->getCode() > 0 ? $e->getCode() : 500;
+    http_response_code($code);
+    echo json_encode(['error' => $e->getMessage()]);
 }
+
 
 /**
  * Obtiene el historial de pedidos de un cliente, incluyendo el nuevo estado 'Pedido finalizado'.

@@ -11,7 +11,10 @@ if (session_status() == PHP_SESSION_NONE) {
                 <img src="img/logo.png" alt="Logo de la Tienda">
             </a>
         </div>
-
+  <form action="index.php" method="GET" class="search-bar">
+            <input type="text" id="search-input" name="search" placeholder="Que producto buscaba?">
+            <button type="submit" id="search-button">Buscar</button>
+        </form>
 
         
         <?php // --- CONDICIÓN AÑADIDA PARA OCULTAR CONTROLES --- ?>

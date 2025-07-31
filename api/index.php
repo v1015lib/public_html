@@ -111,6 +111,30 @@ try {
                 handleGetOrderHistory($pdo, $_SESSION['id_cliente']);
             }
             break;
+        case 'check-phone':
+            $phone = $_GET['phone'] ?? '';
+            if (empty($phone)) {
+                echo json_encode(['is_available' => false]);
+                exit;
+            }
+            $stmt = $pdo->prepare("SELECT 1 FROM clientes WHERE telefono = :phone LIMIT 1");
+            $stmt->execute([':phone' => $phone]);
+            $is_available = !$stmt->fetch();
+            echo json_encode(['is_available' => $is_available]);
+            exit;
+
+        case 'check-email':
+            $email = $_GET['email'] ?? '';
+            if (empty($email)) {
+                echo json_encode(['is_available' => false]);
+                exit;
+            }
+            $stmt = $pdo->prepare("SELECT 1 FROM clientes WHERE email = :email LIMIT 1");
+            $stmt->execute([':email' => $email]);
+            $is_available = !$stmt->fetch();
+            echo json_encode(['is_available' => $is_available]);
+            exit;
+     
         
         case 'reorder':
             if ($method === 'POST' && isset($_SESSION['id_cliente'])) {
@@ -119,7 +143,7 @@ try {
             break;
         case 'ofertas':
     // Se usa el ID del cliente que ha iniciado sesión para más seguridad.
-    if (isset($_SESSION['id_cliente'])) {
+        if (isset($_SESSION['id_cliente'])) {
         $id_cliente = $_SESSION['id_cliente'];
 
         // Se prepara la consulta usando los métodos de PDO.
@@ -442,43 +466,93 @@ function handleLoginRequest(PDO $pdo) {
 // ... (todo el resto de tu archivo api/index.php se queda igual) ...
 
 
-function handleRegisterRequest(PDO $pdo, array $data) { // Se añade $data como parámetro
-    // ... (todo el código de validación de tu función original) ...
-    $nombre = $data['nombre'] ?? '';
-    // ... etc. ...
-    
-    // --- NUEVO: CAPTURAR LAS PREFERENCIAS ---
-    $preferencias = $data['preferencias'] ?? [];
+function handleRegisterRequest(PDO $pdo, array $data) {
+    // Validación de campos básicos
+    $required_fields = ['nombre', 'nombre_usuario', 'password', 'telefono'];
+    foreach ($required_fields as $field) {
+        if (empty($data[$field])) {
+            throw new Exception("El campo '$field' es obligatorio.");
+        }
+    }
+
+    $pdo->beginTransaction();
 
     try {
-        $pdo->beginTransaction();
-        // ... (todo el código para insertar el cliente que ya tenías) ...
+        // 1. INSERTAR EL NUEVO USUARIO EN LA TABLA 'clientes'
+        $password_hash = password_hash($data['password'], PASSWORD_DEFAULT);
         
-        // --- NUEVO: GUARDAR LAS PREFERENCIAS EN LA BASE DE DATOS ---
+        $stmt_cliente = $pdo->prepare(
+            "INSERT INTO clientes (nombre, apellido, nombre_usuario, telefono, email, password_hash, id_tipo_cliente) 
+             VALUES (:nombre, :apellido, :nombre_usuario, :telefono, :email, :password_hash, :id_tipo_cliente)"
+        );
+        
+        $stmt_cliente->execute([
+            ':nombre' => $data['nombre'],
+            ':apellido' => $data['apellido'] ?? null,
+            ':nombre_usuario' => $data['nombre_usuario'],
+            ':telefono' => $data['telefono'],
+            ':email' => !empty($data['email']) ? $data['email'] : null,
+            ':password_hash' => $password_hash,
+            ':id_tipo_cliente' => $data['id_tipo_cliente'] ?? 1
+        ]);
+
+        // 2. OBTENER EL ID DEL CLIENTE QUE ACABAMOS DE CREAR
         $new_client_id = $pdo->lastInsertId();
-        
+
+        if (!$new_client_id) {
+            throw new Exception("No se pudo crear el cliente.");
+        }
+
+        // 3. INICIAMOS LA SESIÓN PARA EL NUEVO USUARIO
+        $_SESSION['id_cliente'] = $new_client_id;
+        $_SESSION['nombre_usuario'] = $data['nombre_usuario'];
+        $_SESSION['last_activity'] = time();
+
+        // 4. GUARDAR LAS PREFERENCIAS USANDO EL NUEVO ID
+        $preferencias = $data['preferencias'] ?? [];
         if (!empty($preferencias) && is_array($preferencias)) {
             $stmt_pref = $pdo->prepare(
                 "INSERT INTO preferencias_cliente (id_cliente, id_departamento) VALUES (:client_id, :dept_id)"
             );
             foreach ($preferencias as $dept_id) {
-                if(!empty($dept_id)) {
+                if (!empty($dept_id)) {
                     $stmt_pref->execute([
                         ':client_id' => $new_client_id,
-                        ':dept_id' => (int)$dept_id
+                        ':dept_id'   => (int)$dept_id
                     ]);
                 }
             }
         }
 
         $pdo->commit();
-    return ['success' => true, 'message' => '¡Registro exitoso!'];
+        
+        echo json_encode(['success' => true, 'message' => '¡Registro exitoso!']);
+
     } catch (Exception $e) {
-        if ($pdo->inTransaction()) $pdo->rollBack();
-        throw $e;
+        if ($pdo->inTransaction()) {
+            $pdo->rollBack();
+        }
+        http_response_code(400);
+
+        // --- INICIO DE LA INTEGRACIÓN ---
+        // Verificamos si el error es por una entrada duplicada (código de error SQLSTATE 23000)
+        if ($e->getCode() == '23000') {
+            // Revisamos el mensaje de error para ver qué campo se duplicó
+            if (strpos($e->getMessage(), 'telefono') !== false) {
+                echo json_encode(['success' => false, 'error' => 'Este número de teléfono ya está registrado.']);
+            } elseif (strpos($e->getMessage(), 'email') !== false) {
+                echo json_encode(['success' => false, 'error' => 'Este correo electrónico ya está registrado.']);
+            } else {
+                // Mensaje genérico para otros duplicados (como el nombre de usuario)
+                echo json_encode(['success' => false, 'error' => 'El nombre de usuario ya existe.']);
+            }
+        } else {
+            // Para cualquier otro tipo de error, muestra el mensaje original
+            echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+        }
+        // --- FIN DE LA INTEGRACIÓN ---
     }
 }
-
 // ... (el resto de las funciones de tu api/index.php)
 function handleGetFavoritesRequest(PDO $pdo) {
     if (!isset($_SESSION['id_cliente'])) { echo json_encode([]); return; }

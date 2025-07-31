@@ -12,10 +12,7 @@ if (session_status() == PHP_SESSION_NONE) {
             </a>
         </div>
 
-        <form action="index.php" method="GET" class="search-bar">
-            <input type="text" id="search-input" name="search" placeholder="Que producto buscaba?">
-            <button type="submit" id="search-button">Buscar</button>
-        </form>
+
         
         <?php // --- CONDICIÓN AÑADIDA PARA OCULTAR CONTROLES --- ?>
         <?php if (!isset($page_type) || $page_type !== 'simplified'): ?>

@@ -7,7 +7,7 @@ try {
     if (!isset($pdo)) throw new Exception("La conexión a la base de datos no está disponible.");
     $stmt_deps = $pdo->query("SELECT id_departamento, departamento FROM departamentos ORDER BY departamento ASC");
     $departments = $stmt_deps->fetchAll(PDO::FETCH_ASSOC);
-} catch (Exception $e) { /* Si falla, no se mostrarán las preferencias */ }
+} catch (Exception $e) { /* No se mostrarán las preferencias */ }
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -20,43 +20,57 @@ try {
 <body class="page-register">
     <?php include 'includes/header.php'; ?>
 
-    <div class="wizard-container">
-        <div class="wizard-sidebar">
-            <h1 id="wizard-title">Crea tu cuenta</h1>
-            <p id="wizard-subtitle">Sigue los pasos para unirte a nosotros.</p>
-            <div class="progress-bar">
-                <div class="progress-step active" data-step="1"><strong>1.</strong> Datos Personales</div>
-                <div class="progress-step" data-step="2"><strong>2.</strong> Seguridad de la Cuenta</div>
-                <div class="progress-step" data-step="3"><strong>3.</strong> Tus Intereses</div>
-            </div>
+    <div class="form-container">
+        <div class="form-header">
+            <h1 id="form-title">Crea tu cuenta</h1>
+            <p id="form-subtitle">Paso <span id="current-step-indicator">1</span> de 5</p>
         </div>
 
-        <div class="wizard-content">
-            <form id="register-form" method="POST" novalidate>
-                <div id="form-message" class="form-message" style="display:none;"></div>
+        <div class="form-content">
+            <form id="register-form" novalidate>
+                <div id="form-message" class="form-message"></div>
 
                 <div class="form-step active" data-step="1">
-                    <div class="form-group"><label for="nombre">Nombre <span class="required">*</span></label><input type="text" id="nombre" name="nombre" required></div>
-                    <div class="form-group"><label for="apellido">Apellido (Opcional)</label><input type="text" id="apellido" name="apellido"></div>
-                    <div class="form-group">
-                        <label for="nombre_usuario">Nombre de Usuario <span class="required">*</span></label>
-                        <input type="text" id="nombre_usuario" name="nombre_usuario" required>
-                        <div id="username-availability" class="availability-message"></div>
+                    <div class="form-group floating-label"><input type="text" id="nombre" name="nombre" required placeholder=" "><label for="nombre">Nombre <span class="required">*</span></label></div>
+                    <div class="form-group floating-label"><input type="text" id="apellido" name="apellido" placeholder=" "><label for="apellido">Apellido (Opcional)</label></div>
+                    <div class="form-group floating-label">
+                        <input type="tel" id="telefono" name="telefono" required placeholder=" ">
+                        <label for="telefono">Teléfono <span class="required">*</span></label>
+                        <div id="phone-availability" class="form-message"></div>
                     </div>
-                    <div class="form-group"><label for="telefono">Teléfono <span class="required">*</span></label><input type="tel" id="telefono" name="telefono" required></div>
                 </div>
 
                 <div class="form-step" data-step="2">
-                    <div class="form-group"><label for="email">Correo (Opcional)</label><input type="email" id="email" name="email"></div>
-                    <div class="form-group"><label for="password">Contraseña <span class="required">*</span></label><input type="password" id="password" name="password" required></div>
-                    <div class="form-group"><label for="password_confirm">Confirmar Contraseña <span class="required">*</span></label><input type="password" id="password_confirm" name="password_confirm" required></div>
+                    <div class="form-group floating-label">
+                        <input type="text" id="nombre_usuario" name="nombre_usuario" required placeholder=" ">
+                        <label for="nombre_usuario">Nombre de Usuario <span class="required">*</span></label>
+                        <div id="username-availability" class="form-message"></div>
+                    </div>
+                    <div class="form-group floating-label"><input type="password" id="password" name="password" required placeholder=" "><label for="password">Contraseña <span class="required">*</span></label></div>
+                    <div class="form-group floating-label"><input type="password" id="password_confirm" name="password_confirm" required placeholder=" "><label for="password_confirm">Confirmar Contraseña <span class="required">*</span></label></div>
                 </div>
 
                 <div class="form-step" data-step="3">
-                    <div class="form-group-checkbox"><input type="checkbox" id="is_student_check" name="is_student_check"><label for="is_student_check">Soy estudiante</label></div>
-                    <div id="student-fields" class="student-fields hidden">
-                         <div class="form-group"><label for="institucion">Institución Educativa <span class="required">*</span></label><input type="text" id="institucion" name="institucion"></div>
-                         <div class="form-group"><label for="grado_actual">Grado Actual <span class="required">*</span></label><input type="text" id="grado_actual" name="grado_actual"></div>
+                    <h2>¿Eres estudiante?</h2>
+                    <p>Al confirmar, podrías acceder a beneficios especiales.</p>
+                    <div class="choice-buttons">
+                        <button type="button" class="btn-choice" data-student-choice="yes">Sí</button>
+                        <button type="button" class="btn-choice" data-student-choice="no">No</button>
+                    </div>
+                    <input type="hidden" name="is_student_check" id="is_student_check" value="0">
+                </div>
+
+                <div class="form-step" data-step="4">
+                    <h2>Información de Estudiante</h2>
+                    <div class="form-group floating-label"><input type="text" id="institucion" name="institucion" placeholder=" "><label for="institucion">Institución Educativa <span class="required">*</span></label></div>
+                    <div class="form-group floating-label"><input type="text" id="grado_actual" name="grado_actual" placeholder=" "><label for="grado_actual">Grado Actual <span class="required">*</span></label></div>
+                </div>
+
+                <div class="form-step" data-step="5">
+                    <div class="form-group floating-label">
+                        <input type="email" id="email" name="email" required placeholder=" ">
+                        <label for="email">Correo <span class="required">*</span></label>
+                        <div id="email-availability" class="form-message"></div>
                     </div>
                     <?php if (!empty($departments)): ?>
                     <fieldset class="form-group">
@@ -74,18 +88,17 @@ try {
             </form>
             
             <div class="form-navigation">
-                <button type="button" id="btn-prev" class="btn-secondary">Atrás</button>
-                <button type="button" id="btn-next" class="submit-btn">Siguiente</button>
+                <button type="button" id="btn-prev">Atrás</button>
+                <button type="button" id="btn-next">Siguiente</button>
             </div>
             
-            <div id="success-container" style="display: none;"></div>
+            <div id="success-container" style="display:none;"></div>
             <p class="form-footer-link">¿Ya tienes una cuenta? <a href="login.php">Inicia Sesión</a></p>
         </div>
     </div>
 
     <?php include 'includes/footer.php'; ?>
-        <div id="notification-container" class="notification-container"></div>
-
+    <div id="notification-container" class="notification-container"></div>
     <script type="module" src="js/register.js"></script>
 </body>
 </html>

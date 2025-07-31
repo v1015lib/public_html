@@ -127,6 +127,7 @@ try {
             SELECT 
                 p.id_producto,
                 p.nombre_producto,
+                p.codigo_producto,
                 p.precio_venta,
                 p.precio_oferta,
                 p.url_imagen,
@@ -264,7 +265,7 @@ function handleGetOrderHistory(PDO $pdo, int $client_id) {
         $orders[] = [
             'id_pedido' => $order_raw['id_carrito'],
             'fecha' => date("d/m/Y H:i", strtotime($order_raw['fecha_creacion'])),
-            'total' => number_format($total, 2),
+            'total' => number_format($total, 2),//Decimales de los totales
             'status_name' => $order_raw['nombre_estado'],
             'items' => $items
         ];
@@ -576,7 +577,7 @@ function handleCartStatusRequest(PDO $pdo) {
     $stmt = $pdo->prepare("SELECT SUM(dc.cantidad * dc.precio_unitario) as total_price FROM detalle_carrito dc JOIN carritos_compra cc ON dc.id_carrito = cc.id_carrito WHERE cc.id_cliente = :client_id AND cc.estado_id = 1");
     $stmt->execute([':client_id' => $client_id]);
     $result = $stmt->fetch(PDO::FETCH_ASSOC);
-    $total_price = $result['total_price'] ? number_format($result['total_price'], 2, '.', '') : '0.00';
+    $total_price = $result['total_price'] ? number_format($result['total_price'], 2, '.', '') : '0.00';//Decimales en los numero
     echo json_encode(['total_price' => $total_price]);
 }
 
@@ -590,7 +591,7 @@ function handleCartDetailsRequest(PDO $pdo) {
     $cart_items = $stmt_items->fetchAll(PDO::FETCH_ASSOC);
     $total = 0;
     foreach ($cart_items as $item) $total += $item['subtotal'];
-    echo json_encode(['cart_items' => $cart_items, 'total' => number_format($total, 2, '.', '')]);
+    echo json_encode(['cart_items' => $cart_items, 'total' => number_format($total, 2, '.', '')]);//Decimales en los numeros
 }
 
 function handleDeleteCartItemRequest(PDO $pdo) {

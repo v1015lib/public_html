@@ -28,9 +28,11 @@ document.addEventListener('DOMContentLoaded', () => {
                         <h3>${product.nombre_producto}</h3>
                         <p class="department">${product.nombre_departamento}</p>
                         <div class="price-container">
-                            <p class="price" style="color: #28a745;">$${precioOferta.toFixed(2)}</p>
-                            <p class="code" style="text-decoration: line-through;">$${precioVenta.toFixed(2)}</p>
+                            <p class="price-offer" ">$${precioOferta.toFixed(2)}</p>
+                            <p class="price-older">$${precioVenta.toFixed(2)}</p>
                         </div>
+                    <p class="code"># ${product.codigo_producto}</p>
+
                         <div class="quantity-selector">
                             <button class="quantity-btn minus" data-action="decrease">-</button>
                             <input type="number" class="quantity-input" value="0" min="0" max="99" data-product-id="${product.id_producto}" aria-label="Cantidad">

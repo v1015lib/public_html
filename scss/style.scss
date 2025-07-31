@@ -23,8 +23,7 @@
 // Responsividad
 @import 'responsive';
 
-// Estilos para el layout general
-.main-container {
+.main-container {//Contenedor padre de product-list
     display: flex;
     flex-grow: 1;
     overflow: hidden;
@@ -32,7 +31,7 @@
 
 .products-container {
     flex-grow: 1;
-    padding: 1.5rem;
+    padding: .5rem;
     overflow-y: auto;
 }
 
@@ -42,21 +41,12 @@
     font-size: 1.1rem;
     color: #555;
     padding-left: 0.5rem;
-    border-left: 3px solid #007bff;
+
 
 }
 
 
-/* ===== CORRECCIONES PARA CHROME MÓVIL ===== */
 
-/* 1. Viewport Base más flexible */
-@media (max-width: 768px) {
-  body {
-    overflow-y: auto !important;
-    height: auto !important;
-    min-height: 100vh;
-  }
-}
 
 /* 2. Header más responsivo */
 @media (max-width: 768px) {
@@ -77,55 +67,10 @@
   }
 }
 
-/* 3. Grid más flexible */
-@media (max-width: 768px) {
-  .product-grid {
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)) !important;
-    gap: 1rem;
-    padding: 0 0.5rem;
-  }
-}
 
-@media (max-width: 480px) {
-  .product-grid {
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)) !important;
-  }
-}
 
-/* 4. Sidemenu responsivo */
-@media (max-width: 768px) {
-  .sidemenu {
-    width: 280px !important;
-    max-width: 80vw;
-  }
-  
-  .dashboard-sidemenu {
-    width: 280px !important;
-    max-width: 80vw;
-  }
-}
 
-/* 5. Cards más compactas */
-@media (max-width: 480px) {
-  .product-card {
-    min-height: auto;
-  }
-  
-  .product-image-container {
-    width: 100%;
-    max-width: 120px;
-  }
-  
-  h3 {
-    font-size: 0.9rem;
-    height: auto;
-    line-height: 1.3;
-  }
-  
-  p.price {
-    font-size: 1.2rem;
-  }
-}
+
 
 /* 6. Modal responsive */
 @media (max-width: 480px) {
@@ -152,17 +97,7 @@
   }
 }
 
-/* 8. Dashboard móvil */
-@media (max-width: 991px) {
-  .dashboard-content {
-    padding: 1rem !important;
-  }
-  
-  .dashboard-content .profile-forms-grid {
-    grid-template-columns: 1fr !important;
-    gap: 1rem;
-  }
-}
+
 
 /* 9. Cart panel responsive */
 @media (max-width: 480px) {
@@ -190,7 +125,7 @@
 
 @media (max-width: 768px) {
   .main-container,
-  .products-container,
+
   .summary-container {
     overflow-x: hidden;
   }

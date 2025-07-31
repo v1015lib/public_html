@@ -42,7 +42,7 @@ const renderOrderHistory = (orders) => {
                     <div class="order-card-actions">
                         <span class="order-status-badge">${order.status_name}</span>
                         <span class="order-card-total">Total: <strong>$${order.total}</strong></span>
-                        <button class="details-btn toggle-details-btn">Ver detalle</button>
+                        <button class="details-btn toggle-details-btn">Detalles</button>
                     </div>
                 </div>
                 <div class="order-card-body">
@@ -100,16 +100,16 @@ const renderOrderHistory = (orders) => {
         container.querySelectorAll('.order-card.is-open').forEach(openCard => {
             if (openCard !== currentCard) {
                 openCard.classList.remove('is-open');
-                openCard.querySelector('.toggle-details-btn').textContent = 'Ver detalle';
+                openCard.querySelector('.toggle-details-btn').textContent = 'Detalles';
             }
         });
 
         if (isOpening) {
             currentCard.classList.add('is-open');
-            button.textContent = 'Ocultar detalle';
+            button.textContent = 'Ocultar';
         } else {
             currentCard.classList.remove('is-open');
-            button.textContent = 'Ver detalle';
+            button.textContent = 'Detalles';
         }
     };
 

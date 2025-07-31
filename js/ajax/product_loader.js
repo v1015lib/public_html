@@ -91,8 +91,8 @@ export async function loadProducts(productListId, paginationControlsId, params =
                 // Si hay una oferta válida, se sobreescribe el HTML
                 if (precioOferta && precioOferta > 0 && precioOferta < precioVenta) {
                     priceHtml = `
-                        <p class="price" style="color: #28a745;">$${precioOferta.toFixed(2)}</p>
-                        <p class="code" style="text-decoration: line-through; color: #6c757d;">$${precioVenta.toFixed(2)}</p>
+                        <p class="price" ">$${precioOferta.toFixed(2)}</p>
+                        <p class="price-older" >$${precioVenta.toFixed(2)}</p>
                     `;
                     const discountPercent = Math.round(((precioVenta - precioOferta) / precioVenta) * 100);
                     // Y se crea la etiqueta de descuento
@@ -102,7 +102,7 @@ export async function loadProducts(productListId, paginationControlsId, params =
 
                 const productCardHtml = `
                     <div class="product-card" data-product-id="${product.id_producto}">
-                        <button class="favorite-btn ${isFavorite ? 'is-favorite' : ''}" data-product-id="${product.id_producto}" aria-label="Añadir a favoritos">❤️</button>
+                        <button class="favorite-btn ${isFavorite ? 'is-favorite' : ''}" data-product-id="${product.id_producto}" aria-label="Añadir a favoritos">&#10084;</button>
                         <div class="product-image-container">
                             <img src="${product.url_imagen || 'https://via.placeholder.com/200'}" alt="${product.nombre_producto}">
                             ${discountBadgeHtml}
@@ -113,6 +113,7 @@ export async function loadProducts(productListId, paginationControlsId, params =
                             <div class="price-container">
                                 ${priceHtml}
                             </div>
+
                             <div class="quantity-selector">
                                 <button class="quantity-btn minus" data-action="decrease">-</button>
                                 <input type="number" class="quantity-input" value="${currentQuantity}" min="0" max="99" data-product-id="${product.id_producto}" aria-label="Cantidad">

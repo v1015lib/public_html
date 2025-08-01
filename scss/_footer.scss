@@ -2,15 +2,21 @@
 @import 'vars';
 
 .main-footer {
-    position: sticky;
+    width: 100%;
+    position: fixed;
     bottom: 0;
-    background-color: #f8f9fa; // Un color de fondo suave
-    color: #6c757d; // Texto de color gris
-
+    background-color: $primary-color; // Un color de fondo suave
+    color: white; // Texto de color gris
+    padding: .5rem;
     border-top: 1px solid $border-color;
     text-align: center;
     font-size: 1rem;
-
+    margin: auto;
+    @media screen and (max-width: 425px){
+        & > * {
+            font-size: .8rem;
+        }
+    }
     .footer-content {
         max-width: 1200px;
         margin: 0 auto;

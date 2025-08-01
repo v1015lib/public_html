@@ -4,25 +4,50 @@
 .sidemenu {
     width:20vw; // Ancho en PC
     flex-shrink: 0; // Evita que se encoja
-    background-color: #fff;
-    border-right: 1px solid $border-color;
+    background-color: $primary-color;
+
 
     position: sticky; // Menú pegajoso en PC
     top: 80px; // Ajustar esto según la altura final del header
     height: 100%; // Se ajusta a la altura de la ventana menos el header
     overflow-y: auto; // Permite scroll si hay muchos departamentos
+    z-index: 100000;
 
+
+
+    &::-webkit-scrollbar {
+        width: 15px; /* Ancho para scrollbars verticales */
+        height: 10px; /* Alto para scrollbars horizontales */
+    }
+    &::-webkit-scrollbar-track {
+        background: $primary-color;
+
+    }
+    &::-webkit-scrollbar-thumb {
+
+        background: darken($primary-color, 5%)
+
+    }
+
+   
     .sidemenu-header {
+        width: 100%;
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: $spacing-unit;
-        background: white;
+
+
         padding: .5rem;
+
+
+
+        background: $primary-color;
         h3 {
+            width: 100%;
             margin: 0;
-            font-size: 1.2rem;
+            font-size: 1rem;
             height: fit-content;
+            color: $tcolor2;
         }
         .close-sidemenu {
             display: none; // Oculto por defecto en PC
@@ -30,7 +55,7 @@
             border: none;
             font-size: 2rem;
             cursor: pointer;
-            color: $text-color;
+            color: white;
             position: absolute;
             top: 0;
             right: 0;
@@ -39,20 +64,25 @@
     }
 
     ul {
+
+        height: inherit;
         li {
 
             a {
-                font-size: .8rem;
+                font-size: .9rem;
                 display: block;
-                padding: .5rem;
-                color: $text-color;
+                padding: .3rem;
+                color: $tcolor2;
                 font-weight: 900;
                 width: 100%;
+                @media screen and (max-width: 425px){
+                    font-size: .7rem;
+                }
                 &:hover {
                     color: $primary-color;
                     text-decoration: none;
-                    background: $primary-color;
-                    color: white;
+                    background: white;
+                    color: $primary-color;
                 }
             }
         }

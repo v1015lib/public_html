@@ -3,7 +3,6 @@
 ?>
 <header class="dashboard-header">
     <div class="dashboard-header-left">
-        <button id="dashboard-menu-toggle" class="dashboard-menu-toggle">&#9776;</button>
         <div class="logo">
             <a href="index.php">
                 <img src="img/logo.png" alt="Logo de la Tienda">
@@ -18,5 +17,7 @@
                 <span id="cart-total-header" class="cart-total-header">$0.00</span>
             </a>
         </div>
-    </div>
+    </div>        
+    <button id="dashboard-menu-toggle" class="dashboard-menu-toggle">&#9776;</button>
+
 </header>

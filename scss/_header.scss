@@ -19,13 +19,18 @@
         max-width: 1200px;
         margin: 0 auto;
         flex-wrap: wrap;
+
     }
 
     .logo a {
         display: flex;
         align-items: center;
-        height: 50px;
+        height: 65px;
         padding: 0;
+
+        @media screen and (max-width: 425px){
+            height: 45px;
+        }
         img {
             max-height: 100%;
             width: auto;
@@ -38,26 +43,46 @@
         display: flex;
         flex-grow: 1;
         max-width: 500px;
-        margin: 0 1.5rem;
+
+        margin: auto;
+        box-shadow: 0 0 .2rem white;
+        border-radius: 1rem;
+        overflow: hidden;
+        background: white;
+
+        font-size: .8rem;
     }
     
     input[type="text"] {
+        all: unset;
         width: 100%;
-        padding: 0.5rem;
+        border-radius: 1rem;
         border: none;
-        border-radius: 4px 0 0 4px;
+        padding: .2rem;
+        color: black;
+        @media screen and (max-width: 480px){
+            font-size: .3rem;
+        }
 
     }
     
     button#search-button {
-        background-color: darken($primary-color, 10%);
-        color: white;
+
+        all: unset;
+        background: $primary-color;
+        color: $tcolor2;
         border: none;
-        padding: 0.5rem 1rem;
+        padding: 0.5rem;
         border-radius: 0 4px 4px 0;
         cursor: pointer;
+        font-weight: 900;
+        transition: .4s;
         &:hover {
-            background-color: darken($primary-color, 15%);
+            transition: all .4s;
+            background-color: #F0F2F5;
+        }
+        @media screen and (max-width: 480px){
+            display: none;
         }
     }
 
@@ -65,6 +90,7 @@
         display: flex;
         align-items: center;
         margin-left: auto;
+        font-weight: 900;
     }
     
     .main-nav {
@@ -78,7 +104,7 @@
             li {
                 margin-left: 0.75rem;
                 a { /*Link a mi cuenta*/
-                    color: white;
+                    color: $tcolor2;
                     text-decoration: none;
                     padding: 0.5rem;
                     display: block;
@@ -98,10 +124,11 @@
         font-size: 2rem;
         cursor: pointer;
         margin-left: 1rem;
+        color: $tcolor2;
         @media screen and (max-width: 425px) and (min-width: 320px) {
 
-            font-size: $font-mobile;
-            font-weight: bold;
+            font-size: 1rem;
+
 
         }
         @media (max-width: 425px) {
@@ -114,7 +141,7 @@
         a {
             display: flex;
             align-items: center;
-            color: white;
+
             text-decoration: none;
             padding: 0.5rem;
             border-radius: 5px;
@@ -129,7 +156,7 @@
     }
 
     .cart-icon {
-
+        color: $tcolor2;
 
         @media screen and (max-width: 425px) and (min-width: 320px) {
             font-size: calc($font-mobile + .5rem);
@@ -140,7 +167,7 @@
     .cart-total-header {/*Total de  compra*/
         font-size: 1rem;
         font-weight: bold;
-
+        color: $tcolor2;
         @media screen and (max-width: 425px) and (min-width: 320px) {
             font-size: $font-mobile;
 

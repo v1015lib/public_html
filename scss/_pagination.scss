@@ -8,6 +8,7 @@
     margin-top: 2rem;
     padding-bottom: 2rem;
 
+    margin-bottom: 4rem;
     button {
         background-color: #fff;
         border: 1px solid $border-color;
@@ -28,9 +29,10 @@
         // Estilo para el botón de la página activa
         &.active {
             background-color: $primary-color;
-            color: white;
+            color: $tcolor2;
             border-color: $primary-color;
             cursor: default;
+            scale: .7;
         }
 
         &:disabled {

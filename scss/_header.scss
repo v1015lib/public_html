@@ -41,7 +41,7 @@
 
     .search-bar {
         display: flex;
-        flex-grow: 1;
+        flex-grow: .7;
         max-width: 500px;
 
         margin: auto;
@@ -49,7 +49,7 @@
         border-radius: 1rem;
         overflow: hidden;
         background: white;
-
+        margin:  .5rem auto;
         font-size: .8rem;
     }
     

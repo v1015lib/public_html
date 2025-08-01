@@ -5,10 +5,12 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-        <link rel="shortcut icon" href="img/favicon.png">    
-
+    <link rel="shortcut icon" href="img/favicon.png">    
+    <meta name="robots" content="index, follow">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Diez y Quince Store</title>
+    <meta name="description" content="Busca en la variedad de productos disponibles, lo que buscas en un solo lugar, y horarios de atencion unicos.">
+    <link rel="manifest" href="/manifest.json">
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>

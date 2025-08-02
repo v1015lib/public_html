@@ -419,6 +419,12 @@ function handleRegisterRequest(PDO $pdo, array $data) {
         // 4. GUARDAR LAS PREFERENCIAS USANDO EL NUEVO ID
         $preferencias = $data['preferencias'] ?? [];
         if (!empty($preferencias) && is_array($preferencias)) {
+            // Si "Seleccionar Todos" está marcado, obtenemos todos los departamentos
+            if (in_array('all', $preferencias)) {
+                $stmt_all_deps = $pdo->query("SELECT id_departamento FROM departamentos");
+                $preferencias = $stmt_all_deps->fetchAll(PDO::FETCH_COLUMN);
+            }
+
             $stmt_pref = $pdo->prepare(
                 "INSERT INTO preferencias_cliente (id_cliente, id_departamento) VALUES (:client_id, :dept_id)"
             );

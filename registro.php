@@ -77,8 +77,13 @@ try {
                     <fieldset class="form-group">
                         <legend>Mis Intereses</legend>
                         <div class="checkbox-group">
+                            <input type="checkbox" id="select_all_prefs" name="preferencias[]" value="all">
+                            <label for="select_all_prefs">Seleccionar Todos</label>
                             <?php foreach ($departments as $dept): ?>
-                                <div class="checkbox-item"><input type="checkbox" id="dept_<?php echo $dept['id_departamento']; ?>" name="preferencias[]" value="<?php echo $dept['id_departamento']; ?>"><label for="dept_<?php echo $dept['id_departamento']; ?>"><?php echo htmlspecialchars($dept['departamento']); ?></label></div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="dept_<?php echo $dept['id_departamento']; ?>" name="preferencias[]" value="<?php echo $dept['id_departamento']; ?>">
+                                    <label for="dept_<?php echo $dept['id_departamento']; ?>"><?php echo htmlspecialchars($dept['departamento']); ?></label>
+                                </div>
                             <?php endforeach; ?>
                         </div>
                     </fieldset>

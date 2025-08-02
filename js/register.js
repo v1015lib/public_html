@@ -1,158 +1,208 @@
 import { showNotification } from './notification_handler.js';
 
-document.addEventListener('DOMContentLoaded', () => {
-    // --- REFERENCIAS A ELEMENTOS DEL DOM ---
-    const prevBtn = document.getElementById('btn-prev');
-    const nextBtn = document.getElementById('btn-next');
-    const formSteps = document.querySelectorAll('.form-step');
-    const registerForm = document.getElementById('register-form');
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('register-form');
+    if (!form) return;
+
+    const steps = Array.from(form.querySelectorAll('.form-step'));
+    const btnNext = document.getElementById('btn-next');
+    const btnPrev = document.getElementById('btn-prev');
     const stepIndicator = document.getElementById('current-step-indicator');
-
-    // Referencias para validación en tiempo real
-    const usernameInput = document.getElementById('nombre_usuario');
-    const usernameAvailabilityDiv = document.getElementById('username-availability');
-    const phoneInput = document.getElementById('telefono');
-    const phoneAvailabilityDiv = document.getElementById('phone-availability');
-    const emailInput = document.getElementById('email');
-    const emailAvailabilityDiv = document.getElementById('email-availability');
-
-    const userTypeInput = document.getElementById('id_tipo_cliente');
+    const formTitle = document.getElementById('form-title');
+    const formSubtitle = document.getElementById('form-subtitle');
+    const formMessage = document.getElementById('form-message');
+    
+    // --- Campos y elementos específicos ---
     const studentChoiceButtons = document.querySelectorAll('.btn-choice');
+    const isStudentCheckInput = document.getElementById('is_student_check');
+    const studentInfoStep = document.querySelector('[data-step="4"]');
+    const finalStep = document.querySelector('[data-step="5"]');
+    
+    // --- Campos de validación en tiempo real ---
+    const usernameInput = document.getElementById('nombre_usuario');
+    const phoneInput = document.getElementById('telefono');
+    const emailInput = document.getElementById('email');
 
-    let currentStep = 1;
-    const totalSteps = 5;
+    // --- Checkbox "Seleccionar Todos" ---
+    const selectAllCheckbox = document.getElementById('select_all_prefs');
+    const preferencesCheckboxes = form.querySelectorAll('input[name="preferencias[]"]:not(#select_all_prefs)');
 
-    // --- FUNCIÓN GENÉRICA PARA VERIFICACIÓN EN TIEMPO REAL ---
-    const setupRealTimeValidation = (inputElement, availabilityDiv, resourceName, validationRegex, formatMessage, minLength = 1) => {
-        let debounceTimer;
-        inputElement.addEventListener('input', () => {
-            const value = inputElement.value.trim();
-            availabilityDiv.textContent = '';
-            // Limpiamos las clases para que no se muestre la caja vacía
-            availabilityDiv.className = 'form-message'; // <- Usa la clase base
-            clearTimeout(debounceTimer);
+    let currentStep = 0;
 
-            if (value.length < minLength || (validationRegex && !validationRegex.test(value))) {
-                availabilityDiv.textContent = formatMessage;
-                // CORRECCIÓN: Usa la clase 'form-message' para que se vea como alerta
-                availabilityDiv.className = 'form-message error';
-                return;
-            }
+    const updateTotalSteps = () => {
+        const visibleSteps = steps.filter(step => !step.classList.contains('step-hidden'));
+        return visibleSteps.length;
+    };
 
-            debounceTimer = setTimeout(async () => {
-                try {
-                    const paramName = resourceName.replace('check-', '');
-                    const response = await fetch(`api/index.php?resource=${resourceName}&${paramName}=${encodeURIComponent(value)}`);
-                    const data = await response.json();
-                    const fieldName = inputElement.labels[0].textContent.replace('*', '').trim();
-                    availabilityDiv.textContent = data.is_available ? `${fieldName} disponible ✔` : `${fieldName} ya registrado ✖`;
-                    // CORRECCIÓN: Usa la clase 'form-message' para que se vea como alerta
-                    availabilityDiv.className = data.is_available ? 'form-message success' : 'form-message error';
-                } catch (error) { console.error(`Error al verificar ${resourceName}:`, error); }
-            }, 500);
+    const updateFormView = () => {
+        const visibleSteps = steps.filter(step => !step.classList.contains('step-hidden'));
+        const totalSteps = visibleSteps.length;
+        
+        visibleSteps.forEach((step, index) => {
+            step.classList.toggle('active', index === currentStep);
         });
+
+        stepIndicator.textContent = currentStep + 1;
+        document.getElementById('form-subtitle').querySelector('span:last-of-type').textContent = totalSteps;
+
+        btnPrev.style.display = currentStep > 0 ? 'inline-block' : 'none';
+        btnNext.textContent = currentStep === totalSteps - 1 ? 'Finalizar Registro' : 'Siguiente';
     };
+    
+    const validateStep = (stepIndex) => {
+        const step = steps.filter(s => !s.classList.contains('step-hidden'))[stepIndex];
+        if (!step) return false;
 
-    // Activamos la validación para los tres campos
-    setupRealTimeValidation(usernameInput, usernameAvailabilityDiv, 'check-username', null, 'Mínimo 4 caracteres.', 4);
-    setupRealTimeValidation(phoneInput, phoneAvailabilityDiv, 'check-phone', /^\d{4}\d{4}$/, 'Formato debe ser xxxx-xxxx.');
-    setupRealTimeValidation(emailInput, emailAvailabilityDiv, 'check-email', /^[^\s@]+@[^\s@]+\.[^\s@]+$/, 'Formato de correo no válido.');
-
-
-    const updateWizardUI = () => {
-        formSteps.forEach(step => step.classList.toggle('active', parseInt(step.dataset.step) === currentStep));
-        stepIndicator.textContent = currentStep;
-        prevBtn.style.display = currentStep > 1 ? 'inline-block' : 'none';
-        nextBtn.style.display = currentStep === 3 ? 'none' : 'inline-block';
-        nextBtn.textContent = (currentStep === totalSteps || (currentStep === 4 && userTypeInput.value === '1')) ? 'Crear Cuenta' : 'Siguiente';
-    };
-
-    const validateCurrentStep = () => {
-        const activeStep = document.querySelector('.form-step.active');
-        if (!activeStep) return false;
-
-        for (const input of activeStep.querySelectorAll('input[required]')) {
+        const inputs = Array.from(step.querySelectorAll('input[required], select[required]'));
+        let isStepValid = true;
+        
+        inputs.forEach(input => {
             if (!input.value.trim()) {
-                showNotification(`Por favor, completa el campo "${input.labels[0].textContent.replace('*', '').trim()}".`, 'error');
-                return false;
+                showNotification(`El campo "${input.labels[0].innerText.replace('*','').trim()}" es obligatorio.`, 'error');
+                isStepValid = false;
             }
-        }
+        });
 
-        if (currentStep === 1 && phoneAvailabilityDiv.classList.contains('error')) {
-            return false;
-        }
-        if (currentStep === 2) {
-            if (usernameAvailabilityDiv.classList.contains('error')) {
-                return false;
-            }
-            if (document.getElementById('password').value !== document.getElementById('password_confirm').value) {
+        if (isStepValid && step.dataset.step === "2") {
+            const password = document.getElementById('password').value;
+            const passwordConfirm = document.getElementById('password_confirm').value;
+            if (password !== passwordConfirm) {
                 showNotification('Las contraseñas no coinciden.', 'error');
-                return false;
+                isStepValid = false;
             }
         }
-        if (currentStep === 5 && emailAvailabilityDiv.classList.contains('error')) {
-            return false;
-        }
-        return true;
+        
+        return isStepValid;
     };
 
-    nextBtn.addEventListener('click', () => {
-        if (!validateCurrentStep()) return;
-        if (currentStep < totalSteps) {
-            currentStep++;
-            updateWizardUI();
-        } else {
-            registerForm.dispatchEvent(new Event('submit', { cancelable: true }));
-        }
-    });
-
-    prevBtn.addEventListener('click', () => {
-        if (currentStep > 1) {
-            currentStep -= (currentStep === 5 && userTypeInput.value === '1') ? 2 : 1;
-            updateWizardUI();
-        }
-    });
-
-    studentChoiceButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            const choice = button.dataset.studentChoice;
-            document.getElementById('is_student_check').value = (choice === 'yes') ? '1' : '0';
-            userTypeInput.value = (choice === 'yes') ? '2' : '1';
-            document.getElementById('institucion').required = (choice === 'yes');
-            document.getElementById('grado_actual').required = (choice === 'yes');
-            studentChoiceButtons.forEach(btn => btn.classList.remove('selected'));
-            button.classList.add('selected');
-            setTimeout(() => {
-                currentStep += (choice === 'yes') ? 1 : 2;
-                updateWizardUI();
-            }, 300);
-        });
-    });
-
-    registerForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        if (!validateCurrentStep(true)) return;
-        nextBtn.disabled = true;
-        nextBtn.textContent = 'Procesando...';
-        const formData = new FormData(registerForm);
+    const handleFormSubmission = async () => {
+        const formData = new FormData(form);
         const data = Object.fromEntries(formData.entries());
         data.preferencias = formData.getAll('preferencias[]');
+
+        // Si "Seleccionar Todos" está marcado, su valor "all" se enviará.
+        // Si no, se enviará la lista de IDs de los departamentos seleccionados.
+
         try {
             const response = await fetch('api/index.php?resource=register', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data)
             });
+
             const result = await response.json();
-            if (!response.ok) throw new Error(result.error || 'Error en el servidor.');
-            document.querySelector('.form-container').innerHTML = `<div style="text-align:center; padding: 4rem;"><h2>¡Registro Exitoso!</h2><p>Serás redirigido a la tienda.</p></div>`;
-            setTimeout(() => { window.location.href = 'index.php'; }, 2500);
+
+            if (result.success) {
+                form.style.display = 'none';
+                document.querySelector('.form-navigation').style.display = 'none';
+                formTitle.textContent = "¡Bienvenido!";
+                formSubtitle.style.display = 'none';
+                const successContainer = document.getElementById('success-container');
+                successContainer.innerHTML = `<p>${result.message} Serás redirigido a tu panel en 3 segundos.</p>`;
+                successContainer.style.display = 'block';
+
+                setTimeout(() => {
+                    window.location.href = 'dashboard.php';
+                }, 3000);
+            } else {
+                 showNotification(result.error || 'Ocurrió un error inesperado.', 'error');
+            }
         } catch (error) {
-            showNotification(error.message, 'error');
-            nextBtn.disabled = false;
-            nextBtn.textContent = 'Crear Cuenta';
+            showNotification('Error de conexión. Inténtalo de nuevo.', 'error');
+            console.error('Error en el registro:', error);
+        }
+    };
+    
+    const checkAvailability = async (field, value, endpoint, messageElementId) => {
+        const messageElement = document.getElementById(messageElementId);
+        if (!value) {
+            messageElement.textContent = '';
+            return;
+        }
+        try {
+            const response = await fetch(`api/index.php?resource=${endpoint}&${field}=${encodeURIComponent(value)}`);
+            const result = await response.json();
+            if (result.is_available) {
+                messageElement.textContent = 'Disponible';
+                messageElement.className = 'form-message success';
+            } else {
+                messageElement.textContent = 'No disponible';
+                messageElement.className = 'form-message error';
+            }
+        } catch (error) {
+            messageElement.textContent = 'Error al verificar';
+            messageElement.className = 'form-message error';
+        }
+    };
+    
+    // --- Event Listeners ---
+    
+    btnNext.addEventListener('click', () => {
+        if (!validateStep(currentStep)) return;
+        
+        const totalSteps = updateTotalSteps();
+        if (currentStep < totalSteps - 1) {
+            currentStep++;
+            updateFormView();
+        } else {
+            handleFormSubmission();
         }
     });
 
-    updateWizardUI();
+    btnPrev.addEventListener('click', () => {
+        if (currentStep > 0) {
+            currentStep--;
+            updateFormView();
+        }
+    });
+
+    studentChoiceButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const choice = button.dataset.studentChoice;
+            isStudentCheckInput.value = choice === 'yes' ? '1' : '0';
+            
+            studentChoiceButtons.forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+            
+            if (choice === 'yes') {
+                studentInfoStep.classList.remove('step-hidden');
+            } else {
+                studentInfoStep.classList.add('step-hidden');
+            }
+            
+            // Avanza automáticamente al siguiente paso visible
+            const totalSteps = updateTotalSteps();
+            if (currentStep < totalSteps - 1) {
+                currentStep++;
+                updateFormView();
+            }
+        });
+    });
+
+    usernameInput.addEventListener('blur', () => checkAvailability('username', usernameInput.value, 'check-username', 'username-availability'));
+    phoneInput.addEventListener('blur', () => checkAvailability('phone', phoneInput.value, 'check-phone', 'phone-availability'));
+    emailInput.addEventListener('blur', () => checkAvailability('email', emailInput.value, 'check-email', 'email-availability'));
+    
+    // Lógica para el checkbox "Seleccionar Todos"
+    if (selectAllCheckbox) {
+        selectAllCheckbox.addEventListener('change', function() {
+            preferencesCheckboxes.forEach(checkbox => {
+                checkbox.checked = this.checked;
+            });
+        });
+
+        preferencesCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                if (!this.checked) {
+                    selectAllCheckbox.checked = false;
+                } else {
+                    const allChecked = Array.from(preferencesCheckboxes).every(cb => cb.checked);
+                    selectAllCheckbox.checked = allChecked;
+                }
+            });
+        });
+    }
+
+    // Inicializar vista
+    updateFormView();
 });

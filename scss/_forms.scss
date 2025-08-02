@@ -65,6 +65,7 @@
   }
 }
 
+
 /* --- Efecto de Etiqueta Flotante (Floating Label) CORREGIDO --- */
 .form-group.floating-label {
   position: relative;
@@ -261,5 +262,14 @@
 
   &:hover {
     background-color: lighten($primary-color, 35%);
+  }
+}
+.form-group{
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+
+  input{
+    width: 40px;
   }
 }
